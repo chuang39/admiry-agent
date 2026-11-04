@@ -10,7 +10,7 @@ import httpx
 import pydantic
 import pytest
 
-from agent.creatives import meta
+from agent.creatives import copy, meta
 
 BASE = "https://api.meta.ai/v1"
 FIXTURE = Path(__file__).parent / "fixtures" / "sam_one_bit.txt"
@@ -79,7 +79,49 @@ def test_json_sends_image_parts_and_schema():
     assert uri.startswith("data:image/png;base64,")
     assert body["response_format"]["type"] == "json_schema"
     assert body["response_format"]["json_schema"]["name"] == PhotoRead.__name__
-    assert body["response_format"]["json_schema"]["schema"] == PhotoRead.model_json_schema()
+    assert body["response_format"]["json_schema"]["schema"] == meta.closed_schema(PhotoRead.model_json_schema())
+
+
+def test_closed_schema_closes_every_object_including_defs():
+    schema = copy.AdText.model_json_schema()
+    before = json.dumps(schema, sort_keys=True)
+
+    closed = meta.closed_schema(schema)
+
+    assert json.dumps(schema, sort_keys=True) == before
+    assert closed["additionalProperties"] is False
+    assert closed["required"] == ["headlines", "descriptions", "callouts"]
+    claim = closed["$defs"]["Claim"]
+    assert claim["additionalProperties"] is False
+    assert claim["required"] == ["text", "fact_ids"]
+
+
+def test_json_sends_a_closed_schema():
+    sent = []
+    completion = {
+        "choices": [
+            {"finish_reason": "stop", "message": {"role": "assistant", "content": '{"headlines":[],"descriptions":[]}'}}
+        ]
+    }
+    client = make(lambda request: httpx.Response(200, json=completion), sent)
+
+    client.json(meta.SPARK, "Write ads.", [{"type": "text", "text": "Go."}], copy.AdText)
+
+    json_schema = json.loads(sent[0].content)["response_format"]["json_schema"]
+    assert json_schema["strict"] is False
+    assert json_schema["schema"]["additionalProperties"] is False
+    assert json_schema["schema"]["$defs"]["Claim"]["additionalProperties"] is False
+    assert json_schema["schema"]["$defs"]["Claim"]["required"] == ["text", "fact_ids"]
+
+
+def test_closed_schema_keeps_nullable_fields_nullable():
+    class Maybe(pydantic.BaseModel):
+        x: str | None = None
+
+    closed = meta.closed_schema(Maybe.model_json_schema())
+
+    assert "x" in closed["required"]
+    assert {"type": "null"} in closed["properties"]["x"]["anyOf"]
 
 
 def test_edit_image_returns_bytes():

@@ -84,6 +84,21 @@ def _reason(response: httpx.Response) -> str:
     return f": {str(message)[:100]}" if message else ""
 
 
+def closed_schema(schema: Any) -> Any:
+    """A deep copy of a JSON schema with every object node closed: no additional properties, every property required.
+    Pydantic's schemas are open, and on an open one Spark invents near-miss keys (`fact_ids1`) instead of the real
+    ones; a closed schema gets exactly the right keys. Recurses into `$defs`, `items`, `anyOf`; never mutates."""
+    if isinstance(schema, list):
+        return [closed_schema(v) for v in schema]
+    if not isinstance(schema, dict):
+        return schema
+    out = {k: closed_schema(v) for k, v in schema.items()}
+    if out.get("type") == "object" and isinstance(out.get("properties"), dict):
+        out["additionalProperties"] = False
+        out["required"] = list(out["properties"])
+    return out
+
+
 class MetaClient:
     """One httpx client on the Model API (base URL and Authorization header set by `client()`). `effort` is sent as
     reasoning_effort on the JSON calls only when set, as agent/llm.py does."""
@@ -134,7 +149,11 @@ class MetaClient:
             "max_completion_tokens": MAX_TOKENS,
             "response_format": {
                 "type": "json_schema",
-                "json_schema": {"name": schema.__name__, "schema": schema.model_json_schema(), "strict": False},
+                "json_schema": {
+                    "name": schema.__name__,
+                    "schema": closed_schema(schema.model_json_schema()),
+                    "strict": False,
+                },
             },
         }
         if self.effort:
