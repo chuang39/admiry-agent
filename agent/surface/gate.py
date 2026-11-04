@@ -108,7 +108,7 @@ RETIRED_RESOURCES: dict[str, str | None] = {
 PAGE_KIT_NOW = "the page guide for this business comes from `get_landing_page` with view kit"
 # The public contract's name (spec 2026-10-01 §9.7): the docs, the skill and get_marketing_state carry it; it changes
 # whenever the contract's golden file does (surface/contract.py). Here, in the leaf module, so a command can read it.
-SURFACE_VERSION = "2026-11-04"
+SURFACE_VERSION = "2026-11-04.2"
 
 
 def again() -> str:

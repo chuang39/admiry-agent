@@ -160,9 +160,10 @@ def test_assistants_see_exactly_the_public_tools(client, conn, strict_surface):
     assert by_name["get_marketing_state"]["annotations"]["readOnlyHint"] is True
     assert by_name["launch_marketing_plan"]["annotations"]["readOnlyHint"] is False
     assert by_name["get_landing_page"]["annotations"]["readOnlyHint"] is False  # its kit view e-mails the owner
-    # an annotation states the truth: a repeat of these two does something again (starts over; writes a new preview)
+    # an annotation states the truth: a repeat of these does something again (starts over; writes a new preview; makes
+    # a new set of ads)
     not_idempotent = {n for n, t in by_name.items() if t["annotations"]["idempotentHint"] is False}
-    assert not_idempotent == {"create_marketing_plan", "update_landing_page"}
+    assert not_idempotent == {"create_marketing_plan", "update_landing_page", "suggest_ad_creatives"}
     reads_the_web = {n for n, t in by_name.items() if t["annotations"]["openWorldHint"] is True}
     assert reads_the_web == {
         "create_marketing_plan",

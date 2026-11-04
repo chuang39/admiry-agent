@@ -3,9 +3,12 @@
 (creatives.studio), shows the newest set as its card, and records the owner's acceptance of a ready one -- which is
 what the Google launch then uses.
 
-The start runs in `prepare`, outside run()'s transaction: the set's row must be committed before the studio's own
-thread reads it, and the thread is started at once, so the call answers within a second or two while the set is
-`making` (Review Focus 1). A business with no photos gets the upload link and no model is called (Review Focus 4)."""
+Only `refresh` or a business with no set yet starts a run -- each one paid, and counted against the business's day
+(studio.start's ceiling); a poll reads the card, and a poll that finds a `making` set whose run died fails it
+(studio.fail_stale) and answers with that failed card, so the owner is asked before a new run. The start runs in
+`prepare`, outside run()'s transaction, so the set is committed when the studio's thread looks for it, and the call
+answers within a second or two while the set is `making` (Review Focus 1). A business with no photos gets its upload
+link, or what gives one, and no model is called (Review Focus 4). Accepting answers with the accepted set's card."""
 
 from __future__ import annotations
 
@@ -28,9 +31,9 @@ NO_PHOTOS = (
     "Admiry makes your ads from photos of your own work, and it has none yet. Add 3 to 5 photos of jobs you did here: "
     "{url} -- then ask for your ads again."
 )
-NO_PAGE = (
-    "Admiry makes your ads from photos of your own work, and it has none yet. Photos come in through your website's "
-    "upload link: start your website with Admiry first, then add 3 to 5 photos of jobs you did."
+NO_LINK = (
+    "Admiry makes your ads from photos of your own work, and it has none yet. Next comes a link where you add 3 to 5 "
+    "photos of jobs you did from your phone."
 )
 NOT_YET = "Nothing has been made yet."
 
@@ -43,16 +46,17 @@ NOTE_READY = (
     "removed list with why. Ask the owner whether to use these ads; only after their yes, call again with "
     "accept_set_id = set_id. refresh true makes a new set."
 )
-NOTE_FAILED = "Tell the owner why; with their yes, call again with refresh true to try again."
-NOTE_PHOTOS = "Give the owner the upload link; once they say the photos are in, call again."
+NOTE_FAILED = (
+    "Tell the owner why; only with their yes, call again with refresh true to try again (each new set is a paid run)."
+)
 
 
 def _say(card: dict) -> tuple[str, str | None]:
     """The owner's sentence for the card, and the assistant's note."""
     status = card["status"]
     if status == "needs_photos":
-        url = card.get("upload_url")
-        return (NO_PHOTOS.format(url=url) if url else NO_PAGE), NOTE_PHOTOS
+        url = card.get("upload_url")  # the card's error says what the assistant does next, with the link or without
+        return (NO_PHOTOS.format(url=url) if url else NO_LINK), card.get("error")
     if status == "making":
         return MAKING.format(steps=len(card.get("steps") or [])), NOTE_MAKING
     if status == "failed":
@@ -86,17 +90,17 @@ def ad_creatives(accept_set_id: str | None = None, refresh: bool = False) -> dic
         if accept_set_id:
             return None  # accepted in the body, with its audit row
         latest = studio.card(conn, biz, base)
-        # start commits a new set before its thread starts; for a set still making it is the card again, unless that
-        # set's run died with its process (studio.STALE_S, e.g. a deploy): then it is failed and a new one starts
-        if refresh or latest["set_id"] is None or latest["status"] == "making":
-            return studio.start(conn, settings, biz)
+        if refresh or latest["set_id"] is None:  # a new paid run (or the photos' card), committed before its thread
+            return studio.start(conn, settings, biz, draft=p.key.cls == "draft")
+        if latest["status"] == "making" and studio.fail_stale(conn, biz):  # its run died (a deploy): failed, no new run
+            return studio.card(conn, biz, base)
         return latest
 
     def body(conn, p, card):
         if accept_set_id:
             biz = need_business(p)
             studio.accept(conn, biz, accept_set_id)
-            card = studio.card(conn, biz, base)
+            card = studio.card(conn, biz, base, set_id=accept_set_id)
         say, notes = _say(card)
         return envelope.make(card, say=say, notes=notes)
 

@@ -10,7 +10,7 @@ import time
 
 import pytest
 
-from agent import config
+from agent import config, uploads
 from agent.channels.google_search import adapter as google_adapter
 from agent.creatives import meta as metamod
 from agent.creatives import studio
@@ -56,18 +56,38 @@ def sets(conn) -> int:
     return conn.execute("SELECT count(*) AS n FROM ad_creative_set").fetchone()["n"]
 
 
+def end_runs(conn) -> None:
+    """Every `making` set ended, as its run would end it: a new one may start."""
+    conn.execute("UPDATE ad_creative_set SET status = 'failed', error = 'ended' WHERE status = 'making'")
+
+
 def test_no_photos_returns_upload_link_and_calls_no_model(client, conn, launched, monkeypatch):
+    """The upload link is the one create_page or build_site minted, read back (ruling R24): the studio never mints."""
     clients: list[object] = []
     monkeypatch.setattr(metamod, "client", lambda settings: clients.append(settings))
     key = owner(conn)
+    token = uploads.new_token(conn, f"pg_{BIZ}")  # as create_page would
     answer = call(client, key)
     card = answer["data"]
     assert card["status"] == "needs_photos" and card["set_id"] is None and card["images"] == []
-    assert card["upload_url"].startswith(f"{config.load().web_base_url}/u/")
+    assert card["upload_url"] == f"{config.load().web_base_url}/u/{token}"
     assert card["upload_url"] in answer["say"]  # the owner is given the link itself
+    assert answer["assistant_notes"] == card["error"] == studio.NEEDS_PHOTOS
     # and again (refresh too): the same link, still nothing made
     assert call(client, key, refresh=True)["data"]["upload_url"] == card["upload_url"]
     assert launched == [] and clients == [] and sets(conn) == 0
+
+
+def test_no_photos_and_no_valid_link_names_the_tool_that_gives_one(client, conn, launched):
+    key = owner(conn)
+    token = uploads.new_token(conn, f"pg_{BIZ}")
+    conn.execute("UPDATE upload_token SET expires_at = now() - interval '1 minute' WHERE token = %s", (token,))
+    answer = call(client, key)
+    card = answer["data"]
+    assert card["status"] == "needs_photos" and card["upload_url"] is None
+    assert "update_landing_page" in card["error"] and answer["assistant_notes"] == card["error"]
+    assert "/u/" not in answer["say"] and "update_landing_page" not in answer["say"]  # the owner's words name no tool
+    assert launched == [] and sets(conn) == 0
 
 
 def test_first_call_returns_making_within_2s(client, conn, monkeypatch):
@@ -94,17 +114,56 @@ def test_first_call_returns_making_within_2s(client, conn, monkeypatch):
     assert again["status"] == "making" and again["set_id"] == card["set_id"] and sets(conn) == 1
 
 
-def test_a_making_set_whose_run_died_is_started_again(client, conn, launched):
+def test_a_poll_fails_a_dead_making_set_and_starts_nothing(client, conn, launched):
     """A run lives at most studio.GIVE_UP_S; a set still `making` after studio.STALE_S lost its process (a deploy):
-    the next call fails it with the owner's sentence and starts a new one, so the assistant's polling never waits on
-    a run that is gone."""
+    the next poll fails it with the owner's sentence and answers with that failed card -- a new paid run waits for the
+    owner's yes (refresh)."""
     key = owner(conn, photos=[photo_bytes()])
     dead = call(client, key)["data"]["set_id"]
     conn.execute("UPDATE ad_creative_set SET created_at = now() - interval '11 minutes' WHERE id = %s", (dead,))
-    card = call(client, key)["data"]
-    assert card["status"] == "making" and card["set_id"] != dead and launched == [dead, card["set_id"]]
-    row = conn.execute("SELECT status, error FROM ad_creative_set WHERE id = %s", (dead,)).fetchone()
-    assert (row["status"], row["error"]) == ("failed", studio.DIED)
+    answer = call(client, key)
+    card = answer["data"]
+    assert (card["status"], card["set_id"], card["error"]) == ("failed", dead, studio.DIED)
+    assert launched == [dead] and sets(conn) == 1
+    assert studio.DIED in answer["say"] and "refresh" in answer["assistant_notes"]
+    assert call(client, key)["data"]["set_id"] == dead  # polling again starts nothing either
+    fresh = call(client, key, refresh=True)["data"]  # the owner said yes
+    assert fresh["status"] == "making" and launched == [dead, fresh["set_id"]]
+
+
+def test_new_sets_are_capped_per_day_and_polls_of_a_live_set_are_free(client, conn, launched):
+    key = owner(conn, photos=[photo_bytes()])
+    cap = config.load().creatives_per_day
+    assert cap == 10  # the default
+    for n in range(cap):
+        made = call(client, key, refresh=True)["data"]
+        assert made["status"] == "making" and len(launched) == n + 1
+        if n < cap - 1:
+            end_runs(conn)
+    # at the ceiling, with its last set still making: polls, and a refresh while it makes, answer with that set
+    for args in ({}, {"refresh": True}, {}):
+        assert call(client, key, **args)["data"]["set_id"] == made["set_id"], args
+    end_runs(conn)
+    res = call_tool(client, TOOL, {"refresh": True}, key=key)
+    assert res["isError"] and studio.DAILY_LIMIT.format(cap=cap) in tool_text(res)
+    assert sets(conn) == cap and len(launched) == cap
+    # yesterday's (UTC) sets are not today's
+    conn.execute("UPDATE ad_creative_set SET created_at = created_at - interval '1 day'")
+    assert call(client, key, refresh=True)["data"]["status"] == "making" and len(launched) == cap + 1
+
+
+def test_a_draft_key_starts_fewer_sets_a_day(client, conn, launched, monkeypatch):
+    business(conn, BIZ, photos=[photo_bytes()])
+    key = business_with_key(conn, biz_id=BIZ, cls="draft")
+    cap = config.load().creatives_per_day_draft
+    assert cap == 3  # the default
+    for _ in range(cap):
+        assert call(client, key, refresh=True)["data"]["status"] == "making"
+        end_runs(conn)
+    res = call_tool(client, TOOL, {"refresh": True}, key=key)
+    assert res["isError"] and studio.DAILY_LIMIT.format(cap=cap) in tool_text(res)
+    monkeypatch.setenv("AGENT_CREATIVES_PER_DAY_DRAFT", "4")  # the ceiling is the settings' own
+    assert call(client, key, refresh=True)["data"]["status"] == "making" and len(launched) == cap + 1
 
 
 def test_second_call_returns_ready_card(client, conn, launched):
@@ -150,6 +209,10 @@ def test_accept_marks_accepted(client, conn, launched):
     making = call(client, key, refresh=True)["data"]["set_id"]
     res = call_tool(client, TOOL, {"accept_set_id": making}, key=key)
     assert res["isError"] and studio.NOT_READY in tool_text(res)
+    # with a newer set making, the answer to accepting is still the accepted set's card, not the newest set's
+    again = call(client, key, accept_set_id=set_id)
+    assert (again["data"]["set_id"], again["data"]["status"]) == (set_id, "accepted") and again["data"]["images"]
+    assert "accepted" in again["say"]
 
 
 def test_image_route_serves_bytes_and_404s_unknown(client, conn, launched):
@@ -177,9 +240,10 @@ def test_tool_listed_in_public_surface(client, conn, strict_surface):
     assert not tool["inputSchema"].get("required")
     notes = tool["annotations"]
     assert notes["readOnlyHint"] is False and notes["destructiveHint"] is False
+    assert notes["idempotentHint"] is False  # refresh makes a new set, as create_marketing_plan starts over
     meta = next(m for m in registry.SURFACE if m.name == TOOL)
     assert (meta.cls, meta.scope, meta.approval, meta.commands) == ("W", "manage", "none", ("ad_creatives",))
-    assert TOOL in gate.PUBLIC and gate.SURFACE_VERSION == "2026-11-04"
+    assert TOOL in gate.PUBLIC and gate.SURFACE_VERSION == "2026-11-04.2"
     said = " ".join(tool["description"].split())
     for words in (
         "30 seconds",
@@ -187,6 +251,7 @@ def test_tool_listed_in_public_surface(client, conn, strict_surface):
         "Removed",
         "ask the owner",
         "Never call it with accept_set_id without the owner's yes",
+        "a paid run",
     ):
         assert words in said, words
 

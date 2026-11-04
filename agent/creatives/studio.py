@@ -78,6 +78,11 @@ NO_UPLOAD_LINK = (
     "photos are in."
 )
 DIED = "Making your ads stopped before it finished. Please try again."
+# start's daily ceiling (Settings.creatives_per_day, _draft for a draft key): each new set is a paid run of the models
+DAILY_LIMIT = (
+    "Admiry makes new ads for a business at most {cap} times a day, and today's are used up. Your latest ads are still "
+    "here; ask again tomorrow for new ones."
+)
 TOO_SMALL = "This photo is too small for an ad; a larger one works."
 UNREADABLE = "This photo could not be opened."
 NOT_READ = "This photo could not be looked at this time."
@@ -509,10 +514,23 @@ def _launch(settings: config.Settings, set_id: str) -> None:
     threading.Thread(target=run, args=(settings, set_id), name=f"creatives-{set_id}", daemon=True).start()
 
 
-def start(conn: psycopg.Connection, settings: config.Settings, business_id: str) -> dict:
+def fail_stale(conn: psycopg.Connection, business_id: str) -> bool:
+    """The business's `making` set whose run died with its process (older than STALE_S: a run lives at most
+    GIVE_UP_S), failed with DIED; True when there was one. Starts nothing: a new run is the owner's to ask for."""
+    died = conn.execute(
+        "UPDATE ad_creative_set SET status = 'failed', error = %s "
+        "WHERE business_id = %s AND status = 'making' AND created_at < now() - make_interval(secs => %s) RETURNING id",
+        (DIED, business_id, STALE_S),
+    ).fetchall()
+    return bool(died)
+
+
+def start(conn: psycopg.Connection, settings: config.Settings, business_id: str, *, draft: bool = False) -> dict:
     """Start making a set (R3): no photos -> the `needs_photos` card with the valid upload link (or the sentence naming
-    the tool that gives a fresh one), no set, no model called; a set already making -> its card; else a new `making`
-    set, run on a daemon thread (which waits for this INSERT to commit with the caller's transaction). Returns the
+    the tool that gives a fresh one), no set, no model called; a set already making -> its card, counted nothing; else
+    a new `making` set, run on a daemon thread (which waits for this INSERT to commit with the caller's transaction).
+    Each new set counts toward the business's day (UTC): past Settings.creatives_per_day of them
+    (creatives_per_day_draft for a draft key) the start is refused, a ToolError in the owner's words. Returns the
     card."""
     base = settings.web_base_url
     if not _has_photos(conn, business_id):
@@ -521,15 +539,19 @@ def start(conn: psycopg.Connection, settings: config.Settings, business_id: str)
     with conn.transaction():
         if conn.execute("SELECT 1 FROM business WHERE id = %s FOR UPDATE", (business_id,)).fetchone() is None:
             raise ToolError(NO_BUSINESS)
-        conn.execute(
-            "UPDATE ad_creative_set SET status = 'failed', error = %s "
-            "WHERE business_id = %s AND status = 'making' AND created_at < now() - make_interval(secs => %s)",
-            (DIED, business_id, STALE_S),
-        )
+        fail_stale(conn, business_id)
         making = conn.execute(
             "SELECT id FROM ad_creative_set WHERE business_id = %s AND status = 'making' LIMIT 1", (business_id,)
         ).fetchone()
         if making is None:
+            cap = settings.creatives_per_day_draft if draft else settings.creatives_per_day
+            today = conn.execute(  # under the business row's lock: two starts can never both pass the count
+                "SELECT count(*) AS n FROM ad_creative_set WHERE business_id = %s "
+                "AND created_at >= date_trunc('day', now() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC'",
+                (business_id,),
+            ).fetchone()["n"]
+            if today >= cap:
+                raise ToolError(DAILY_LIMIT.format(cap=cap))
             set_id = db.new_id("cs")
             conn.execute(
                 "INSERT INTO ad_creative_set (id, business_id, status) VALUES (%s, %s, 'making')", (set_id, business_id)
@@ -580,14 +602,17 @@ def _models(ledger: dict | None) -> dict:
     }
 
 
-def card(conn: psycopg.Connection, business_id: str, base_url: str) -> dict:
-    """The business's newest set as the owner sees it (R2). Without any set: `needs_photos` when there are no photos,
-    else the same empty card with `status` None (nothing made yet). `error` is the failed set's sentence."""
+def card(conn: psycopg.Connection, business_id: str, base_url: str, *, set_id: str | None = None) -> dict:
+    """The business's newest set as the owner sees it (R2), or its set `set_id` (another business's is a ToolError).
+    Without any set: `needs_photos` when there are no photos, else the same empty card with `status` None (nothing
+    made yet). `error` is the failed set's sentence."""
     row = conn.execute(
         "SELECT id, status, steps, ledger, error FROM ad_creative_set WHERE business_id = %s "
-        "ORDER BY created_at DESC LIMIT 1",
-        (business_id,),
+        "AND (%s::text IS NULL OR id = %s) ORDER BY created_at DESC LIMIT 1",
+        (business_id, set_id, set_id),
     ).fetchone()
+    if row is None and set_id is not None:
+        raise ToolError(NOT_YOURS)
     if row is None:
         empty = _needs_photos(conn, business_id, base_url)
         if _has_photos(conn, business_id):

@@ -5,7 +5,7 @@ from __future__ import annotations
 from .registry import dispatch, public_tool
 
 
-@public_tool(cls="W", scope="manage", commands=("ad_creatives",))
+@public_tool(cls="W", scope="manage", commands=("ad_creatives",), idempotent=False)  # refresh makes a new set
 def suggest_ad_creatives(accept_set_id: str | None = None, refresh: bool = False) -> dict:
     """Google ads made from the owner's own job photos and the facts Admiry has about the business: a landscape and a
     square picture per photo, plus headlines, descriptions and short extras, each line checked against those facts.
@@ -19,5 +19,6 @@ def suggest_ad_creatives(accept_set_id: str | None = None, refresh: bool = False
     these ads. Only after the owner says yes, call it with accept_set_id set to the card's set_id: the accepted set
     is what Admiry uses when it creates the Google ads, after the owner approves the launch. Never call it with
     accept_set_id without the owner's yes. Status "failed": say why (error); refresh true starts a new set, with
-    the owner's yes."""
+    the owner's yes. Each new set is a paid run, and a business may start only a few a day: send refresh true only
+    when the owner asks for new ads."""
     return dispatch("ad_creatives", accept_set_id=accept_set_id, refresh=refresh)

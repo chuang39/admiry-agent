@@ -153,6 +153,10 @@ class Settings:
     # prompt, the Reviewer's stamp; off (unset) = no rule acts anywhere. The daily summary runs either way, and the
     # business's own refused lines (§2.1) make their item either way.
     refusal_rules: bool = False
+    # Ads made from the owner's photos (hackathon 2026-11-04, creatives.studio.start): the new sets a business may start
+    # a day (UTC), each a paid run of the models; fewer on a draft key. AGENT_CREATIVES_PER_DAY, _DRAFT
+    creatives_per_day: int = 10
+    creatives_per_day_draft: int = 3
 
     @property
     def payments_ready(self) -> bool:
@@ -562,4 +566,6 @@ def load() -> Settings:
         launch_review=_launch_review(),
         admin_emails=_admin_emails(),
         refusal_rules=_refusal_rules(),
+        creatives_per_day=_whole("AGENT_CREATIVES_PER_DAY", 10),
+        creatives_per_day_draft=_whole("AGENT_CREATIVES_PER_DAY_DRAFT", 3),
     )
