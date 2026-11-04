@@ -461,6 +461,15 @@ CALLOUT_MAX = 25  # Google's callout text limit
 RSA_MAX_HEADLINES, RSA_MAX_DESCRIPTIONS = 15, 4  # what one responsive search ad takes
 
 
+def kept_callouts(callouts: list[str], banned: list[str]) -> list[str]:
+    """The accepted callouts a build sends (final review I2: the create is all or nothing, so one callout Google
+    refuses fails the whole launch): each once, case-insensitively, in its order, and only the ones that pass the
+    headline rules (`_reason`: no banned word, no "!", no phone or e-mail, no shouting) within `CALLOUT_MAX`."""
+    return [
+        c for c in _dedupe_keep_order(callouts) if _reason(c, max_len=CALLOUT_MAX, max_bangs=0, banned=banned) is None
+    ]
+
+
 def creative_asset_ops(campaign_ref: str, creatives: dict, customer_id: str, start: int) -> list[dict]:
     """The owner's accepted images and callouts (hackathon spec 2026-11-04 §5) as campaign assets: per image an
     `IMAGE` asset (named `admiry <set> <format> <n>`, the bytes base64 as REST carries them) linked for `AD_IMAGE`,
@@ -526,7 +535,8 @@ def operations(
     `creatives` is the owner's accepted creative set (hackathon spec 2026-11-04 §5; `studio.accepted`'s shape), None
     when there is none -- the mutate is then exactly what it was before. Its headlines and descriptions, when it has
     any, replace the plan's in every ad (the copy linter, `dropped` and the service-name pin still apply); its images
-    and callouts are appended as campaign assets (`creative_asset_ops`), after everything else."""
+    and callouts are appended as campaign assets (`creative_asset_ops`), after everything else -- the callouts first
+    deduplicated and linted with the trade's banned words (`kept_callouts`)."""
     biz = plan["business_id"]
     c = plan["sections"]["consultation"]
     ch = plan["sections"]["ads"]["channels"][0]
@@ -625,7 +635,8 @@ def operations(
         )
 
     if accepted:
-        ops.extend(creative_asset_ops(campaign_ref, accepted, customer_id, next(ids)))
+        callouts = kept_callouts(list(accepted.get("callouts") or []), recipe["banned"])
+        ops.extend(creative_asset_ops(campaign_ref, {**accepted, "callouts": callouts}, customer_id, next(ids)))
 
     return ops
 

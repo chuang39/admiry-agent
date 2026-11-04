@@ -264,6 +264,29 @@ def test_asset_ops_link_images_and_callouts():
     assert ads_launch.creative_asset_ops(campaign_ref, _creatives(images=[], callouts=[]), CID, -9) == []
 
 
+def test_operations_lint_and_dedupe_the_accepted_callouts():
+    """Final review I2: the create is all or nothing, so one callout Google refuses fails the whole launch. The build
+    sends a callout only once (case-insensitively) and only when it passes the headline rules with the trade's banned
+    words: no banned word, no "!", no phone, no shouting, at most `CALLOUT_MAX` characters."""
+    callouts = [
+        "Free Inspections",
+        "Guaranteed Repairs",  # a word the home-services recipe bans
+        "Call Us Today!",  # an exclamation mark
+        "free inspections",  # the first one again
+        "Family Owned",
+        "Licensed & Insured",
+    ]
+    ops = _ops(_creatives(callouts=callouts))
+    sent = [
+        op["assetOperation"]["create"]["calloutAsset"]["calloutText"]
+        for op in ops
+        if "calloutAsset" in op.get("assetOperation", {}).get("create", {})
+    ]
+    assert sent == ["Free Inspections", "Family Owned", "Licensed & Insured"]
+    links = [op["campaignAssetOperation"]["create"]["fieldType"] for op in ops if "campaignAssetOperation" in op]
+    assert links.count("CALLOUT") == 3
+
+
 # ---------------------------------------------------------------- resources_from
 
 
