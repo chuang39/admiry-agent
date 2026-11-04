@@ -36,8 +36,8 @@ can't verify is cut before it reaches Google.
    - a **Removed** list says what the checker cut and why;
    - a before/after toggle shows which pixels are the owner's.
 4. **"Looks good, set it up."** → the campaign, budget, ad group, keywords, responsive search ad, image assets and
-   callout assets are created live in Google Ads, all paused. Muse answers with the campaign id and a link; the
-   Google Ads UI shows the same campaign with the owner's images.
+   callout assets are created live in Google Ads, all paused. Muse answers that the campaign is built in Google Ads
+   and paused; the Google Ads UI shows the campaign with the owner's images.
 
 ## How it stays honest
 
@@ -77,7 +77,7 @@ page and the home-services knowledge. Its own docs: [`agent/README.md`](agent/RE
 |---|---|---|
 | 0 | Run this repo's agent on the dev box and walk the existing flow: [`scripts/deploy-agent.sh`](scripts/deploy-agent.sh), [walk notes](docs/ops/dev-walk-2026-11-04.md) | done |
 | N1 | **Creative studio** (`agent/creatives/`): job photos → Google image assets and ad text, each checked | done: [`8a297dc`](https://github.com/chuang39/admiry-agent/commit/8a297dc), [`1b97adb`](https://github.com/chuang39/admiry-agent/commit/1b97adb), [`28594aa`](https://github.com/chuang39/admiry-agent/commit/28594aa), [`1544c91`](https://github.com/chuang39/admiry-agent/commit/1544c91), [`13cbecb`](https://github.com/chuang39/admiry-agent/commit/13cbecb), [`dcb0a2c`](https://github.com/chuang39/admiry-agent/commit/dcb0a2c) |
-| N2 | **Public tool `suggest_ad_creatives`** and the owner's acceptance, with a creatives card in Muse and the web chat | done: [`e93ab4d`](https://github.com/chuang39/admiry-agent/commit/e93ab4d), [`056607b`](https://github.com/chuang39/admiry-agent/commit/056607b) |
+| N2 | **Public tool `suggest_ad_creatives`** and the owner's acceptance, with a creatives card in Muse (over MCP) | done: [`e93ab4d`](https://github.com/chuang39/admiry-agent/commit/e93ab4d), [`056607b`](https://github.com/chuang39/admiry-agent/commit/056607b) |
 | N3 | **Google builder additions:** landscape and square image assets and callout assets linked to the campaign; accepted text feeds the responsive search ad | done: [`f6f3fc2`](https://github.com/chuang39/admiry-agent/commit/f6f3fc2) |
 | N4 | **`live_paused` execution mode:** the real create mutate, everything paused, never enabled | done: [`02a11d3`](https://github.com/chuang39/admiry-agent/commit/02a11d3) |
 | N5 | README, run notes, demo video | in progress ([demo script](docs/demo-script.md)) |

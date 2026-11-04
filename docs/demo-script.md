@@ -8,6 +8,10 @@ on screen. Total run time of the live parts is cut down by fast-forward where ma
 - [ ] Signed in on admiry.ai in the browser.
 - [ ] Muse connected to the Admiry connector at `https://agent.admiry.ai/mcp`.
 - [ ] A roofing, remodel or landscaping business set up, with 3-5 job photos you have the rights to.
+- [ ] Rehearse on a DIFFERENT business than the one you record: each business gets one campaign, so a rehearsal's
+      launch uses up the recorded business's create.
+- [ ] Accept the creatives BEFORE approving the launch: the launch builds with the set accepted at that moment, and a
+      set accepted afterwards is not in the campaign.
 - [ ] Stripe test card ready for the allowlisted top-up: `4242 4242 4242 4242`, any future expiry, any CVC
       (Stripe's public test card).
 - [ ] The approval code ready: it is shown on the signed-in plan page.
@@ -52,7 +56,9 @@ on screen. Total run time of the live parts is cut down by fast-forward where ma
 
 - **Say to Muse:** (none, let the card sit) then voice-over: "Every claim shows the fact it came from."
 - **On screen:** the creatives card. Toggle before/after on one image (original pixels vs the extended margins).
-  Click a headline to show its source fact. Scroll to the **Removed** list.
+  Click a headline to show its source fact. Scroll to the **Removed** list and show whatever it holds this run
+  (duplicates, lines without a source, a claim the checker refused); do not promise a particular cut, since what
+  Muse Spark writes differs from run to run.
 - **Caption:** "Before/after: every photo pixel is the owner's"
 - **Caption (claims):** "Each claim cites a fact the owner gave"
 - **Caption (Removed):** "What the checker cut, and why"
@@ -61,7 +67,8 @@ on screen. Total run time of the live parts is cut down by fast-forward where ma
 
 - **Say to Muse:** "Looks good, set it up."
 - **On screen:** Muse approval step: enter the approval code from the plan page; top-up with the Stripe test
-  card if asked. Muse answers with the campaign id and a link. Cut to the Google Ads UI: the campaign, status
+  card if asked. Muse answers that the campaign is built in Google Ads and paused (demo mode, nothing spends). Cut
+  to the Google Ads UI (open it yourself; Muse gives no link): the campaign, status
   **Paused**, ad group, keywords, responsive search ad, the landscape and square images, the callouts.
 - **Caption:** "Real Google Ads campaign, created live. Paused: nothing spends."
 

@@ -374,9 +374,14 @@ AGENT_LLM_LIVE=1 $PY -m pytest agent/tests/test_llm_live.py -q   # two Muse Spar
   box did not make is answered 200 and ignored;
   `agent/stripe_mode.py`), `AGENT_TOPUP_MIN_USD` / `AGENT_TOPUP_MAX_USD`
   (one top-up's bounds in whole dollars, default 200 / 5000; `0 < min ≤ max` or the service refuses to boot),
-  `AGENT_EXEC_<CHANNEL>` (M0: `off` | `validate` | `live` per channel — `AGENT_EXEC_GOOGLE_SEARCH`,
+  `AGENT_EXEC_<CHANNEL>` (M0: `off` | `validate` | `live` | `live_paused` per channel — `AGENT_EXEC_GOOGLE_SEARCH`,
   `AGENT_EXEC_NEWSBREAK`, …; unset = `off`, anything else refuses to boot; while `AGENT_EXEC_GOOGLE_SEARCH` is unset,
-  A3's `AGENT_ADS_EXECUTION` answers for Google Search alone, one release), `AGENT_LAUNCH_ALLOWLIST` (owners' e-mails,
+  A3's `AGENT_ADS_EXECUTION` answers for Google Search alone, one release. `live_paused` (hackathon N4) sends the
+  real create with everything paused and never turns a campaign on — not the launch, not a resume, not the hourly
+  job, and not later under `live` either (the row is marked `demo_paused`); it is for Google Search only and needs
+  `AGENT_LAUNCH_ALLOWLIST`, else the service refuses to boot. With either Stripe sandbox key set, any switch at `live`
+  — `AGENT_EXEC_<CHANNEL>` or `AGENT_ADS_EXECUTION` — refuses to boot: sandbox money must never fund real ads;
+  `live_paused`, `validate` and `off` boot), `AGENT_LAUNCH_ALLOWLIST` (owners' e-mails,
   comma-separated: set, only their businesses launch while a switch is on and every other one runs as under `off`;
   empty = no list. Owners on the list pay with Stripe sandbox (test cards) when the sandbox keys are set, so never put a
   real customer on that list on a box with sandbox keys), `ADS_OPS_DAILY_BUDGET` (Google Search's
