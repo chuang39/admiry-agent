@@ -217,11 +217,13 @@ def _state_text(row: dict, label: str, account_status: str, platform: list[dict]
     ads are on -- but for a refused row whose stop is owed (`stop_owed`), which says the lifecycle's clause (the
     refusal and that Admiry is switching the ads off: M1 follow-up 2, W5); the invitation the owner has not accepted
     yet; else the lifecycle's own clause for the row (`ads_run.state_clause`: "Live", "Waiting for funds", "Paused by
-    you on Tuesday", a channel's own `Words`)."""
+    you on Tuesday", a channel's own `Words`). A row `live_paused` built (`demo_paused`, N4) is never "Launching":
+    nothing turns it on, so it says the lifecycle's demo clause (final review I1)."""
     if platform:
         return f'Needs attention: "{platform[0]["platform_text"]}"'
-    state, owed = row["state"], (row.get("resources") or {}).get("stop_owed")
-    if (state == "launching" and not owed) or (
+    resources = row.get("resources") or {}
+    state, own_clause = row["state"], resources.get("stop_owed") or resources.get("demo_paused")
+    if (state == "launching" and not own_clause) or (
         state == "queued" and not row.get("last_error") and not row.get("validated_at")
     ):
         return "Launching"

@@ -324,6 +324,23 @@ def test_a_rows_one_sentence_is_the_lifecycles_own_clause(conn):
             assert state._state_text(row, label, "none", []) == clause[:1].upper() + clause[1:], fields
 
 
+def test_a_demo_row_reads_built_paused_never_launching(conn):
+    """Final review I1: a row `live_paused` built (`resources.demo_paused`) is `launching` and nothing turns it on, so
+    the card says the lifecycle's demo clause -- never "Launching", which promises ads about to run."""
+    plan_id = live_google_and_waiting_newsbreak(conn)
+    conn.execute("DELETE FROM channel_campaign WHERE channel = %s", (GOOGLE,))
+    campaign(
+        conn,
+        GOOGLE,
+        plan_id,
+        "launching",
+        resources={"campaign": "customers/1234567890/campaigns/1", "demo_paused": True},
+    )
+    google_row = state.build(conn, config.load(), BIZ).channels[0]
+    assert google_row.state_text == ads_run.DEMO_CLAUSE[:1].upper() + ads_run.DEMO_CLAUSE[1:]
+    assert google_row.state_text != "Launching"
+
+
 def test_what_a_sync_read_from_the_platform_is_among_the_rows_issues(conn):
     """Google's own reasons for holding the ads back and a disapproved ad's policy topics (resources.issues, written
     by ads-sync) are the row's issues, quoted, with the headline of that channel's own ad."""
