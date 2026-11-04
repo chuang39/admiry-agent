@@ -27,7 +27,7 @@ def _noise(w, h, seed=1):
 
 def test_pad_keeps_photo_pixels_at_place():
     photo = Image.new("RGB", (400, 400), (200, 10, 10))
-    canvas, place = images.pad(photo, "landscape")
+    _canvas, place = images.pad(photo, "landscape")
     assert canvas.size == images.SIZES["landscape"]
     left, top, right, bottom = place
     assert (right - left, bottom - top) == (628, 628)
@@ -40,7 +40,7 @@ def test_pixel_lock_restores_masked_pixels():
     generated = _noise(*images.SIZES["square"], seed=3)
     mask = Image.new("L", photo.size, 0)
     mask.paste(255, (50, 50, 150, 150))
-    canvas, place = images.pad(photo, "square")
+    _canvas, place = images.pad(photo, "square")
     out = images.pixel_lock(generated, photo, mask, place, "square")
     left, top, right, bottom = place
     sx = (right - left) / photo.width
@@ -55,7 +55,7 @@ def test_pixel_lock_resizes_odd_model_size():
     photo = _noise(300, 200, 4)
     generated = _noise(1792, 1024, 5)
     mask = Image.new("L", photo.size, 255)
-    canvas, place = images.pad(photo, "landscape")
+    _canvas, place = images.pad(photo, "landscape")
     out = images.pixel_lock(generated, photo, mask, place, "landscape")
     assert out.size == (1200, 628)
 
