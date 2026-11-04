@@ -21,7 +21,7 @@ import sys
 import time
 
 import httpx
-from PIL import Image
+from PIL import Image, ImageChops, ImageStat
 
 from agent import config, db
 
@@ -74,6 +74,39 @@ def padded(photo: Image.Image, w: int, h: int) -> Image.Image:
     canvas = Image.new("RGB", (w, h), (128, 128, 128))
     canvas.paste(small, ((w - small.width) // 2, (h - small.height) // 2))
     return canvas
+
+
+def placement(photo: Image.Image, w: int, h: int) -> tuple[int, int, int, int]:
+    """Where `padded` put the photo on its w x h canvas."""
+    scale = min(w / photo.width, h / photo.height)
+    pw, ph = max(1, round(photo.width * scale)), max(1, round(photo.height * scale))
+    left, top = (w - pw) // 2, (h - ph) // 2
+    return left, top, left + pw, top + ph
+
+
+def alignment(got: Image.Image, canvas: Image.Image, place: tuple[int, int, int, int]) -> dict:
+    """Mean absolute pixel difference (0-255) inside the photo's place between the canvas sent and the answer mapped
+    back onto it two ways: stretched to the canvas, or centre-cropped to the canvas's aspect first. The lower one is
+    how the answer lies on the canvas (the pixel-lock needs that mapping)."""
+    got = got.convert("RGB")
+
+    def mad(mapped: Image.Image) -> float:
+        diff = ImageChops.difference(mapped.crop(place), canvas.crop(place))
+        return round(sum(ImageStat.Stat(diff).mean) / 3, 1)
+
+    ratio = canvas.width / canvas.height
+    if got.width / got.height > ratio:  # wider than the canvas: crop the sides
+        cw = round(got.height * ratio)
+        crop = ((got.width - cw) // 2, 0, (got.width - cw) // 2 + cw, got.height)
+    else:  # taller: crop top and bottom
+        ch = round(got.width / ratio)
+        crop = (0, (got.height - ch) // 2, got.width, (got.height - ch) // 2 + ch)
+    grey = Image.new("RGB", canvas.size, (128, 128, 128))
+    return {
+        "mad_stretch": mad(got.resize(canvas.size)),
+        "mad_center_crop": mad(got.crop(crop).resize(canvas.size)),
+        "mad_grey_baseline": mad(grey),
+    }
 
 
 def head(text, n: int = 300) -> str:
@@ -132,7 +165,8 @@ def chat(http: httpx.Client, label: str, model: str, effort: str | None, photo_p
 
 def edit(http: httpx.Client, label: str, photo: Image.Image, size: str) -> None:
     w, h = (int(v) for v in size.split("x"))
-    canvas = padded(photo, 1200, 1200) if w == h else padded(photo, 1200, 628)  # Google's two canvases
+    cw, ch = (1200, 1200) if w == h else (1200, 628)  # Google's two canvases
+    canvas = padded(photo, cw, ch)
     body = {
         "model": IMAGE,
         "prompt": "Fill only the flat grey padding so the scene continues naturally (sky, yard). "
@@ -160,6 +194,7 @@ def edit(http: httpx.Client, label: str, photo: Image.Image, size: str) -> None:
         bytes=len(raw),
         keys=sorted(data),
         item_keys=sorted(item),
+        **alignment(img, canvas, placement(photo, cw, ch)),
     )
 
 
