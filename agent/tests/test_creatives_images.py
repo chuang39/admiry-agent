@@ -158,9 +158,33 @@ def test_load_applies_exif_orientation():
     assert out.size == (20, 40)
 
 
-def test_encode_under_5mb():
+def _jpeg(img: Image.Image, quality: int) -> bytes:
+    buf = io.BytesIO()
+    img.save(buf, "JPEG", quality=quality)
+    return buf.getvalue()
+
+
+def test_encode_is_jpeg_quality_90_under_5mb():
+    """Final review I4: the create mutate carries every image base64-encoded, so six PNGs of 1-2 MB made it 10-17 MB
+    against the launch's 20 s budget. Ad images are stored as JPEG quality 90."""
     data, mime = images.encode(Image.new("RGB", (1200, 628), (9, 9, 9)))
-    assert mime == "image/png" and len(data) < 5 * 1024 * 1024
-    data, mime = images.encode(_noise(1200, 1200, 7))
-    assert len(data) < 5 * 1024 * 1024
-    assert mime in ("image/png", "image/jpeg")
+    assert mime == "image/jpeg" and data[:3] == b"\xff\xd8\xff" and len(data) < 5 * 1024 * 1024
+    noisy = _noise(1200, 1200, 7)
+    data, mime = images.encode(noisy)
+    assert mime == "image/jpeg" and data == _jpeg(noisy, 90) and len(data) <= 5 * 1024 * 1024
+    assert Image.open(io.BytesIO(data)).size == (1200, 1200)
+    png = io.BytesIO()
+    noisy.save(png, "PNG")
+    assert len(data) < png.tell() / 2
+
+
+def test_encode_steps_quality_down_to_stay_under_the_cap(monkeypatch):
+    noisy = _noise(600, 600, 3)
+    monkeypatch.setattr(images, "_MAX_BYTES", len(_jpeg(noisy, 90)) - 1)
+    data, mime = images.encode(noisy)
+    assert mime == "image/jpeg" and len(data) <= images._MAX_BYTES and data == _jpeg(noisy, 80)
+
+
+def test_encode_takes_an_image_with_alpha():
+    data, mime = images.encode(Image.new("RGBA", (300, 300), (9, 9, 9, 128)))
+    assert mime == "image/jpeg" and Image.open(io.BytesIO(data)).mode == "RGB"

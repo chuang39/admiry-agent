@@ -16,7 +16,7 @@ MODEL_SIZE = {"landscape": "1792x1024", "square": "1024x1024"}
 
 _GREY = (128, 128, 128)
 _ON = bytes([0] + [255] * 255)  # a raster byte 0/1 -> an "L" pixel 0/255
-_MAX_PNG = 5 * 1024 * 1024
+_MAX_BYTES = 5 * 1024 * 1024  # Google's image asset limit
 
 Box = tuple[int, int, int, int]
 
@@ -174,10 +174,13 @@ def too_small(photo: Image.Image, fmt: str) -> bool:
 
 
 def encode(img: Image.Image) -> tuple[bytes, str]:
-    buf = io.BytesIO()
-    img.save(buf, "PNG")
-    if buf.tell() <= _MAX_PNG:
-        return buf.getvalue(), "image/png"
-    buf = io.BytesIO()
-    img.convert("RGB").save(buf, "JPEG", quality=90)
+    """An ad image as stored and sent to Google: JPEG quality 90 (final review I4 -- the create mutate carries every
+    image base64-encoded, and six PNGs of 1-2 MB made it 10-17 MB against the launch's 20 s budget), stepping the
+    quality down by 10 in the rare case it is still over Google's 5 MB."""
+    rgb = img.convert("RGB")
+    for quality in (90, 80, 70, 60, 50):
+        buf = io.BytesIO()
+        rgb.save(buf, "JPEG", quality=quality)
+        if buf.tell() <= _MAX_BYTES:
+            break
     return buf.getvalue(), "image/jpeg"

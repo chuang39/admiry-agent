@@ -196,7 +196,7 @@ def test_run_writes_ready_set_with_images(conn, settings, launched):
     rows = conn.execute("SELECT format, width, height, bytes, content_type FROM ad_creative_image").fetchall()
     for row in rows:
         assert (row["width"], row["height"]) == images.SIZES[row["format"]]
-        assert bytes(row["bytes"])[:4] in (b"\x89PNG", b"\xff\xd8\xff\xe0", b"\xff\xd8\xff\xdb")
+        assert bytes(row["bytes"])[:3] == b"\xff\xd8\xff" and row["content_type"] == "image/jpeg"  # JPEG q90
     heads = card["text"]["headlines"]
     assert [h["text"] for h in heads] == ["Oakline Roofing", "Free Roof Inspections", "Roofers in Charlotte"]
     assert heads[1]["source"] == "Offer: Free roof inspections"
@@ -268,7 +268,7 @@ def test_accept_then_accepted_returns_kept_text_and_images(conn, settings, launc
     assert got["headlines"] == ["Oakline Roofing", "Free Roof Inspections", "Roofers in Charlotte"]
     assert len(got["descriptions"]) == 2 and got["callouts"] == ["Free Inspections"]
     assert {i["format"] for i in got["images"]} == {"landscape", "square"}
-    assert all(isinstance(i["bytes"], bytes) and i["bytes"][:4] == b"\x89PNG" for i in got["images"])
+    assert all(isinstance(i["bytes"], bytes) and i["bytes"][:3] == b"\xff\xd8\xff" for i in got["images"])  # JPEG
     assert studio.card(conn, "biz_roof", BASE)["status"] == "accepted"
 
 
