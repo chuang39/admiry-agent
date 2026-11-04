@@ -10,3 +10,4 @@ dkimpy>=1.1,<2   # DKIM verification of inbound mail when Resend's DMARC verdict
 cryptography==50.0.1   # seals the owner-side tokens in channel_account.secret_enc (agent/secretbox.py, M0)
 pillow>=10,<13   # the owner's uploaded photos: resize, EXIF-orient, re-encode (A3p-2 Task 6)
 pyyaml>=6,<7   # the knowledge files' frontmatter (agent/knowledge_index.py, capability layer K3); also fastmcp's
+meta-sam-parser==0.1.0   # decodes SAM 3.1's one_bit masks for the creatives studio (agent/creatives/meta.py); pure Python, no deps
