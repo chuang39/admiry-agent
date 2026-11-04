@@ -1199,3 +1199,4 @@ CREATE TABLE IF NOT EXISTS ad_creative_image (
   bytes     BYTEA NOT NULL, content_type TEXT NOT NULL, width INT NOT NULL, height INT NOT NULL,
   checks    JSONB NOT NULL
 );
+CREATE INDEX IF NOT EXISTS ad_creative_image_set ON ad_creative_image (set_id);

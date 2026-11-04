@@ -1,8 +1,9 @@
 """The creatives studio (spec 2026-11-04 §4; rulings R2, R3, R15): one set of verified ad creatives per run, made from
 the business's own page photos and its own facts, kept in ad_creative_set / ad_creative_image.
 
-`start` makes a `making` set and runs `run` on a daemon thread with its own connection, unless one is making already;
-a business with no photos gets the upload link instead and nothing runs. `run`:
+`start` makes a `making` set and runs `run` on a daemon thread with its own connection (which waits for the set to
+commit with the caller's transaction), unless one is making already; a business with no photos gets its valid upload
+link instead (read back, never minted) and nothing runs. `run`:
   1. Spark reads each photo (subject noun phrase, suitability, privacy flags); a photo too small for both of Google's
      sizes is never sent, an unsuitable or private one is skipped, its reason kept for the card;
   2. SAM cuts the work out of each photo;
@@ -10,7 +11,9 @@ a business with no photos gets the upload link instead and nothing runs. `run`:
      the padded photo, the whole original is pasted back (images.restore_photo), and the result must pass SAM's
      re-segmentation (IoU >= 0.9 against the original's mask where it was placed) and Wonder's image policy check --
      any failure falls back to the plain crop, recorded in `checks`;
-  4. the text is written and checked meanwhile (copy.write_and_check), on its own thread.
+  4. the text is written and checked meanwhile (copy.write_and_check, reading the rules and the vertical's guide), on
+     its own thread.
+A run that could use no photo at all, or kept too few lines for Google, ends `failed` with the reasons.
 Image calls run on a pool of WORKERS; the whole run gives up after GIVE_UP_S, the set `failed` with a sentence the
 owner can read. Every model call is a step `{"step", "model", "ok", "ms"}`, written as it happens."""
 
@@ -42,12 +45,17 @@ log = logging.getLogger(__name__)
 
 GIVE_UP_S = 240.0  # the whole run (R: 4 minutes)
 STALE_S = 600  # a `making` set this old is a run that died with its process: failed, so a new one can start
+ROW_WAIT_S = 30.0  # how long a run waits to see its set: start's INSERT commits with the caller's transaction
+ROW_POLL_S = 0.1
 WORKERS = 4
 MAX_PHOTOS = 5
 IOU_MIN = 0.9
 FORMATS = ("landscape", "square")
 RULES_DIR = Path(__file__).resolve().parents[1] / "knowledge" / "home_services"
 TRADE_FILES = {"roofing": "roofing.md", "remodel": "remodel.md", "landscaping": "landscaping.md"}
+GUIDE_FILES = ("google-search.md", "offers.md")  # the writer's knowledge besides the rules (spec §4 step 4)
+# the kinds of a site's photos that show the work (sites/photos.py KINDS), chosen first in this order
+PREFERRED_KINDS = ("work", "before_after", "key")
 
 TOO_LONG = "Making your ads took longer than 4 minutes, so it was stopped. Please try again."
 NO_MODELS = "The models that make your ads are not available right now. Please try again later."
@@ -57,6 +65,18 @@ TOO_FEW = (
     "the 2 it needs). Tell Admiry more about your business and try again."
 )
 BROKE = "Something went wrong while making your ads. Please try again."
+NO_PHOTOS_USED = "None of your photos could be used for ads. {reasons} Add other photos of your work and try again."
+NO_PHOTOS_AT_ALL = "There are no photos of your work to make ads from. Add some and try again."
+NEEDS_PHOTOS = (
+    "Ads are made from photos of the business's own work, and there are none yet: send the owner the upload link "
+    "(upload_url) and start again once the photos are in."
+)
+NO_UPLOAD_LINK = (
+    "Ads are made from photos of the business's own work, and there are none yet. There is no valid upload link right "
+    'now: call update_landing_page with action "build_site" (a home-services business or a dental practice; for any '
+    'other business, action "write") -- its answer carries a fresh upload_url to send the owner. Start again once the '
+    "photos are in."
+)
 DIED = "Making your ads stopped before it finished. Please try again."
 TOO_SMALL = "This photo is too small for an ad; a larger one works."
 UNREADABLE = "This photo could not be opened."
@@ -138,14 +158,16 @@ def _knowledge(conn: psycopg.Connection, biz: str) -> dict:
 
 
 def _photo_rows(conn: psycopg.Connection, biz: str) -> list[dict]:
-    """The current page's photos, its first MAX_PHOTOS in the owner's order; a logo is no ad photo."""
+    """The current page's photos, at most MAX_PHOTOS: the kinds that show the work first (PREFERRED_KINDS, in that
+    order), then the rest, each in the owner's order; a logo is no ad photo."""
     page = landing.current(conn, biz)
     if page is None:
         return []
     return conn.execute(
         "SELECT id, bytes, content_type, width, height FROM page_photo "
-        "WHERE page_id = %s AND kind IS DISTINCT FROM 'logo' ORDER BY created_at, id LIMIT %s",
-        (page["id"], MAX_PHOTOS),
+        "WHERE page_id = %s AND kind IS DISTINCT FROM 'logo' "
+        "ORDER BY coalesce(array_position(%s::text[], kind), %s), created_at, id LIMIT %s",
+        (page["id"], list(PREFERRED_KINDS), len(PREFERRED_KINDS) + 1, MAX_PHOTOS),
     ).fetchall()
 
 
@@ -175,6 +197,12 @@ def _body(path: Path) -> str:
         if end != -1:
             return text[end + 4 :].lstrip()
     return text
+
+
+def _guide() -> str:
+    """The writer's and the repairer's knowledge besides the rules: how Google search ads and offers are written for
+    home services (spec §4 step 4)."""
+    return "\n\n".join(f"# home_services/{name[:-3]}\n{_body(RULES_DIR / name)}" for name in GUIDE_FILES)
 
 
 def _rules(trade: str | None) -> str:
@@ -256,7 +284,8 @@ def _resegment(meta: MetaClient, out: Image.Image, subject: str, steps: list, na
     return mask
 
 
-def _policy(meta: MetaClient, out: Image.Image, subject: str, fmt: str, steps: list, name: str) -> ImageCheck:
+def _policy(meta: MetaClient, out: Image.Image, subject: str, fmt: str, steps: list, name: str) -> ImageCheck | None:
+    """Wonder's verdict on `out`; None when it gave none (the image is then not checked, so not used)."""
     parts = [
         {"type": "text", "text": json.dumps({"subject": subject, "format": fmt})},
         {"type": "image_url", "image_url": {"url": metamod.data_uri(_jpeg(out), "image/jpeg")}},
@@ -266,7 +295,7 @@ def _policy(meta: MetaClient, out: Image.Image, subject: str, fmt: str, steps: l
         verdict = meta.json(WONDER, prompts.CHECK_IMAGE.replace("{subject}", subject), parts, ImageCheck)
     except MetaError:
         _step(steps, name, WONDER, False, started)
-        return ImageCheck(ok=False, problems=["the image check did not answer"])
+        return None
     _step(steps, name, WONDER, True, started)
     return verdict
 
@@ -311,8 +340,11 @@ def _one(meta: MetaClient, photo: _Photo, mask: Image.Image | None, fmt: str, st
         checks["fallback"] = "The work did not stay where it was in the photo, so the photo is cropped instead."
         return _plain(photo, fmt, box, {k: v for k, v in checks.items() if k != "box_out"})
     verdict = _policy(meta, out, photo.subject, fmt, steps, f"check_image {label}")
-    checks["policy"] = verdict.model_dump()
-    if not verdict.ok:
+    checks["policy"] = verdict.model_dump() if verdict is not None else None
+    if verdict is None:
+        checks["fallback"] = "The extended image could not be checked, so the photo is cropped instead."
+        return _plain(photo, fmt, box, {k: v for k, v in checks.items() if k != "box_out"})
+    if not verdict.ok or verdict.problems:  # a problem named is a failure, whatever `ok` says
         checks["fallback"] = "The extended image did not pass Google's image rules, so the photo is cropped instead."
         return _plain(photo, fmt, box, {k: v for k, v in checks.items() if k != "box_out"})
     return _Made(photo, fmt, "extended", out, checks)
@@ -356,7 +388,9 @@ def _make(conn: psycopg.Connection, meta: MetaClient, biz: str, steps: list, dea
     text_pool = ThreadPoolExecutor(1, thread_name_prefix="creatives-text")
     image_pool = ThreadPoolExecutor(WORKERS, thread_name_prefix="creatives-image")
     try:
-        text = text_pool.submit(copy.write_and_check, meta, facts, _rules(trade), trade_words, steps=steps)
+        text = text_pool.submit(
+            copy.write_and_check, meta, facts, _rules(trade), trade_words, guide=_guide(), steps=steps
+        )
         reads = [image_pool.submit(_read, meta, p, about, steps) for p in photos]
         cuts: list[tuple[_Photo, Future]] = []
         for photo, future in zip(photos, reads, strict=True):
@@ -394,8 +428,13 @@ def _finish(conn: psycopg.Connection, set_id: str, result: dict) -> None:
     ledger: copy.Ledger = result["ledger"]
     kept = ledger.kept
     stored = {**ledger.model_dump(), "facts": result["facts"], "skipped": result["skipped"]}
-    short = len(kept.headlines) < copy.LIMITS["headlines"][1] or len(kept.descriptions) < copy.LIMITS["descriptions"][1]
-    error = TOO_FEW.format(headlines=len(kept.headlines), descriptions=len(kept.descriptions)) if short else None
+    errors = []
+    if not result["made"]:  # every photo skipped: the reasons, not a ready set with no images
+        reasons = " ".join(f"Photo {s['index']}: {s['why']}" for s in result["skipped"])
+        errors.append(NO_PHOTOS_USED.format(reasons=reasons) if reasons else NO_PHOTOS_AT_ALL)
+    if len(kept.headlines) < copy.LIMITS["headlines"][1] or len(kept.descriptions) < copy.LIMITS["descriptions"][1]:
+        errors.append(TOO_FEW.format(headlines=len(kept.headlines), descriptions=len(kept.descriptions)))
+    error = " ".join(errors) or None
     with conn.transaction():
         row = conn.execute("SELECT status FROM ad_creative_set WHERE id = %s FOR UPDATE", (set_id,)).fetchone()
         if row is None or row["status"] != "making":
@@ -420,18 +459,20 @@ def _finish(conn: psycopg.Connection, set_id: str, result: dict) -> None:
             )
         conn.execute(
             "UPDATE ad_creative_set SET status = %s, ledger = %s, error = %s WHERE id = %s",
-            ("failed" if short else "ready", Jsonb(stored), error, set_id),
+            ("failed" if error else "ready", Jsonb(stored), error, set_id),
         )
 
 
 def run(settings: config.Settings, set_id: str, *, meta: MetaClient | None = None) -> None:
     """Make the `making` set `set_id` (the module's docstring), on a connection of its own. Never raises: whatever
-    goes wrong ends the set `failed` with a sentence the owner can read."""
-    deadline = time.monotonic() + GIVE_UP_S
+    goes wrong ends the set `failed` with a sentence the owner can read. `start` may be called inside the caller's
+    transaction (every MCP tool body is), so the set becomes visible here only once that commits: the run waits up to
+    ROW_WAIT_S for it, and a set that never appears (the caller rolled back) is no run at all."""
     with db.connect(settings.database_url) as conn:
-        row = conn.execute("SELECT business_id, status FROM ad_creative_set WHERE id = %s", (set_id,)).fetchone()
+        row = _await_set(conn, set_id)
         if row is None or row["status"] != "making":
             return
+        deadline = time.monotonic() + GIVE_UP_S
         steps = _Steps(conn, set_id)
         try:
             client = meta or metamod.client(settings)
@@ -440,6 +481,7 @@ def run(settings: config.Settings, set_id: str, *, meta: MetaClient | None = Non
             return
         try:
             result = _make(conn, client, row["business_id"], steps, deadline)
+            _finish(conn, set_id, result)
         except _GiveUp:
             log.warning("creatives: gave up after %.0f s set=%s", GIVE_UP_S, set_id)
             _fail(conn, set_id, TOO_LONG)
@@ -451,8 +493,16 @@ def run(settings: config.Settings, set_id: str, *, meta: MetaClient | None = Non
         except Exception:  # a run on its own thread must end its set, whatever broke (log.exception keeps it)
             log.exception("creatives: run failed set=%s", set_id)
             _fail(conn, set_id, BROKE)
-            return
-        _finish(conn, set_id, result)
+
+
+def _await_set(conn: psycopg.Connection, set_id: str) -> dict | None:
+    """The set's row once this connection can see it, polling up to ROW_WAIT_S; None if it never appears."""
+    ends = time.monotonic() + ROW_WAIT_S
+    while True:
+        row = conn.execute("SELECT business_id, status FROM ad_creative_set WHERE id = %s", (set_id,)).fetchone()
+        if row is not None or time.monotonic() >= ends:
+            return row
+        time.sleep(ROW_POLL_S)
 
 
 def _launch(settings: config.Settings, set_id: str) -> None:
@@ -460,8 +510,10 @@ def _launch(settings: config.Settings, set_id: str) -> None:
 
 
 def start(conn: psycopg.Connection, settings: config.Settings, business_id: str) -> dict:
-    """Start making a set (R3): no photos -> the `needs_photos` card with the upload link, no set, no model called;
-    a set already making -> its card; else a new `making` set, run on a daemon thread. Returns the card."""
+    """Start making a set (R3): no photos -> the `needs_photos` card with the valid upload link (or the sentence naming
+    the tool that gives a fresh one), no set, no model called; a set already making -> its card; else a new `making`
+    set, run on a daemon thread (which waits for this INSERT to commit with the caller's transaction). Returns the
+    card."""
     base = settings.web_base_url
     if not _has_photos(conn, business_id):
         return _needs_photos(conn, business_id, base)
@@ -494,19 +546,16 @@ def _empty_text() -> dict:
     return {kind: [] for kind in copy.LIMITS}
 
 
-def _upload_url(conn: psycopg.Connection, biz: str, base_url: str, *, mint: bool) -> str | None:
-    """The owner's upload link for the current page: the one still valid, else (`mint`) a new one; None without a
-    page."""
+def _upload_url(conn: psycopg.Connection, biz: str, base_url: str) -> str | None:
+    """The owner's upload link for the current page while one is valid, read back, never minted: only create_page and
+    build_site mint them (uploads.new_token); None otherwise."""
     page = landing.current(conn, biz)
-    if page is None:
-        return None
-    url = uploads.latest_upload_url(conn, page["id"], base_url)
-    if url is None and mint:
-        url = f"{base_url}/u/{uploads.new_token(conn, page['id'])}"
-    return url
+    return uploads.latest_upload_url(conn, page["id"], base_url) if page is not None else None
 
 
 def _needs_photos(conn: psycopg.Connection, biz: str, base_url: str) -> dict:
+    """The card before any photo (R3): the valid upload link, and in `error` what the assistant does next."""
+    url = _upload_url(conn, biz, base_url)
     return {
         "status": "needs_photos",
         "set_id": None,
@@ -515,8 +564,8 @@ def _needs_photos(conn: psycopg.Connection, biz: str, base_url: str) -> dict:
         "text": _empty_text(),
         "removed": [],
         "models": {},
-        "upload_url": _upload_url(conn, biz, base_url, mint=True),
-        "error": None,
+        "upload_url": url,
+        "error": NEEDS_PHOTOS if url else NO_UPLOAD_LINK,
     }
 
 
@@ -542,7 +591,7 @@ def card(conn: psycopg.Connection, business_id: str, base_url: str) -> dict:
     if row is None:
         empty = _needs_photos(conn, business_id, base_url)
         if _has_photos(conn, business_id):
-            empty["status"] = None
+            empty["status"], empty["error"] = None, None
         return empty
     ledger = row["ledger"] or {}
     facts = {f["id"]: f["text"] for f in ledger.get("facts") or []}
@@ -577,7 +626,7 @@ def card(conn: psycopg.Connection, business_id: str, base_url: str) -> dict:
         "text": text,
         "removed": removed,
         "models": _models(ledger),
-        "upload_url": _upload_url(conn, business_id, base_url, mint=False),
+        "upload_url": _upload_url(conn, business_id, base_url),
         "error": row["error"],
     }
 

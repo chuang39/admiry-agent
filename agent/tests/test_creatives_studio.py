@@ -49,10 +49,12 @@ def red_mask(img: Image.Image) -> Image.Image:
 
 
 class FakeMeta:
-    def __init__(self, *, privacy=None, sam_empty=False, image_ok=True, edit_delay=0.0):
+    def __init__(self, *, privacy=None, sam_empty=False, image_ok=True, edit_delay=0.0, image_check="answer"):
         self.privacy = privacy or {}
         self.sam_empty = sam_empty
         self.image_ok = image_ok
+        self.image_check = image_check  # answer | down | ok_with_problems
+        self.parts: dict[str, list[list[dict]]] = {}
         self.edit_delay = edit_delay
         self.lock = threading.Lock()
         self.calls: list[tuple[str, str]] = []
@@ -66,6 +68,8 @@ class FakeMeta:
 
     def json(self, model, system, parts, schema):
         self._log(model, schema.__name__)
+        with self.lock:
+            self.parts.setdefault(schema.__name__, []).append(parts)
         body = json.loads(parts[0]["text"])
         if schema is copy.PhotoRead:
             flags = self.privacy.get(body["photo_id"], [])
@@ -73,6 +77,10 @@ class FakeMeta:
                 photo_id=body["photo_id"], subject="new red roof", suitable=True, reason=None, privacy=flags
             )
         if schema is studio.ImageCheck:
+            if self.image_check == "down":
+                raise meta.MetaError("muse-wonder-1.0 is unavailable (503)")
+            if self.image_check == "ok_with_problems":
+                return studio.ImageCheck(ok=True, problems=["a faint seam at the left"])
             return studio.ImageCheck(ok=self.image_ok, problems=[] if self.image_ok else ["a visible seam"])
         if schema is copy.AdText:
             facts = {f["text"]: f["id"] for f in body["facts"]}
@@ -141,7 +149,7 @@ def launched(monkeypatch):
     return calls
 
 
-def business(conn, biz="biz_roof", photos=(), knowledge=KNOWLEDGE) -> list[str]:
+def business(conn, biz="biz_roof", photos=(), knowledge=KNOWLEDGE, kinds=None) -> list[str]:
     conn.execute("INSERT INTO business (id) VALUES (%s)", (biz,))
     conn.execute(
         "INSERT INTO knowledge (business_id, version, json, source) VALUES (%s, 1, %s, 'owner')",
@@ -157,9 +165,9 @@ def business(conn, biz="biz_roof", photos=(), knowledge=KNOWLEDGE) -> list[str]:
         img = Image.open(io.BytesIO(raw))
         pid = f"ph_{biz}_{i}"
         conn.execute(
-            "INSERT INTO page_photo (id, page_id, bytes, content_type, width, height, created_at) "
-            "VALUES (%s, %s, %s, 'image/jpeg', %s, %s, clock_timestamp())",
-            (pid, page, raw, img.width, img.height),
+            "INSERT INTO page_photo (id, page_id, bytes, content_type, width, height, kind, created_at) "
+            "VALUES (%s, %s, %s, 'image/jpeg', %s, %s, %s, clock_timestamp())",
+            (pid, page, raw, img.width, img.height, kinds[i] if kinds else None),
         )
         ids.append(pid)
     return ids
@@ -278,9 +286,104 @@ def test_start_without_photos_needs_photos_and_starts_nothing(conn, settings, la
     business(conn, photos=[])
     card = studio.start(conn, settings, "biz_roof")
     assert card["status"] == "needs_photos" and card["set_id"] is None
-    assert card["upload_url"].startswith(f"{BASE}/u/up_")
+    # R3 corrected: only create_page and build_site mint upload links; without a valid one the card says which tool
+    # gives the owner a fresh one, and mints none itself
+    assert card["upload_url"] is None
+    assert 'update_landing_page with action "build_site"' in card["error"]
+    assert conn.execute("SELECT count(*) AS n FROM upload_token").fetchone()["n"] == 0
     assert launched == []
     assert conn.execute("SELECT count(*) AS n FROM ad_creative_set").fetchone()["n"] == 0
+
+
+def test_needs_photos_card_reads_the_valid_upload_link_back(conn, settings, launched):
+    from agent import uploads
+
+    business(conn, photos=[])
+    token = uploads.new_token(conn, "pg_biz_roof")
+    card = studio.start(conn, settings, "biz_roof")
+    assert card["status"] == "needs_photos" and card["upload_url"] == f"{BASE}/u/{token}"
+    assert card["error"]
+    assert conn.execute("SELECT count(*) AS n FROM upload_token").fetchone()["n"] == 1
+
+
+def test_start_inside_an_open_transaction_the_run_sees_its_set(conn, settings, monkeypatch):
+    # the MCP wrapper runs a tool's body inside `with conn.transaction()`: the run's own connection sees the set only
+    # once that commits, so the run waits for it rather than giving up on a row it cannot see yet
+    business(conn, photos=[photo_bytes(work=SMALL)])
+    fake, threads = FakeMeta(), []
+
+    def launch(settings, set_id):
+        t = threading.Thread(target=studio.run, args=(settings, set_id), kwargs={"meta": fake}, daemon=True)
+        threads.append(t)
+        t.start()
+
+    monkeypatch.setattr(studio, "_launch", launch)
+    with conn.transaction():
+        first = studio.start(conn, settings, "biz_roof")
+        time.sleep(0.5)  # the run has looked for its set by now, and must not have given up on it
+    threads[0].join(timeout=30)
+    assert not threads[0].is_alive()
+    assert studio.card(conn, "biz_roof", BASE)["status"] == "ready" and first["set_id"]
+
+
+def test_writer_gets_the_knowledge_files(conn, settings, launched):
+    business(conn, photos=[photo_bytes(work=SMALL)])
+    fake = FakeMeta()
+    make(conn, settings, launched, fake)
+    sent = " ".join(p["text"] for p in fake.parts["AdText"][0] if p["type"] == "text")
+    for name in ("compliance.md", "roofing.md", "google-search.md", "offers.md"):
+        body = studio._body(studio.RULES_DIR / name)
+        assert body[:200] in sent, name
+
+
+def test_wonder_ok_with_problems_is_a_failure(conn, settings, launched):
+    business(conn, photos=[photo_bytes()])
+    card = make(conn, settings, launched, FakeMeta(image_check="ok_with_problems"))
+    assert [i["method"] for i in card["images"]] == ["plain_crop", "plain_crop"]
+    assert "Google's image rules" in card["images"][0]["checks"]["fallback"]
+
+
+def test_unanswered_image_check_says_it_could_not_be_checked(conn, settings, launched):
+    business(conn, photos=[photo_bytes()])
+    card = make(conn, settings, launched, FakeMeta(image_check="down"))
+    assert [i["method"] for i in card["images"]] == ["plain_crop", "plain_crop"]
+    for img in card["images"]:
+        assert "could not be checked" in img["checks"]["fallback"]
+        assert "Google's image rules" not in img["checks"]["fallback"]
+
+
+def test_an_error_while_finishing_fails_the_set(conn, settings, launched, monkeypatch):
+    business(conn, photos=[photo_bytes(work=SMALL)])
+
+    def broken(img):
+        raise OSError("disk full")
+
+    monkeypatch.setattr(studio.images, "encode", broken)
+    card = make(conn, settings, launched, FakeMeta())
+    assert card["status"] == "failed" and card["error"] == studio.BROKE
+    assert conn.execute("SELECT count(*) AS n FROM ad_creative_image").fetchone()["n"] == 0
+
+
+def test_all_photos_skipped_fails_the_set_with_the_reasons(conn, settings, launched):
+    ids = business(conn, photos=[photo_bytes(), photo_bytes(size=(280, 200), work=None)])
+    card = make(conn, settings, launched, FakeMeta(privacy={ids[0]: ["house numbers"]}))
+    assert card["status"] == "failed" and card["images"] == []
+    assert "house numbers" in card["error"] and "too small" in card["error"]
+    assert {r["text"] for r in card["removed"]} >= {"Photo 1", "Photo 2"}
+
+
+def test_photo_choice_prefers_work_before_after_and_key(conn):
+    kinds = ["team", "place", "work", "key", "before_after", "work", "before_after"]
+    ids = business(conn, photos=[photo_bytes(work=SMALL)] * len(kinds), kinds=kinds)
+    chosen = [r["id"] for r in studio._photo_rows(conn, "biz_roof")]
+    assert chosen == [ids[2], ids[5], ids[4], ids[6], ids[3]]
+
+
+def test_creative_images_are_indexed_by_set(conn):
+    names = {
+        r["indexname"] for r in conn.execute("SELECT indexname FROM pg_indexes WHERE tablename = 'ad_creative_image'")
+    }
+    assert "ad_creative_image_set" in names
 
 
 def test_start_while_making_starts_no_second_run(conn, settings, launched):

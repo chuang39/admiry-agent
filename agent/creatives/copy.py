@@ -189,11 +189,20 @@ def _limits() -> dict:
     return {kind: {"max_characters": chars, "count": high} for kind, (chars, _low, high) in LIMITS.items()}
 
 
-def _write(meta: MetaClient, facts: list[dict], trade: str, steps: list[dict] | None) -> AdText:
+def _knowledge_parts(rules: str, guide: str) -> list[dict]:
+    """What the writer and the repairer read besides the facts (spec §4 step 4): the rules the checker holds them to,
+    and the guide (how Google search ads and offers are written for the vertical)."""
+    parts = [{"type": "text", "text": "Rules:\n" + rules}] if rules else []
+    if guide:
+        parts.append({"type": "text", "text": "Guide:\n" + guide})
+    return parts
+
+
+def _write(meta: MetaClient, facts: list[dict], trade: str, extra: list[dict], steps: list[dict] | None) -> AdText:
     """Spark's ad text; a failed answer is retried once, told what was wrong (spec §4 step 4). A second failure is the
     MetaError the studio reports."""
     body = {"trade": trade, "facts": facts, "limits": _limits()}
-    parts: list[dict] = [{"type": "text", "text": json.dumps(body)}]
+    parts: list[dict] = [{"type": "text", "text": json.dumps(body)}, *extra]
     for attempt in range(2):
         started = time.monotonic()
         try:
@@ -235,8 +244,9 @@ class _Checker:
         self.meta, self.facts, self.rules, self.steps = meta, facts, rules, steps
         self.model = WONDER
 
-    def verdicts(self, lines: list[_Line]) -> dict[str, Verdict] | None:
-        """Verdicts by the claim's normalised text; None when no checker answered."""
+    def verdicts(self, lines: list[_Line]) -> dict[str, list[Verdict]] | None:
+        """Every verdict given, by the claim's normalised text (a checker may answer twice for one line); None when no
+        checker answered."""
         body = {
             "facts": self.facts,
             "claims": [{"text": ln.claim.text, "kind": ln.kind, "fact_ids": ln.claim.fact_ids} for ln in lines],
@@ -252,7 +262,10 @@ class _Checker:
                 continue
             _step(self.steps, "check_text", model, True, started)
             self.model = model
-            return {_norm(v.text): v for v in check.verdicts}
+            out: dict[str, list[Verdict]] = {}
+            for verdict in check.verdicts:
+                out.setdefault(_norm(verdict.text), []).append(verdict)
+            return out
         return None
 
 
@@ -263,11 +276,17 @@ def _why(verdict: Verdict | None) -> str:
     return f"{why} (rule: {verdict.rule})" if verdict.rule else why
 
 
+def _passes(verdicts: list[Verdict]) -> bool:
+    """A line passes only when it got a verdict and every verdict for it is grounded with no rule hit."""
+    return bool(verdicts) and all(v.grounded and not v.rule for v in verdicts)
+
+
 def _repair(
     meta: MetaClient,
     lines: list[_Line],
     facts: list[dict],
     trade: str,
+    extra: list[dict],
     removed: list[Removed],
     steps: list[dict] | None,
     round_no: int,
@@ -284,7 +303,7 @@ def _repair(
     }
     started = time.monotonic()
     try:
-        repairs = meta.json(SPARK, prompts.REPAIR, [{"type": "text", "text": json.dumps(body)}], Repairs)
+        repairs = meta.json(SPARK, prompts.REPAIR, [{"type": "text", "text": json.dumps(body)}, *extra], Repairs)
     except MetaError:
         _step(steps, f"repair_text {round_no}", SPARK, False, started)
         removed.extend(Removed(text=ln.origin, kind=ln.kind, why=ln.why) for ln in lines)
@@ -304,12 +323,21 @@ def _repair(
 
 
 def write_and_check(
-    meta: MetaClient, facts: list[dict], rules: str, trade: str, *, steps: list[dict] | None = None
+    meta: MetaClient,
+    facts: list[dict],
+    rules: str,
+    trade: str,
+    *,
+    guide: str = "",
+    steps: list[dict] | None = None,
 ) -> Ledger:
-    """The ad text, written and checked (spec §4 steps 4-5b). `steps`, when given, gets one `{"step", "model", "ok",
-    "ms"}` per model call. Raises MetaError only when Spark could not write the text at all (twice)."""
+    """The ad text, written and checked (spec §4 steps 4-5b). The writer and the repairer read `rules` (what the checker
+    holds them to) and `guide` (the vertical's knowledge on search ads and offers) besides the facts. `steps`, when
+    given, gets one `{"step", "model", "ok", "ms"}` per model call. Raises MetaError only when Spark could not write the
+    text at all (twice)."""
     known = {f["id"] for f in facts}
-    written = _write(meta, facts, trade, steps)
+    extra = _knowledge_parts(rules, guide)
+    written = _write(meta, facts, trade, extra, steps)
     removed: list[Removed] = []
     taken: set[str] = set()
     kept: list[_Line] = []
@@ -333,11 +361,11 @@ def write_and_check(
                 break
             checked_by.add(checker.model)
             for ln in to_check:
-                verdict = verdicts.get(_norm(ln.claim.text))
-                if verdict is not None and verdict.grounded and not verdict.rule:
+                given = verdicts.get(_norm(ln.claim.text)) or []
+                if _passes(given):
                     kept.append(ln)
                 else:
-                    ln.why = _why(verdict)
+                    ln.why = _why(next((v for v in given if not v.grounded or v.rule), None))
                     rejected.append(ln)
         for ln in rejected:  # a rewrite may say the same as the rejected line again: that is no duplicate
             taken.discard(_norm(ln.claim.text))
@@ -346,7 +374,7 @@ def write_and_check(
         if round_no == MAX_REPAIRS:
             removed.extend(Removed(text=ln.origin, kind=ln.kind, why=ln.why) for ln in rejected)
             break
-        lines = _repair(meta, rejected, facts, trade, removed, steps, round_no + 1)
+        lines = _repair(meta, rejected, facts, trade, extra, removed, steps, round_no + 1)
         if not lines:
             break
     out: dict[str, list[Claim]] = {kind: [] for kind in LIMITS}

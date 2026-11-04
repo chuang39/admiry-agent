@@ -47,14 +47,24 @@ class FakeMeta:
     """Answers `json` by schema: the writer's AdText, the checker's Check (a licence line is never grounded: there is
     no licence fact), the repairer's Repairs (it hands the same line back, so it fails again)."""
 
-    def __init__(self, text: copy.AdText, *, wonder_down: bool = False, bad_shape_first: bool = False):
+    def __init__(
+        self,
+        text: copy.AdText,
+        *,
+        wonder_down: bool = False,
+        bad_shape_first: bool = False,
+        contradicting: str | None = None,
+    ):
         self.text = text
         self.wonder_down = wonder_down
         self.bad_shape_first = bad_shape_first
+        self.contradicting = contradicting  # a line the checker answers twice for: rejected, then grounded
         self.calls: list[tuple[str, str]] = []
+        self.parts: dict[str, list[list[dict]]] = {}
 
     def json(self, model, system, parts, schema):
         self.calls.append((model, schema.__name__))
+        self.parts.setdefault(schema.__name__, []).append(parts)
         if schema is copy.AdText:
             if self.bad_shape_first and len(self.calls) == 1:
                 raise meta.MetaError("muse-spark-1.3 answered in the wrong shape: headlines missing")
@@ -65,7 +75,10 @@ class FakeMeta:
                 raise meta.MetaError("muse-wonder-1.0 is unavailable (503)")
             verdicts = []
             for c in body["claims"]:
-                if "licensed" in c["text"].lower():
+                if c["text"] == self.contradicting:
+                    verdicts.append(copy.Verdict(text=c["text"], grounded=False, rule=LICENCE_RULE, why="No."))
+                    verdicts.append(copy.Verdict(text=c["text"], grounded=True, rule=None, why="Yes."))
+                elif "licensed" in c["text"].lower():
                     verdicts.append(
                         copy.Verdict(text=c["text"], grounded=False, rule=LICENCE_RULE, why="No licence fact.")
                     )
@@ -147,6 +160,23 @@ def test_steps_name_the_models():
     copy.write_and_check(fake, FACTS, "rules", "roofing", steps=steps)
     assert ("check_text", meta.WONDER, False) in [(s["step"], s["model"], s["ok"]) for s in steps]
     assert ("check_text", meta.SPARK, True) in [(s["step"], s["model"], s["ok"]) for s in steps]
+
+
+def test_writer_and_repairer_get_the_rules_and_the_guide():
+    fake = FakeMeta(written(headlines=[claim("Licensed & insured", "f1")]))
+    copy.write_and_check(fake, FACTS, "RULES: say a licence only with its number", "roofing", guide="GUIDE: offers")
+    for name in ("AdText", "Repairs"):
+        for parts in fake.parts[name]:
+            sent = " ".join(p["text"] for p in parts if p["type"] == "text")
+            assert "RULES: say a licence only with its number" in sent and "GUIDE: offers" in sent, name
+    assert len(fake.parts["Repairs"]) == 2
+
+
+def test_any_rejecting_verdict_rejects_the_line():
+    fake = FakeMeta(written(), contradicting="Free Roof Inspections")
+    ledger = copy.write_and_check(fake, FACTS, "rules", "roofing")
+    assert "Free Roof Inspections" not in kept_texts(ledger, "headlines")
+    assert any(r.text == "Free Roof Inspections" and LICENCE_RULE in r.why for r in ledger.removed)
 
 
 def test_facts_of_roofer_sample():
