@@ -187,3 +187,36 @@ def test_a_harness_switch_outside_on_and_off_refuses_to_boot(monkeypatch):
     monkeypatch.setenv("AGENT_HARNESS", "validate")
     with pytest.raises(ValueError, match="AGENT_HARNESS must be on or off"):
         config.load()
+
+
+SANDBOX_SECRET = "sk_test_never_printed_42"
+
+
+@pytest.mark.parametrize("var", ["STRIPE_SANDBOX_SECRET_KEY", "STRIPE_SANDBOX_WEBHOOK_SECRET"])
+@pytest.mark.parametrize("switch", ["AGENT_EXEC_GOOGLE_SEARCH", "AGENT_EXEC_NEWSBREAK", "AGENT_ADS_EXECUTION"])
+def test_a_stripe_sandbox_key_with_any_switch_live_refuses_to_boot(monkeypatch, var, switch):
+    """Final review I3: the sandbox keys pay for allowlisted owners' demo launches, which build nothing that spends
+    (live_paused). With any switch `live` an allowlisted owner's sandbox money would fund real ads, so the box
+    refuses to boot -- and never prints the key."""
+    monkeypatch.setenv("AGENT_LAUNCH_ALLOWLIST", "founder@example.com")
+    monkeypatch.setenv(var, SANDBOX_SECRET)
+    monkeypatch.setenv(switch, "live")
+    with pytest.raises(ValueError, match="STRIPE_SANDBOX") as e:
+        config.load()
+    assert SANDBOX_SECRET not in str(e.value)
+
+
+@pytest.mark.parametrize("mode", ["off", "validate", "live_paused", ""])
+def test_a_stripe_sandbox_key_boots_beside_switches_that_spend_nothing(monkeypatch, mode):
+    monkeypatch.setenv("AGENT_LAUNCH_ALLOWLIST", "founder@example.com")
+    monkeypatch.setenv("STRIPE_SANDBOX_SECRET_KEY", SANDBOX_SECRET)
+    monkeypatch.setenv("STRIPE_SANDBOX_WEBHOOK_SECRET", "whsec_sandbox")
+    monkeypatch.setenv("AGENT_EXEC_GOOGLE_SEARCH", mode)
+    monkeypatch.setenv("AGENT_EXEC_NEWSBREAK", "validate")
+    assert config.load().stripe_sandbox_secret_key == SANDBOX_SECRET
+
+
+def test_a_live_switch_boots_without_the_sandbox_keys(monkeypatch):
+    monkeypatch.setenv("AGENT_EXEC_GOOGLE_SEARCH", "live")
+    monkeypatch.setenv("STRIPE_SANDBOX_SECRET_KEY", "")  # compose's empty value counts as unset
+    assert registry.exec_mode(config.load(), "google_search") == "live"

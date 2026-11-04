@@ -474,6 +474,17 @@ def load() -> Settings:
     # Search's switch as registry.exec_mode reads it: its own AGENT_EXEC_ value, else the old AGENT_ADS_EXECUTION
     if (exec_modes.get(LIVE_PAUSED_CHANNEL) or ads_execution) == LIVE_PAUSED and not launch_allowlist:
         raise ValueError(f"{LIVE_PAUSED} needs AGENT_LAUNCH_ALLOWLIST: it runs for the businesses on that list only")
+    # final review I3: the sandbox keys pay for allowlisted owners' demo launches, which spend nothing; beside a switch
+    # that is `live` their test money would fund real ads. Named by variable only, never by value.
+    sandbox = [n for n in ("STRIPE_SANDBOX_SECRET_KEY", "STRIPE_SANDBOX_WEBHOOK_SECRET") if os.environ.get(n)]
+    live = sorted({f"{EXEC_PREFIX}{c.upper()}" for c, m in exec_modes.items() if m == "live"})
+    if ads_execution == "live":
+        live.append("AGENT_ADS_EXECUTION")
+    if sandbox and live:
+        raise ValueError(
+            f"{' and '.join(sandbox)} cannot be set while {', '.join(live)} is live: sandbox payments would fund "
+            f"real ads (use {LIVE_PAUSED}, validate or off, or unset the sandbox keys)"
+        )
     ops_budget_raw = os.environ.get("ADS_OPS_DAILY_BUDGET") or "2300"
     try:
         ads_ops_daily_budget = int(ops_budget_raw)
