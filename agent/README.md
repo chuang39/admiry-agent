@@ -362,9 +362,15 @@ AGENT_LLM_LIVE=1 $PY -m pytest agent/tests/test_llm_live.py -q   # two Muse Spar
   `agent.ops google-ads-auth` prints; the OAuth client above exchanges it), `GOOGLE_ADS_LINK_MODE` (`api` | `manual`;
   unset = `api` when those three and the OAuth client are set, else `manual`; `api` with one missing refuses to boot),
   `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` (prepaid top-ups and refunds; either unset = `/pay` and the balance
-  tools say payments are not set up and `/hooks/stripe` answers 503; the Stripe endpoint is
+  tools say payments are not set up for every owner without sandbox keys, and `/hooks/stripe` answers 503 while no
+  webhook secret is set; the Stripe endpoint is
   `<AGENT_PUBLIC_BASE_URL>/hooks/stripe` with events `checkout.session.completed`,
-  `checkout.session.async_payment_succeeded`, `checkout.session.expired`), `AGENT_TOPUP_MIN_USD` / `AGENT_TOPUP_MAX_USD`
+  `checkout.session.async_payment_succeeded`, `checkout.session.expired`),
+  `STRIPE_SANDBOX_SECRET_KEY` / `STRIPE_SANDBOX_WEBHOOK_SECRET` (Task 8b: with both set, the owners on
+  `AGENT_LAUNCH_ALLOWLIST` pay with Stripe's sandbox -- checkout, expiry, refunds -- and everyone else with the keys
+  above; `/hooks/stripe` verifies with the regular secret, else the sandbox one, and applies a sandbox-only event just
+  for an allowlisted owner's business; an event naming a Checkout this box did not make is answered 200 and ignored;
+  `agent/stripe_mode.py`), `AGENT_TOPUP_MIN_USD` / `AGENT_TOPUP_MAX_USD`
   (one top-up's bounds in whole dollars, default 200 / 5000; `0 < min ≤ max` or the service refuses to boot),
   `AGENT_EXEC_<CHANNEL>` (M0: `off` | `validate` | `live` per channel — `AGENT_EXEC_GOOGLE_SEARCH`,
   `AGENT_EXEC_NEWSBREAK`, …; unset = `off`, anything else refuses to boot; while `AGENT_EXEC_GOOGLE_SEARCH` is unset,

@@ -250,6 +250,7 @@ from . import (
     proposals,
     render_check,
     stripe_client,
+    stripe_mode,
     support,
     support_mail,
     wallet,
@@ -428,7 +429,9 @@ def _refund(conn, biz: str, amount_text: str, note: str | None) -> int:
     No answer or a 5xx is reported as unconfirmed (it may have gone through: the next run records it if it did), a
     4xx as Stripe's refusal; either way what was refunded before it stays recorded."""
     settings = config.load()
-    if not settings.stripe_secret_key:
+    # the business's owner's keys (Task 8b): the sandbox's for an allowlisted owner, else the regular ones
+    secret_key = stripe_mode.for_business(conn, settings, biz).secret_key
+    if not secret_key:
         print("STRIPE_SECRET_KEY is not set: refunds go through Stripe", file=sys.stderr)
         return 1
     try:
@@ -438,7 +441,7 @@ def _refund(conn, biz: str, amount_text: str, note: str | None) -> int:
         return 1
     with wallet.lock(conn, biz), stripe_client.client() as http:
         try:
-            recorded = _record_stripe_refunds(conn, http, settings.stripe_secret_key, biz)
+            recorded = _record_stripe_refunds(conn, http, secret_key, biz)
         except stripe_client.StripeError as e:
             print(f"could not check Stripe for earlier refunds ({e}); nothing was refunded", file=sys.stderr)
             return 1
@@ -466,7 +469,7 @@ def _refund(conn, biz: str, amount_text: str, note: str | None) -> int:
             try:
                 r = stripe_client.create_refund(
                     http,
-                    secret_key=settings.stripe_secret_key,
+                    secret_key=secret_key,
                     payment_intent=p["payment_intent"],
                     amount_cents=p["amount_cents"],
                     idempotency_key=f"refund-{p['session_id']}-{p['refunded_before']}",

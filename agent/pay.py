@@ -11,13 +11,16 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 from starlette.concurrency import run_in_threadpool
 
-from . import audit, config, db, mail, mail_out, plan_review, setup, stripe_client, wallet
+from . import audit, config, db, mail, mail_out, plan_review, setup, stripe_client, stripe_mode, wallet
 from .web import NO_STORE
 
 log = logging.getLogger(__name__)
 router = APIRouter()
 PAID_EVENTS = ("checkout.session.completed", "checkout.session.async_payment_succeeded")
 FAILED_EVENT = "checkout.session.async_payment_failed"  # a bank debit that did not go through (plan P3)
+EXPIRED_EVENT = "checkout.session.expired"
+# The events that write (Task 8b): each names one of our payment_session rows, or it is ignored with one log line
+WRITING_EVENTS = (*PAID_EVENTS, EXPIRED_EVENT, FAILED_EVENT)
 # Google's third-party policy, transparency (founder 2026-10-03): when 80% or more of a partner's customers spend under
 # $1,000 a month on Google Ads, the partner links Google's "Advertiser guide: Working with third parties" on its site and
 # tells each customer of it at every new sale or renewal -- for Admiry, every credited top-up (`_tell_owner_paid`)
@@ -45,12 +48,19 @@ def handle_event(payload: bytes, signature: str | None) -> JSONResponse:
     once through wallet.topup with its audit row in the same transaction; a completed-but-unpaid Checkout is a bank
     debit on its way (`_on_its_way`, `processing` until Stripe says paid or failed); an expired Checkout marks the
     session; a failed bank debit is `_failed`; everything else is acknowledged (200) so Stripe stops retrying. Bad
-    signature -> 400, nothing written."""
+    signature (neither secret) -> 400, nothing written; neither secret set -> 503.
+
+    Task 8b (rulings R17, R18): the regular secret verifies first, else the sandbox one (STRIPE_SANDBOX_WEBHOOK_SECRET).
+    An event that writes must name a Checkout this server made: another's (the sandbox has dev's and prod's endpoints,
+    so every sandbox event reaches both boxes) is acknowledged with one log line and nothing written -- never a 4xx
+    or 5xx, which Stripe retries and in the end disables the endpoint for. One the sandbox secret alone verified is
+    applied only when its business's owner pays with the sandbox (stripe_mode: on AGENT_LAUNCH_ALLOWLIST), else
+    likewise acknowledged and ignored; its credit's audit row is marked sandbox."""
     settings = config.load()
-    if not settings.stripe_webhook_secret:
+    if not (settings.stripe_webhook_secret or settings.stripe_sandbox_webhook_secret):
         return JSONResponse({"error": "payments are not set up"}, status_code=503)
     try:
-        stripe_client.verify_signature(payload, signature, settings.stripe_webhook_secret)
+        sandbox = _verify(settings, payload, signature)
         event = json.loads(payload)
     except (stripe_client.BadSignature, ValueError):
         return JSONResponse({"error": "bad signature"}, status_code=400)
@@ -59,6 +69,10 @@ def handle_event(payload: bytes, signature: str | None) -> JSONResponse:
     obj = data.get("object") if isinstance(data, dict) else None
     if not isinstance(obj, dict) or not isinstance(obj.get("id"), str):
         return JSONResponse({"received": True, "ignored": str(kind)})
+    if kind in WRITING_EVENTS:
+        ignored = _not_ours(settings, obj["id"], kind, event.get("id"), sandbox=sandbox)
+        if ignored is not None:
+            return JSONResponse({"received": True, "ignored": ignored})
     if kind in PAID_EVENTS:
         amount, intent = obj.get("amount_total"), obj.get("payment_intent")
         if kind == "checkout.session.completed" and obj.get("payment_status") == "unpaid":
@@ -78,7 +92,11 @@ def handle_event(payload: bytes, signature: str | None) -> JSONResponse:
                     tool="web.topup",
                     actor="stripe",
                     business_id=out["business_id"],
-                    args={"session_id": obj["id"], "event_id": event.get("id")},
+                    args={
+                        "session_id": obj["id"],
+                        "event_id": event.get("id"),
+                        **({"sandbox": True, "livemode": event.get("livemode")} if sandbox else {}),
+                    },
                     result={"amount_usd": wallet.to_usd(out["amount_cents"]), "verified_now": out["verified_now"]},
                 )
         if out["credited"]:
@@ -87,7 +105,7 @@ def handle_event(payload: bytes, signature: str | None) -> JSONResponse:
         elif out.get("reason") == "amount mismatch":
             _tell_operator_mismatch(settings, obj["id"], out, amount)
         return JSONResponse({"received": True, "credited": out["credited"]})
-    if kind == "checkout.session.expired":
+    if kind == EXPIRED_EVENT:
         with db.connect(settings.database_url) as conn:
             conn.execute(
                 "UPDATE payment_session SET status = 'expired' WHERE id = %s AND status = 'open'", (obj["id"],)
@@ -96,6 +114,47 @@ def handle_event(payload: bytes, signature: str | None) -> JSONResponse:
     if kind == FAILED_EVENT:
         return _failed(settings, obj["id"])
     return JSONResponse({"received": True, "ignored": kind})
+
+
+def _verify(settings: config.Settings, payload: bytes, signature: str | None) -> bool:
+    """Whether only the sandbox secret verified the event (False: the regular one did). BadSignature when neither
+    does; an unset secret verifies nothing."""
+    try:
+        stripe_client.verify_signature(payload, signature, settings.stripe_webhook_secret or "")
+        return False
+    except stripe_client.BadSignature:
+        if not settings.stripe_sandbox_webhook_secret:
+            raise
+    stripe_client.verify_signature(payload, signature, settings.stripe_sandbox_webhook_secret)
+    return True
+
+
+def _not_ours(settings: config.Settings, session_id: str, kind: str, event_id: object, *, sandbox: bool) -> str | None:
+    """Why a writing event is ignored, after one log line, or None to apply it: "unknown session" when no
+    payment_session row of this server has its id (another box's Checkout, or another server's on the same Stripe
+    account); "sandbox" when only the sandbox secret verified it and the business's owner is not a sandbox user (R18).
+    Reads only."""
+    with db.connect(settings.database_url) as conn:
+        row = conn.execute(
+            "SELECT s.business_id, b.owner_email FROM payment_session s LEFT JOIN business b ON b.id = s.business_id "
+            "WHERE s.id = %s",
+            (session_id,),
+        ).fetchone()
+    if row is not None and (not sandbox or stripe_mode.sandbox_user(settings, row["owner_email"])):
+        return None
+    biz = row["business_id"] if row else None
+    where = "sandbox" if sandbox else "regular"
+    if biz is None:
+        log.info("pay: %s %s (%s) ignored: no Checkout %s on this server", where, kind, event_id, session_id)
+        return "unknown session"
+    log.warning(
+        "pay: sandbox %s (%s) for Checkout %s of business %s ignored: its owner is not on AGENT_LAUNCH_ALLOWLIST",
+        kind,
+        event_id,
+        session_id,
+        biz,
+    )
+    return "sandbox"
 
 
 def _on_its_way(settings: config.Settings, session_id: str) -> JSONResponse:

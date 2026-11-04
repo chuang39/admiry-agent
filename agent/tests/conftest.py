@@ -45,6 +45,8 @@ for _name in (
     "GOOGLE_ADS_LINK_MODE",
     "STRIPE_SECRET_KEY",
     "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_SANDBOX_SECRET_KEY",  # Task 8b: no sandbox unless a test sets it
+    "STRIPE_SANDBOX_WEBHOOK_SECRET",
     "AGENT_TOPUP_MIN_USD",
     "AGENT_TOPUP_MAX_USD",
     "AGENT_CARD_COST_BPS",

@@ -188,7 +188,8 @@ def test_other_events_are_acknowledged_and_ignored(client, conn, stripe, google)
 def test_a_session_this_server_did_not_create_is_acknowledged_without_a_row(client, conn, stripe, google):
     started(client, conn, google)
     r = deliver(client, event(session_id="cs_from_another_server"))
-    assert r.status_code == 200 and r.json() == {"received": True, "credited": False}
+    # Task 8b: said as ignored, with one log line (test_stripe_sandbox: every writing event, either secret)
+    assert r.status_code == 200 and r.json() == {"received": True, "ignored": "unknown session"}
     assert count(conn, "SELECT count(*) AS n FROM wallet_entry") == 0
     assert count(conn, "SELECT count(*) AS n FROM agent_action WHERE tool = 'web.topup'") == 0
 

@@ -89,6 +89,10 @@ class Settings:
     # AGENT_LAUNCH_ALLOWLIST (2026-10-08): owners' e-mails, lower-cased; set, only their businesses launch while a switch
     # is on (registry.exec_mode_for), every other business runs as if it were off. Empty = no list: all follow the switch
     launch_allowlist: frozenset[str] = field(default_factory=frozenset)
+    # STRIPE_SANDBOX_SECRET_KEY / STRIPE_SANDBOX_WEBHOOK_SECRET (Task 8b, founder 2026-11-04): the owners on the list
+    # above pay with Stripe's sandbox when both are set (agent/stripe_mode.py); never printed
+    stripe_sandbox_secret_key: str | None = field(default=None, repr=False)
+    stripe_sandbox_webhook_secret: str | None = field(default=None, repr=False)
     # spec 2026-09-30 support-and-feedback (D144): tickets, the Help button (spec 2026-10-12), contact_support and the plan
     # thumbs; off = today's behaviour everywhere (to_operator keeps its own notice)
     support: bool = False
@@ -511,6 +515,8 @@ def load() -> Settings:
         # are not set up
         stripe_secret_key=os.environ.get("STRIPE_SECRET_KEY") or None,
         stripe_webhook_secret=os.environ.get("STRIPE_WEBHOOK_SECRET") or None,
+        stripe_sandbox_secret_key=os.environ.get("STRIPE_SANDBOX_SECRET_KEY") or None,
+        stripe_sandbox_webhook_secret=os.environ.get("STRIPE_SANDBOX_WEBHOOK_SECRET") or None,
         topup_min_usd=topup_min,
         topup_max_usd=topup_max,
         card_cost_bps=_bounded("AGENT_CARD_COST_BPS", 330, 2000),  # 2.9 % + Chargeback Protection's 0.4 %

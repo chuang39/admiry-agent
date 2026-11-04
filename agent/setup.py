@@ -32,6 +32,7 @@ from . import (
     plans,
     proposals,
     stripe_client,
+    stripe_mode,
     wallet,
 )
 from . import state as read_model  # `state` is this module's own function
@@ -272,7 +273,7 @@ def state(conn, settings: config.Settings, business_id: str, *, chosen: bool = F
             if mode == "managed"
             else None
         ),
-        "payments_ready": settings.payments_ready,
+        "payments_ready": stripe_mode.for_owner(settings, row["owner_email"]).ready,  # per owner (Task 8b)
         "steps": _steps(conn, settings, business_id),
         "ways": offered,
         "ways_note": None if "managed" in offered else MODE_WAITS,
@@ -401,15 +402,18 @@ def _withdraw(settings: config.Settings, owner: Owner, business_id: str, link: g
         raise Refused(ads_mode.LINK_IN_PLACE.format(display=link.display))
 
 
-def _expire(settings: config.Settings, owner: Owner, business_id: str, session_ids: list[str]) -> None:
+def _expire(
+    settings: config.Settings, owner: Owner, business_id: str, session_ids: list[str], keys: stripe_mode.StripeKeys
+) -> None:
     """Expire each unpaid Checkout opened in the last 24 hours at Stripe (older ones died at Stripe already; choose
-    marks them expired itself). A fresh idempotency key per attempt: a key reused within 24 hours would make Stripe
+    marks them expired itself), with the keys of the business's owner (`keys`, stripe_mode.for_owner: the sandbox's
+    for an allowlisted owner). A fresh idempotency key per attempt: a key reused within 24 hours would make Stripe
     replay a transient failure instead of trying again."""
     for sid in session_ids:
         try:  # no connection open
             stripe_client.expire_checkout(
                 stripe_client.client(),
-                secret_key=settings.stripe_secret_key or "",
+                secret_key=keys.secret_key or "",
                 session_id=sid,
                 idempotency_key=f"expire-{secrets.token_hex(16)}",
             )
@@ -519,7 +523,7 @@ def choose(settings: config.Settings, owner: Owner, business_id: str, to: object
         if row["ads_mode"] == "own_account" and link is not None and link.status == "pending":
             _withdraw(settings, owner, business_id, link)
         if row["ads_mode"] == "managed" and open_ids:
-            _expire(settings, owner, business_id, open_ids)
+            _expire(settings, owner, business_id, open_ids, stripe_mode.for_owner(settings, row["owner_email"]))
     with db.connect(settings.database_url) as conn:
         try:
             with conn.transaction():  # ads_mode.change locks the row and checks again: a payment that landed wins
@@ -680,7 +684,8 @@ def pay(
             raise Refused(ads_mode.NOT_CLAIMED)
         if not agreements.terms_accepted(conn, business_id):
             raise Refused(NEEDS_TERMS)
-        if not settings.payments_ready:
+        keys = stripe_mode.for_owner(settings, row["owner_email"])  # the sandbox for an allowlisted owner (Task 8b)
+        if not keys.ready:
             raise Refused(NOT_SET_UP, status=503)
         if waits_for_page(conn, business_id, plan_id):  # the page comes before the money (founder, 2026-10-13)
             raise Refused(PAGE_FIRST)
@@ -715,7 +720,7 @@ def pay(
     try:  # no connection open
         checkout = stripe_client.create_checkout(
             stripe_client.client(),
-            secret_key=settings.stripe_secret_key or "",
+            secret_key=keys.secret_key or "",
             business_id=business_id,
             quote=q,
             product_name=f"Advertising balance for {name}",
@@ -758,7 +763,13 @@ def pay(
             email=owner.email,
             ip=owner.ip,
             business_id=business_id,
-            args={"business_id": business_id, "amount_usd": wallet.to_usd(cents), "rail": rail, "plan_id": plan_id},
+            args={
+                "business_id": business_id,
+                "amount_usd": wallet.to_usd(cents),
+                "rail": rail,
+                "plan_id": plan_id,
+                **({"sandbox": True} if keys.sandbox else {}),  # a sandbox payment says so (Task 8b)
+            },
             result={
                 "session_id": checkout.id,
                 "amount_usd": wallet.to_usd(cents),
@@ -822,7 +833,7 @@ def agree_refusal(conn, settings: config.Settings, business_id: str, plan_id: st
         return locked
     if _hard_lock(conn, business_id, "managed"):
         return ALREADY_PAID
-    return None if settings.payments_ready else NOT_SET_UP
+    return None if stripe_mode.for_business(conn, settings, business_id).ready else NOT_SET_UP
 
 
 def agree_amount_usd(conn, settings: config.Settings, business_id: str) -> int:

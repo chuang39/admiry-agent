@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from fastmcp.exceptions import ToolError
 
-from . import ads_mode, agreements, business, config, envelope, launch_check, setup, wallet
+from . import ads_mode, agreements, business, config, envelope, launch_check, setup, stripe_mode, wallet
 from .mcp_app import agent_tool, need_business, run
 from .util import iso
 
@@ -113,7 +113,7 @@ def get_balance() -> dict:
         }
         if s["transfer_pending_cents"]:
             out["transfer_pending_usd"] = wallet.to_usd(s["transfer_pending_cents"])
-        if not config.load().payments_ready:
+        if not stripe_mode.for_owner(config.load(), row["owner_email"]).ready:  # per owner (Task 8b)
             out["note"] = NOT_SET_UP
         return out
 
@@ -162,7 +162,7 @@ def request_payment_link(amount_usd: float | None = None) -> dict:
             return _ask_page(conn, biz, out)
         elif not agree and not agreements.terms_accepted(conn, biz):
             out.update(pay_url=None, connect_url=url, note=NEEDS_TERMS)
-        elif not s.payments_ready:
+        elif not stripe_mode.for_owner(s, row["owner_email"]).ready:  # the sandbox for an allowlisted owner (Task 8b)
             out.update(pay_url=None, note=NOT_SET_UP)
         return out
 
