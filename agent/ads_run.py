@@ -179,6 +179,7 @@ _OWN = (
     "url_stale",
     "refused_url",
     "stop_owed",
+    "demo_paused",
 )
 
 
@@ -253,6 +254,14 @@ MOVED = "The linked account changed; ask Admiry to move your ads"  # a re-link n
 # follow-up 2, W5; the channels card says the line's own clause)
 STOPPING_ADS = "Admiry is switching your ads on {label} off"
 SWITCHING_OFF = "Switching off"
+# N4 (spec 2026-11-04-muse-verified-creatives-google-ads), the `live_paused` switch (config.LIVE_PAUSED, Google Search
+# only): the real create, everything built paused, and nothing ever turns it on -- not the launch step (`_work` has no
+# `enable` for it, `_create` stops after storing), not a resume (DEMO_PAUSED), not the hourly job (it steps through
+# `_work`), and `_enable` and the Google adapter refuse behind them. Its row stays `launching`, marked
+# `resources.demo_paused`: its clause, badge and audit note say so instead of "turns on"
+DEMO_PAUSED = "Demo mode: these ads were built paused in Google Ads and are not turned on."
+DEMO_CLAUSE = "built in Google Ads, paused — demo mode, nothing spends"
+DEMO_BADGE = "Built in Google Ads, paused (demo mode)"
 RETRY_SOON = "Admiry retries within the hour"
 LAUNCH_LATER = "Your ads are waiting to launch; Admiry retries within the hour."
 OFF = "Your ads are not launched yet, and nothing is spent on them until they are."
@@ -678,6 +687,8 @@ def _execution_clause(row: dict) -> str:
         return "Run by Admiry from the platform's own report"
     if state == "launching" and (row.get("resources") or {}).get("stop_owed"):
         return SWITCHING_OFF  # a refused row whose stop is owed: its ads are going off, never launching (W5)
+    if state == "launching" and (row.get("resources") or {}).get("demo_paused"):
+        return DEMO_BADGE  # N4: built paused under `live_paused`, never turned on
     return "Launching"
 
 
@@ -720,6 +731,8 @@ def state_clause(row: dict, channel: str | None = None) -> str:
     if state == "launching" and owed:
         label = registry.label(row.get("channel") or channel or "")
         return f"{owed['sentence'].rstrip('. ')}; {STOPPING_ADS.format(label=label)}"
+    if state == "launching" and (row.get("resources") or {}).get("demo_paused"):
+        return DEMO_CLAUSE  # N4: built paused under `live_paused`, and nothing turns them on
     if state == "launching":
         return "your ads are built and turn on within the hour"
     if state == "queued":  # A3's `validated` (plan P4)
@@ -1266,13 +1279,20 @@ def _create(
     conn: psycopg.Connection, settings: config.Settings, biz: str, channel: str, account: Account, plan: dict, http
 ) -> None:
     """P7/P8: the adapter's launch (everything paused, or a lost create found by name and read back), stored, then
-    turned on by the enable step."""
+    turned on by the enable step -- except under `live_paused` (N4): stored, marked `demo_paused`, and left paused."""
     adapter = registry.adapter(channel)
     build = adapter.build(conn, settings, biz, plan, _knowledge(conn, biz), account, http=http)
     done = adapter.launch(
         conn, settings, account, build, get(conn, biz, channel)["resources"], http=http, validate_only=False
     )
     _store_built(conn, biz, channel, done.plan_id or plan["id"], done.ids, build)
+    if registry.exec_mode(settings, channel) == config.LIVE_PAUSED:
+        conn.execute(
+            "UPDATE channel_campaign SET resources = resources || '{\"demo_paused\": true}'::jsonb, updated_at = now() "
+            "WHERE business_id = %s AND channel = %s",
+            (biz, channel),
+        )
+        return
     _enable(conn, settings, biz, channel, account, plan, http, done.seen)
 
 
@@ -1491,7 +1511,11 @@ def _enable(
     (`_refuse_url`), unless that page is down, which pauses them. While the page is still at an address the platform
     refused (`resources.refused_url`), nothing is sent and only a stray flag goes (H28). Last, D1's guard: ads that
     carry a page that is down (`_page_down`) are paused for it (`page_down`) instead of turned on -- a launch, any
-    resume, the new month's lift of a month cap alike."""
+    resume, the new month's lift of a month cap alike. Under `live_paused` (N4) it turns nothing on, whoever calls it:
+    `_work` and `_create` never do, and this is the wall behind them."""
+    if registry.exec_mode(settings, channel) == config.LIVE_PAUSED:
+        log.warning("ads enable for business %s on %s refused: the switch is live_paused", biz, channel)
+        return
     latest = approved(conn, biz)
     if latest is not None and channel not in funded_channels(latest):
         return
@@ -1526,7 +1550,8 @@ def _enable(
     adapter.enable(conn, settings, account, plan, row["resources"], http=http, seen=seen)
     conn.execute(
         "UPDATE channel_campaign SET state = 'live', launched_at = COALESCE(launched_at, now()), paused_at = NULL, "
-        "paused_reason = NULL, last_error = NULL, resources = resources - 'paused_by' - 'owner_paused', "
+        "paused_reason = NULL, last_error = NULL, "
+        "resources = resources - 'paused_by' - 'owner_paused' - 'demo_paused', "
         "updated_at = now() WHERE business_id = %s AND channel = %s AND state <> 'paused'",
         (biz, channel),
     )
@@ -1726,7 +1751,8 @@ def _work(settings: config.Settings, row: dict, plan: dict) -> str | None:
     `refresh_url` when the approved version is one the platform refused (H26/S15: never sent again)."""
     channel, state, resources = row["channel"], row["state"], row["resources"]
     funded = channel in funded_channels(plan)
-    if registry.exec_mode(settings, channel) == "validate":
+    mode = registry.exec_mode(settings, channel)
+    if mode == "validate":
         if not funded:
             return None
         if state == "waiting_account":
@@ -1744,8 +1770,10 @@ def _work(settings: config.Settings, row: dict, plan: dict) -> str | None:
         return "recheck"
     if state == "queued":  # ruling S9: a plan checked (validated_at set) launches once the switch is live
         return "create"
-    if state == "launching":
-        return "stop" if resources.get("stop_owed") else "enable"
+    if state == "launching":  # N4: under `live_paused` nothing is ever turned on -- an owed stop is still sent
+        if resources.get("stop_owed"):
+            return "stop"
+        return None if mode == config.LIVE_PAUSED else "enable"
     refused = plan["id"] == resources.get("refused_plan_id")
     if state not in ("live", "limited") or not _built(row):
         return None
@@ -1778,8 +1806,9 @@ def due(settings: config.Settings, channel: str) -> str:
     moved (`url_stale`, A3p-2 H9: normally sent at once by `launch_now`; this is the retry). `validate`: `queued` rows
     not checked yet and rows waiting for their account (validate never touches what is really built). Never a `failed`
     row: only a refusal of the request itself fails a row, and a new approval requeues it; never a row waiting for an
-    image of a channel the plan funds (a new approval brings the image). The channel id goes into the SQL text, so only
-    an id `registry.LABELS` names is taken (ValueError otherwise)."""
+    image of a channel the plan funds (a new approval brings the image). `live_paused` (N4) reads as `live` here: its
+    `launching` rows are due, and `_work` answers them with an owed stop, a `drop`, or nothing -- never `enable`. The
+    channel id goes into the SQL text, so only an id `registry.LABELS` names is taken (ValueError otherwise)."""
     if channel not in registry.LABELS:
         raise ValueError(f"unknown channel {channel!r}")
     mine = f"c.channel = '{channel}'"
@@ -1886,6 +1915,8 @@ def _note(conn: psycopg.Connection, biz: str, before: dict | None, after: dict) 
             if (before or {}).get("launched_at"):
                 return f"turned your ads on {label} back on"
             return f"launched your ads on {label}"
+        if to == "launching" and after["resources"].get("demo_paused"):  # N4: never turned on
+            return f"built your ads on {label}, paused in Google Ads: demo mode, nothing spends"
         if to == "launching":
             return f"built your ads on {label}; they turn on within the hour"
         if to == "failed":
@@ -2067,11 +2098,12 @@ def pause(
     enable may have reached the platform with the answer lost. When the platform cannot be told -- the switch is
     `off`, `validate` never changes what is real, or the platform failed -- `resources.pause_owed` records it (ruling
     S11; the owner reads the adapter's `pause_owed` words): the hourly ads-launch sends the pause under the `live`
-    switch and clears the flag, and it is logged for the operator. Ads never built change only here. It never waits
-    for, or fails on, the lock a running step holds (ruling S17): the pause is then recorded without it, owed whatever
-    is built (a create may be in flight), and that step reads the row again before it turns anything on and never
-    writes a state over `paused`. `by` ("owner", "assistant", "admiry", "job:<name>", "stripe", ...) is kept as
-    `resources.paused_by`. A row already paused gets this pause's mark too, and its `paused_at` moves -- so a resume
+    switch and clears the flag, and it is logged for the operator. `live_paused` (N4) sends it as `live` does: a stop
+    is always allowed. Ads never built change only here. It never waits for, or fails on, the lock a running step
+    holds (ruling S17): the pause is then recorded without it, owed whatever is built (a create may be in flight), and
+    that step reads the row again before it turns anything on and never writes a state over `paused`. `by` ("owner",
+    "assistant", "admiry", "job:<name>", "stripe", ...) is kept as `resources.paused_by`. A row already paused gets
+    this pause's mark too, and its `paused_at` moves -- so a resume
     that read it before loses (ruling S17); one a resume turned back on after this pause read it is paused for real,
     and a pause that lands between this one's read and its write keeps its own mark. A pause the platform takes on a
     refused row whose stop was owed (`stop_owed`, M1 follow-up fix round 1) is that stop: the row is paused, not
@@ -2129,7 +2161,7 @@ def pause(
             owed = "another step for the business is running"
         elif _built(row):
             owed = f"the switch is {mode}"
-            if mode == "live" and adapter.capabilities().pause:
+            if mode in ("live", config.LIVE_PAUSED) and adapter.capabilities().pause:  # N4: a stop is always sent
                 sent = adapter.ops_sent(http)
                 try:
                     adapter.set_paused(conn, settings, _account(conn, biz, channel), row["resources"], True, http=http)
@@ -2137,7 +2169,7 @@ def pause(
                 except (PlatformError, ToolError, Unsupported) as e:  # ToolError: no linked account to tell
                     owed = str(e)
                 ops = adapter.ops_sent(http) - sent
-            elif mode == "live":
+            elif mode in ("live", config.LIVE_PAUSED):
                 owed = "the platform is paused by hand for this channel"
         if owed:
             log.warning(
@@ -2226,8 +2258,9 @@ def resume(
     applied first, the budget checked; what does not finish now, the hourly ads-launch does); ads never built go back
     to where an approval would put them -- `queued` (not checked yet, plan P4), or waiting for the account or the
     image -- and launch. Under the `validate` switch a built campaign's resume is only checked by the platform and the
-    row stays paused. Lifting Admiry's pause forgets the month cap's mark (`month_cap_at`), whether the row turns on or
-    stays paused for the owner: the cap is gone either way. A pause that lands while this runs wins (ruling S17: every
+    row stays paused; under `live_paused` (N4) it is refused (DEMO_PAUSED) and the row stays paused. Lifting Admiry's
+    pause forgets the month cap's mark (`month_cap_at`), whether the row turns on or stays paused for the owner: the
+    cap is gone either way. A pause that lands while this runs wins (ruling S17: every
     write here is conditioned on the `paused_at` it read, and a lift of Admiry's on the reason it read). ToolError with
     an owner sentence when that pause is not there (NOT_PAUSED, or PAUSED_BY_ADMIRY for an owner's resume of Admiry's
     pause) or the ads cannot be changed now.
@@ -2288,6 +2321,8 @@ def resume(
         built, mode = _built(row), registry.exec_mode(settings, channel)
         if built and mode == "off":
             raise ToolError(SWITCHED_OFF.format(label=registry.label(channel)))
+        if built and mode == config.LIVE_PAUSED:  # N4: nothing turns these ads on; ads never built may still be built
+            raise ToolError(DEMO_PAUSED)
         if built and mode == "validate":
             sent = adapter.ops_sent(http)
             account = _account(conn, biz, channel)

@@ -86,7 +86,8 @@ def channel_for_click(kind: str | None) -> str | None:
 
 
 def exec_mode(settings: config.Settings, channel: str) -> str:
-    """off | validate | live for one channel (D81, P7): its AGENT_EXEC_<CHANNEL>; for google_search alone, and for one
+    """off | validate | live | live_paused for one channel (D81, P7; live_paused: N4, Google Search only, never turned
+    on -- agent/ads_run.py): its AGENT_EXEC_<CHANNEL>; for google_search alone, and for one
     release, the old AGENT_ADS_EXECUTION when that is unset; else off. An explicit `off` is a value and wins over the
     alias, so a box can switch Google off without touching the old variable."""
     mode = settings.exec_modes.get(channel)

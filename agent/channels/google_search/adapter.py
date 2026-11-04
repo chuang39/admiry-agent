@@ -1015,7 +1015,10 @@ class GoogleSearchAdapter:
         An owner's pause that landed while the step ran (ruling S17: it never waits for the lock) is final: the row
         is read again right before anything is turned on, and a paused one is left off. `seen` is the campaign as
         the create step just saw it; None reads it by its stored resource name (PlatformError(GONE) once it was
-        removed in Google Ads by hand: an operator decides what happens to it)."""
+        removed in Google Ads by hand: an operator decides what happens to it). Under `live_paused` (N4) nothing is
+        turned on: ToolError(ads_run.DEMO_PAUSED), the last wall behind ads_run's own."""
+        if registry.exec_mode(settings, CHANNEL) == config.LIVE_PAUSED:
+            raise ToolError(ads_run.DEMO_PAUSED)
         biz = account.business_id
         try:
             customer_id = _built_in(conn, biz, resources)
@@ -1171,7 +1174,10 @@ class GoogleSearchAdapter:
         outright is read against Google's own listing of the campaign (M1 follow-up fix round 1, F1): one it lists as
         removed, or not at all -- removed by hand, so it takes no change -- serves nothing, and the stop is done; any
         other keeps the refusal. Never keyed on Google's error code, never a mark on the row: the listing decides each
-        time."""
+        time. Under `live_paused` (N4) an ENABLED is never sent, not even validate-only: ToolError(ads_run.DEMO_PAUSED);
+        a PAUSED always is."""
+        if not paused and registry.exec_mode(settings, CHANNEL) == config.LIVE_PAUSED:
+            raise ToolError(ads_run.DEMO_PAUSED)
         biz = account.business_id
         try:
             customer_id = _built_in(conn, biz, resources)

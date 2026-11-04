@@ -14,7 +14,11 @@ from dataclasses import dataclass, field
 EFFORTS = ("minimal", "low", "medium", "high", "xhigh")
 
 LINK_MODES = ("api", "manual")  # GOOGLE_ADS_LINK_MODE (spec 2026-09-25 §5, §7)
-ADS_EXECUTION_MODES = ("off", "validate", "live")  # AGENT_ADS_EXECUTION (spec 2026-09-28 D49), AGENT_EXEC_<CHANNEL>
+ADS_EXECUTION_MODES = ("off", "validate", "live", "live_paused")  # AGENT_ADS_EXECUTION (D49), AGENT_EXEC_<CHANNEL>
+# spec 2026-11-04-muse-verified-creatives-google-ads N4: Google's real create, everything built paused and never turned
+# on by any path (agent/ads_run.py). Google Search only, and only with AGENT_LAUNCH_ALLOWLIST set: refused at boot else
+LIVE_PAUSED = "live_paused"
+LIVE_PAUSED_CHANNEL = "google_search"
 ROLES_MODES = ("off", "validate", "on")  # AGENT_ROLES (spec 2026-10-07-admiry-capability-layer-design §8.3)
 DIGEST_MODES = ("off", "operator", "on")  # AGENT_DIGEST (spec 2026-09-30-admiry-daily-digest-design §12)
 # the switch per channel (spec 2026-09-29 D81): AGENT_EXEC_GOOGLE_SEARCH, AGENT_EXEC_NEWSBREAK, ...
@@ -76,9 +80,10 @@ class Settings:
     # AGENT_KEY_ENCRYPTION_KEY (M0): seals the owner-side tokens in channel_account.secret_enc (agent/secretbox.py)
     key_encryption_key: str | None = field(repr=False)
     google_ads_link_mode: str = "manual"
-    ads_execution: str = "off"  # AGENT_ADS_EXECUTION (A3 D49): off | validate | live
+    ads_execution: str = "off"  # AGENT_ADS_EXECUTION (A3 D49): off | validate | live | live_paused
     ads_ops_daily_budget: int = 2300  # ADS_OPS_DAILY_BUDGET (A3 ruling S4): Google Ads operations the jobs send a day
-    # AGENT_EXEC_<CHANNEL> (M0, spec 2026-09-29 D81): {channel id: off | validate | live} for the switches that are set.
+    # AGENT_EXEC_<CHANNEL> (M0, spec 2026-09-29 D81): {channel id: off | validate | live | live_paused} for the switches
+    # that are set (live_paused: google_search alone, LIVE_PAUSED).
     # Read through agent.channels.registry.exec_mode(), which also answers for google_search from ads_execution above.
     exec_modes: dict[str, str] = field(default_factory=dict)
     # AGENT_LAUNCH_ALLOWLIST (2026-10-08): owners' e-mails, lower-cased; set, only their businesses launch while a switch
@@ -203,8 +208,9 @@ def _email_settings(api_key: str | None) -> dict:
 
 def _exec_modes() -> dict[str, str]:
     """Every AGENT_EXEC_<CHANNEL> in the environment as {channel id: mode}. An empty value counts as unset (compose
-    passes "" for a variable the box's .env does not set); a mode other than off, validate or live refuses to boot,
-    like AGENT_ADS_EXECUTION. A name no channel answers to is harmless: nothing reads it, so nothing switches on."""
+    passes "" for a variable the box's .env does not set); a mode other than off, validate, live or live_paused refuses
+    to boot, like AGENT_ADS_EXECUTION, and so does live_paused for any channel but Google Search (N4: its owner words
+    and its tests are Google's). A name no channel answers to is harmless: nothing reads it, so nothing switches on."""
     modes: dict[str, str] = {}
     for name, value in sorted(os.environ.items()):
         channel = name.removeprefix(EXEC_PREFIX).lower() if name.startswith(EXEC_PREFIX) else ""
@@ -212,6 +218,8 @@ def _exec_modes() -> dict[str, str]:
             continue
         if value not in ADS_EXECUTION_MODES:
             raise ValueError(f"{name} must be one of {', '.join(ADS_EXECUTION_MODES)} or unset, not {value!r}")
+        if value == LIVE_PAUSED and channel != LIVE_PAUSED_CHANNEL:
+            raise ValueError(f"{name}={LIVE_PAUSED} is for Google Search only (AGENT_EXEC_GOOGLE_SEARCH)")
         modes[channel] = value
     return modes
 
@@ -453,6 +461,11 @@ def load() -> Settings:
         raise ValueError(
             f"AGENT_ADS_EXECUTION must be one of {', '.join(ADS_EXECUTION_MODES)} or unset, not {ads_execution!r}"
         )
+    exec_modes, launch_allowlist = _exec_modes(), _launch_allowlist()
+    # N4: live_paused runs for allowlisted businesses only -- without a list it would build for every business. Google
+    # Search's switch as registry.exec_mode reads it: its own AGENT_EXEC_ value, else the old AGENT_ADS_EXECUTION
+    if (exec_modes.get(LIVE_PAUSED_CHANNEL) or ads_execution) == LIVE_PAUSED and not launch_allowlist:
+        raise ValueError(f"{LIVE_PAUSED} needs AGENT_LAUNCH_ALLOWLIST: it runs for the businesses on that list only")
     ops_budget_raw = os.environ.get("ADS_OPS_DAILY_BUDGET") or "2300"
     try:
         ads_ops_daily_budget = int(ops_budget_raw)
@@ -523,8 +536,8 @@ def load() -> Settings:
         # A3 ruling S4: the ads-launch and ads-sync jobs stop for the day once they have sent this many operations
         # (Explorer access allows 2,880 a day on real accounts; the default leaves room for approvals and ads-probe).
         ads_ops_daily_budget=ads_ops_daily_budget,
-        exec_modes=_exec_modes(),
-        launch_allowlist=_launch_allowlist(),
+        exec_modes=exec_modes,
+        launch_allowlist=launch_allowlist,
         **support,
         # M1: unset (or empty, compose's marker) = NewsBreak not configured: nothing calls it. Blanks around a value
         # (a stray newline in the box's .env) would break the header, so they are dropped.
