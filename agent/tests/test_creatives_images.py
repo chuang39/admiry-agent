@@ -27,7 +27,7 @@ def _noise(w, h, seed=1):
 
 def test_pad_keeps_photo_pixels_at_place():
     photo = Image.new("RGB", (400, 400), (200, 10, 10))
-    _canvas, place = images.pad(photo, "landscape")
+    canvas, place = images.pad(photo, "landscape")
     assert canvas.size == images.SIZES["landscape"]
     left, top, right, bottom = place
     assert (right - left, bottom - top) == (628, 628)
