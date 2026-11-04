@@ -32,6 +32,7 @@ the model never fails a launch.
 
 from __future__ import annotations
 
+import base64
 import math
 import re
 from dataclasses import dataclass
@@ -456,6 +457,55 @@ def campaign_op(resource_name: str, name: str, budget: str, cpc_ceiling_micros: 
     }
 
 
+CALLOUT_MAX = 25  # Google's callout text limit
+RSA_MAX_HEADLINES, RSA_MAX_DESCRIPTIONS = 15, 4  # what one responsive search ad takes
+
+
+def creative_asset_ops(campaign_ref: str, creatives: dict, customer_id: str, start: int) -> list[dict]:
+    """The owner's accepted images and callouts (hackathon spec 2026-11-04 §5) as campaign assets: per image an
+    `IMAGE` asset (named `admiry <set> <format> <n>`, the bytes base64 as REST carries them) linked for `AD_IMAGE`,
+    per callout a callout asset linked for `CALLOUT` -- each asset created right before the link that names it.
+    Temporary asset names count down from `start` (negative; the caller hands the next id of its own call, so they
+    stay unique across the whole mutate). An image with no bytes, a blank callout or one over `CALLOUT_MAX`
+    characters is left out, never sent for Google to refuse the whole mutate."""
+    ids = count(start, -1)
+    set_id = creatives.get("set_id") or ""
+    ops: list[dict] = []
+
+    def link(asset_ref: str, field_type: str) -> dict:
+        return {
+            "campaignAssetOperation": {
+                "create": {"campaign": campaign_ref, "asset": asset_ref, "fieldType": field_type}
+            }
+        }
+
+    for n, image in enumerate(creatives.get("images") or [], start=1):
+        if not image.get("bytes"):
+            continue
+        ref = google_ads.temp("assets", next(ids), customer_id)
+        ops.append(
+            {
+                "assetOperation": {
+                    "create": {
+                        "resourceName": ref,
+                        "name": f"admiry {set_id} {image.get('format')} {n}",
+                        "type": "IMAGE",
+                        "imageAsset": {"data": base64.b64encode(image["bytes"]).decode("ascii")},
+                    }
+                }
+            }
+        )
+        ops.append(link(ref, "AD_IMAGE"))
+    for text in creatives.get("callouts") or []:
+        text = (text or "").strip()
+        if not text or len(text) > CALLOUT_MAX:
+            continue
+        ref = google_ads.temp("assets", next(ids), customer_id)
+        ops.append({"assetOperation": {"create": {"resourceName": ref, "calloutAsset": {"calloutText": text}}}})
+        ops.append(link(ref, "CALLOUT"))
+    return ops
+
+
 def operations(
     plan: dict,
     knowledge: dict,
@@ -465,13 +515,18 @@ def operations(
     account: Account,
     customer_id: str,
     dropped: Dropped = NOTHING_DROPPED,
+    creatives: dict | None = None,
 ) -> list[dict]:
     """The one create-mutate a launch sends (spec §4), every resource `PAUSED` (D50 -- `enable` turns the
     campaign on after this succeeds), temporary resource names negative and unique across the call. Assumes
     the plan is fundable and launchable (a funded Google Search channel, a phone, a resolved `target`):
     `ads_run.precheck`, with the adapter's own `precheck`, is where an unfit plan is refused with an owner sentence,
     not here. `dropped` is what every Google build of the business leaves out -- a line Google refused, by its exact
-    text (spec 2026-10-11 §5; ruling L2): those lines and phrases are never sent again."""
+    text (spec 2026-10-11 §5; ruling L2): those lines and phrases are never sent again.
+    `creatives` is the owner's accepted creative set (hackathon spec 2026-11-04 §5; `studio.accepted`'s shape), None
+    when there is none -- the mutate is then exactly what it was before. Its headlines and descriptions, when it has
+    any, replace the plan's in every ad (the copy linter, `dropped` and the service-name pin still apply); its images
+    and callouts are appended as campaign assets (`creative_asset_ops`), after everything else."""
     biz = plan["business_id"]
     c = plan["sections"]["consultation"]
     ch = plan["sections"]["ads"]["channels"][0]
@@ -501,9 +556,16 @@ def operations(
 
     ops.extend(_negative_ops(campaign_ref, _negatives(list(ch.get("negatives") or []), recipe["negatives"])))
 
+    accepted = creatives or {}
     kept_headlines, kept_descriptions, _notes = kept_lines(
-        list(ch.get("headlines") or []), list(ch.get("descriptions") or []), recipe["banned"], dropped
+        list(accepted.get("headlines") or ch.get("headlines") or []),
+        list(accepted.get("descriptions") or ch.get("descriptions") or []),
+        recipe["banned"],
+        dropped,
     )
+    if accepted:  # the owner's own set may run longer than one ad takes; the plan's never does
+        kept_headlines = kept_headlines[:RSA_MAX_HEADLINES]
+        kept_descriptions = kept_descriptions[:RSA_MAX_DESCRIPTIONS]
     headlines_payload = _pin_headlines(kept_headlines, service_names)
     example_searches = list((plan["sections"].get("rationale") or {}).get("example_searches") or [])
     intent_phrases = _intent_phrases(knowledge, service_names)
@@ -562,6 +624,9 @@ def operations(
             {"campaignAssetOperation": {"create": {"campaign": campaign_ref, "asset": asset_ref, "fieldType": "CALL"}}}
         )
 
+    if accepted:
+        ops.extend(creative_asset_ops(campaign_ref, accepted, customer_id, next(ids)))
+
     return ops
 
 
@@ -596,7 +661,8 @@ def resources_from(responses: list[dict], operations: list[dict], *, ad_groups: 
     list this call sent (one response per operation, in the same order). Keyed the way `diff` (P10) and
     `channel_campaign.resources` need them -- by the one thing that still means something once
     this mutate is over, since a temp id does not: `"campaign_budget"`, `"campaign"`, `"call_asset"` and
-    `"campaign_asset"` each a single resource name; `"ad_groups"` and `"ads"` each `{theme: resource_name}`;
+    `"campaign_asset"` (the call asset and its `CALL` link only: an accepted image or callout and its link are not
+    kept) each a single resource name; `"ad_groups"` and `"ads"` each `{theme: resource_name}`;
     `"keywords"` `{theme: {keyword_text: resource_name}}`; `"negatives"` `{keyword_text: resource_name}`
     (campaign-level negative criteria); `"geo_criteria"` the location/proximity criteria, as a list (`diff`
     replaces all of them together, never one at a time); `"final_url"` (A3p-2 H9) the address every ad this
@@ -649,9 +715,10 @@ def resources_from(responses: list[dict], operations: list[dict], *, ad_groups: 
             final_urls = (body.get("ad") or {}).get("finalUrls")
             if final_urls:  # H9: every ad a create/diff sends carries the same page_url; any one confirms it
                 out["final_url"] = final_urls[0]
-        elif kind == "assetOperation":
+        # the call asset and its CALL link only: an accepted image or callout (creative_asset_ops) is not kept
+        elif kind == "assetOperation" and "callAsset" in body:
             out["call_asset"] = resource_name
-        elif kind == "campaignAssetOperation":
+        elif kind == "campaignAssetOperation" and body.get("fieldType") == "CALL":
             out["campaign_asset"] = resource_name
     return out
 

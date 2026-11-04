@@ -477,6 +477,8 @@ def _operations(
         account=_account(conn, settings, biz, customer_id, http),
         customer_id=customer_id,
         dropped=build.payload.get("dropped") or ads_launch.NOTHING_DROPPED,
+        # the owner's accepted creative set (hackathon spec 2026-11-04 §5), None when there is none
+        creatives=build.payload.get("creatives"),
     )
 
 

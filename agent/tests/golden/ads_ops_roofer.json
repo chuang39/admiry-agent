@@ -1,0 +1,381 @@
+[
+  {
+    "campaignBudgetOperation": {
+      "create": {
+        "resourceName": "customers/4445556666/campaignBudgets/-1",
+        "name": "Admiry · Hill Country Roofing · biz_roofer budget",
+        "amountMicros": 49340000,
+        "deliveryMethod": "STANDARD",
+        "explicitlyShared": false
+      }
+    }
+  },
+  {
+    "campaignOperation": {
+      "create": {
+        "resourceName": "customers/4445556666/campaigns/-2",
+        "name": "Admiry · Hill Country Roofing · biz_roofer",
+        "status": "PAUSED",
+        "advertisingChannelType": "SEARCH",
+        "campaignBudget": "customers/4445556666/campaignBudgets/-1",
+        "targetSpend": {
+          "cpcBidCeilingMicros": 15000000
+        },
+        "networkSettings": {
+          "targetGoogleSearch": true,
+          "targetSearchNetwork": false,
+          "targetContentNetwork": false,
+          "targetPartnerSearchNetwork": false
+        },
+        "geoTargetTypeSetting": {
+          "positiveGeoTargetType": "PRESENCE",
+          "negativeGeoTargetType": "PRESENCE"
+        },
+        "containsEuPoliticalAdvertising": "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "proximity": {
+          "geoPoint": {
+            "latitudeInMicroDegrees": 30267200,
+            "longitudeInMicroDegrees": -97743100
+          },
+          "radius": 15.0,
+          "radiusUnits": "MILES"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "language": {
+          "languageConstant": "languageConstants/1000"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "roofing jobs",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "jobs",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "salary",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "diy",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "how to",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "course",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "free",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupOperation": {
+      "create": {
+        "resourceName": "customers/4445556666/adGroups/-3",
+        "name": "roof repair austin",
+        "campaign": "customers/4445556666/campaigns/-2",
+        "status": "ENABLED",
+        "type": "SEARCH_STANDARD"
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-3",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "roof repair austin",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-3",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "roof leak repair near me",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-3",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "roofer austin",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-3",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "emergency roof repair",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-3",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "shingle repair",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupAdOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-3",
+        "status": "ENABLED",
+        "ad": {
+          "finalUrls": [
+            "https://hillcountryroofing.example/roof-repair?src=gads"
+          ],
+          "responsiveSearchAd": {
+            "headlines": [
+              {
+                "text": "Roof Repair in Austin",
+                "pinnedField": "HEADLINE_1"
+              },
+              {
+                "text": "Free Roof Inspections"
+              },
+              {
+                "text": "Licensed Austin Roofers"
+              }
+            ],
+            "descriptions": [
+              {
+                "text": "Leaks, storm damage and worn shingles fixed by a local crew. Book a visit."
+              },
+              {
+                "text": "Licensed and insured roofers serving Austin and Round Rock."
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "adGroupOperation": {
+      "create": {
+        "resourceName": "customers/4445556666/adGroups/-4",
+        "name": "roof replacement",
+        "campaign": "customers/4445556666/campaigns/-2",
+        "status": "ENABLED",
+        "type": "SEARCH_STANDARD"
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-4",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "roof replacement",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-4",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "roof leak repair near me",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-4",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "roofer austin",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-4",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "emergency roof repair",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-4",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "shingle repair",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupAdOperation": {
+      "create": {
+        "adGroup": "customers/4445556666/adGroups/-4",
+        "status": "ENABLED",
+        "ad": {
+          "finalUrls": [
+            "https://hillcountryroofing.example/roof-repair?src=gads"
+          ],
+          "responsiveSearchAd": {
+            "headlines": [
+              {
+                "text": "Roof Repair in Austin",
+                "pinnedField": "HEADLINE_1"
+              },
+              {
+                "text": "Free Roof Inspections"
+              },
+              {
+                "text": "Licensed Austin Roofers"
+              }
+            ],
+            "descriptions": [
+              {
+                "text": "Leaks, storm damage and worn shingles fixed by a local crew. Book a visit."
+              },
+              {
+                "text": "Licensed and insured roofers serving Austin and Round Rock."
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "assetOperation": {
+      "create": {
+        "resourceName": "customers/4445556666/assets/-5",
+        "callAsset": {
+          "countryCode": "US",
+          "phoneNumber": "5125550142",
+          "callConversionReportingState": "USE_RESOURCE_LEVEL_CALL_CONVERSION_ACTION",
+          "callConversionAction": "customers/4445556666/conversionActions/7"
+        }
+      }
+    }
+  },
+  {
+    "campaignAssetOperation": {
+      "create": {
+        "campaign": "customers/4445556666/campaigns/-2",
+        "asset": "customers/4445556666/assets/-5",
+        "fieldType": "CALL"
+      }
+    }
+  }
+]
