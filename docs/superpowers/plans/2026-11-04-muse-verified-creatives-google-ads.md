@@ -246,6 +246,37 @@ then `campaignAssetOperation.create` `{campaign: campaign_ref, asset: temp, fiel
   `test_resume_refused_under_live_paused`; `test_off_list_owner_is_off` (allowlist still applies).
 - [ ] **Step 2:** Implement; PASS with the existing ads_run tests; ruff; commit.
 
+### Task 8b: Stripe sandbox for allowlisted owners (founder ruling 2026-11-04)
+
+The founder's rule: an owner on `AGENT_LAUNCH_ALLOWLIST` pays with Stripe **sandbox** (test cards); everyone else
+uses the regular Stripe keys (unset on prod today, so their payment step keeps saying it is not set up).
+
+**Files:**
+- Modify: `agent/config.py` (`stripe_sandbox_secret_key` ← `STRIPE_SANDBOX_SECRET_KEY`,
+  `stripe_sandbox_webhook_secret` ← `STRIPE_SANDBOX_WEBHOOK_SECRET`, both `repr=False`, never printed), the Stripe
+  callers that create checkouts, refunds or read payments (`agent/setup.py`, `agent/ops.py`, `agent/wallet.py`,
+  `agent/tools_account.py`, others found by `git grep -n stripe_secret_key`), `agent/pay.py` (`/hooks/stripe`)
+- Create: `agent/stripe_mode.py`
+- Test: `agent/tests/test_stripe_sandbox.py`
+
+**Interfaces — Produces:**
+- `stripe_mode.for_owner(settings, owner_email: str | None) -> StripeKeys` where
+  `@dataclass(frozen=True) class StripeKeys: secret_key: str | None; webhook_secret: str | None; sandbox: bool`
+  — sandbox keys when the owner's lower-cased e-mail is on the allowlist AND both sandbox keys are set; the regular
+  keys otherwise. `for_business(conn, settings, business_id) -> StripeKeys` reads the owner.
+- `has_stripe` becomes per owner: the payment step is offered when `for_owner(...)` has both keys.
+- `/hooks/stripe`: verify the signature with the regular secret, else with the sandbox secret. An event verified
+  only by the sandbox secret is applied ONLY when its business's owner is allowlisted (else logged and ignored,
+  200). Events carry `livemode`; a sandbox payment is recorded like any other and marked sandbox where the payment
+  row or its audit allows it.
+
+- [ ] **Step 1: Failing tests:** `test_allowlisted_owner_gets_sandbox_keys`; `test_other_owner_gets_regular_keys`;
+  `test_no_sandbox_keys_means_regular_for_everyone`; `test_checkout_for_allowlisted_owner_uses_sandbox_key`
+  (the HTTP call to Stripe carries the sandbox key); `test_webhook_sandbox_signature_credits_allowlisted_owner`;
+  `test_webhook_sandbox_signature_ignored_for_other_owner`; `test_webhook_regular_signature_unchanged`;
+  `test_payment_step_offered_to_allowlisted_owner_without_regular_keys`.
+- [ ] **Step 2:** Implement; PASS together with the existing tests of every module touched; ruff; commit.
+
 ### Task 9: Live smoke on dev, then the Muse walk
 
 **Files:**
