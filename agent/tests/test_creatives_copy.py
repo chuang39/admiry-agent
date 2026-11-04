@@ -120,6 +120,19 @@ def test_grounded_claim_kept():
     assert fake.count("Repairs") == 0
 
 
+def test_a_callout_may_repeat_a_headline_but_not_another_callout():
+    """Final review (Task 9a minor): Google takes a callout that says what a headline says, so a duplicate is one
+    within its own kind only."""
+    callouts = [claim("Free Roof Inspections", "f3"), claim("free  inspections", "f3")]
+    fake = FakeMeta(written(callouts=callouts))
+    ledger = copy.write_and_check(fake, FACTS, "rules", "roofing")
+    assert kept_texts(ledger, "callouts") == ["Free Inspections", "Free Roof Inspections"]
+    assert "Free Roof Inspections" in kept_texts(ledger, "headlines")
+    assert [(r.text, r.kind, r.why) for r in ledger.removed] == [
+        ("free  inspections", "callouts", "Says the same as another line.")
+    ]
+
+
 def test_overlong_headline_dropped_not_truncated():
     long = "Charlotte's Friendliest Roof Repair Crew"  # 40 characters
     fake = FakeMeta(written(headlines=[claim(long, "f2")]))

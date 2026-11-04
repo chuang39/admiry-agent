@@ -218,8 +218,9 @@ def _write(meta: MetaClient, facts: list[dict], trade: str, extra: list[dict], s
     raise AssertionError("unreachable")  # pragma: no cover - the loop returns or raises
 
 
-def _shape(lines: list[_Line], taken: set[str], removed: list[Removed]) -> list[_Line]:
-    """Google's shape, enforced by code: an empty line, one over its kind's length, or one already said is dropped."""
+def _shape(lines: list[_Line], taken: set[tuple[str, str]], removed: list[Removed]) -> list[_Line]:
+    """Google's shape, enforced by code: an empty line, one over its kind's length, or one its own kind already said is
+    dropped (`taken` is keyed by kind and normalised text: a callout may say what a headline says, Google takes it)."""
     out = []
     for line in lines:
         text = line.claim.text.strip()
@@ -229,10 +230,10 @@ def _shape(lines: list[_Line], taken: set[str], removed: list[Removed]) -> list[
         if len(text) > chars:
             removed.append(Removed(text=line.origin, kind=line.kind, why=f"Longer than {chars} characters."))
             continue
-        if _norm(text) in taken:
+        if (line.kind, _norm(text)) in taken:
             removed.append(Removed(text=line.origin, kind=line.kind, why="Says the same as another line."))
             continue
-        taken.add(_norm(text))
+        taken.add((line.kind, _norm(text)))
         out.append(_Line(line.kind, line.origin, Claim(text=text, fact_ids=line.claim.fact_ids), line.why))
     return out
 
@@ -339,7 +340,7 @@ def write_and_check(
     extra = _knowledge_parts(rules, guide)
     written = _write(meta, facts, trade, extra, steps)
     removed: list[Removed] = []
-    taken: set[str] = set()
+    taken: set[tuple[str, str]] = set()
     kept: list[_Line] = []
     checker = _Checker(meta, facts, rules, steps)
     checked_by: set[str] = set()
@@ -368,7 +369,7 @@ def write_and_check(
                     ln.why = _why(next((v for v in given if not v.grounded or v.rule), None))
                     rejected.append(ln)
         for ln in rejected:  # a rewrite may say the same as the rejected line again: that is no duplicate
-            taken.discard(_norm(ln.claim.text))
+            taken.discard((ln.kind, _norm(ln.claim.text)))
         if not rejected:
             break
         if round_no == MAX_REPAIRS:
