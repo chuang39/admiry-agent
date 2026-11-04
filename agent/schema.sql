@@ -1178,3 +1178,24 @@ CREATE TABLE IF NOT EXISTS refusal_summary (
 -- §2.3: the active rule a refused line matched when the Reviewer recorded it (local_rules.stamp): the summary's hits
 -- -- a rule that was right, and a line that still reached Google under it.
 ALTER TABLE ads_refusal ADD COLUMN IF NOT EXISTS rule_id TEXT REFERENCES refusal_rule(id) ON DELETE SET NULL;
+
+-- Verified creatives (spec 2026-11-04-muse-verified-creatives-google-ads §4): one set per studio run -- the steps it
+-- took (`{step, model, ok, ms}`), the claim ledger (kept lines with their facts, removed lines and skipped photos with
+-- why, the checker), an owner-readable error when it failed -- and its images: the owner's photo extended to Google's
+-- sizes or plainly cropped, with what each check found. The images are the raw bytes sent to Google.
+CREATE TABLE IF NOT EXISTS ad_creative_set (
+  id          TEXT PRIMARY KEY,                                   -- cs_…
+  business_id TEXT NOT NULL REFERENCES business(id) ON DELETE CASCADE,
+  status      TEXT NOT NULL CHECK (status IN ('making', 'ready', 'failed', 'accepted')),
+  steps       JSONB NOT NULL DEFAULT '[]', ledger JSONB, error TEXT,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(), accepted_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS ad_creative_set_biz ON ad_creative_set (business_id, created_at DESC);
+CREATE TABLE IF NOT EXISTS ad_creative_image (
+  id        TEXT PRIMARY KEY,                                     -- ci_…, unguessable (db.new_id)
+  set_id    TEXT NOT NULL REFERENCES ad_creative_set(id) ON DELETE CASCADE,
+  photo_id  TEXT NOT NULL, format TEXT NOT NULL CHECK (format IN ('landscape', 'square')),
+  method    TEXT NOT NULL CHECK (method IN ('extended', 'plain_crop')),
+  bytes     BYTEA NOT NULL, content_type TEXT NOT NULL, width INT NOT NULL, height INT NOT NULL,
+  checks    JSONB NOT NULL
+);
