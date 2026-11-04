@@ -889,3 +889,32 @@ def sign_out(request: Request, csrf: str | None = Form(None)):
     response.delete_cookie(VISIT_COOKIE, path="/api")
     response.delete_cookie(BIZ_COOKIE, path="/")
     return response
+
+
+# The pictures of a set of ads made from the owner's photos (hackathon spec 2026-11-04 §3 step 3; plan Task 6): served
+# by the image's own unguessable id (ad_creative_image.id, db.new_id), like a page's photos (hosted._photo_response) --
+# no session, so the card's links open in Muse and in the web chat alike; a wrong id is a plain 404. `/original` is the
+# owner's photo the picture was made from (the "before" of the card's before/after).
+CREATIVE_CACHE = {"Cache-Control": "public, max-age=86400", "X-Content-Type-Options": "nosniff"}
+
+
+def _creative(sql: str, image_id: str) -> Response:
+    with db.connect(config.load().database_url) as conn:
+        row = conn.execute(sql, (image_id,)).fetchone()
+    if row is None:
+        return Response("Not found.", status_code=404, media_type="text/plain")
+    return Response(bytes(row["bytes"]), media_type=row["content_type"], headers=CREATIVE_CACHE)
+
+
+@router.get("/creatives/{image_id}")
+def creative_image(image_id: str) -> Response:
+    return _creative("SELECT bytes, content_type FROM ad_creative_image WHERE id = %s", image_id)
+
+
+@router.get("/creatives/{image_id}/original")
+def creative_original(image_id: str) -> Response:
+    return _creative(
+        "SELECT p.bytes, p.content_type FROM ad_creative_image i JOIN page_photo p ON p.id = i.photo_id "
+        "WHERE i.id = %s",
+        image_id,
+    )

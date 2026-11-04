@@ -78,6 +78,7 @@ PUBLIC = [
     "get_billing",
     "get_activity_log",
     "contact_support",
+    "suggest_ad_creatives",  # hackathon 2026-11-04: ads made from the owner's own photos
 ]
 ON_MAIN = (  # the 47 tools assistants knew before this surface (spec Appendix A)
     "whoami",
@@ -147,7 +148,7 @@ def test_assistants_see_exactly_the_public_tools(client, conn, strict_surface):
     key = business_with_key(conn, claim_state="claimed")
     tools = rpc(client, "tools/list", key=key)["result"]["tools"]
     by_name = {t["name"]: t for t in tools}
-    assert sorted(by_name) == sorted(PUBLIC) and len(tools) == 27
+    assert sorted(by_name) == sorted(PUBLIC) and len(tools) == 28
     assert sorted(m.name for m in registry.SURFACE) == sorted(PUBLIC) and gate.PUBLIC == set(PUBLIC)
     cards = {n: t["_meta"]["ui"]["resourceUri"] for n, t in by_name.items() if (t.get("_meta") or {}).get("ui")}
     assert cards == {
@@ -240,7 +241,7 @@ def test_a_public_tool_runs_exactly_the_commands_it_declares():
         assert called == set(meta.commands), (meta.name, sorted(called), sorted(meta.commands))
     public = {meta.name for meta in registry.SURFACE}
     written = set()
-    for module in ("context.py", "outcomes.py", "plan.py", "run.py", "supporting.py"):
+    for module in ("context.py", "creatives.py", "outcomes.py", "plan.py", "run.py", "supporting.py"):
         tree = ast.parse((REPO / "agent" / "surface" / module).read_text())
         tools = [n for n in tree.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name in public]
         written |= {node.name for node in tools}

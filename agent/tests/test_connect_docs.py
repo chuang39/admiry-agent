@@ -60,7 +60,7 @@ def test_tools_json_lists_the_public_tools_with_schemas_and_classes(client):
     body = r.json()
     assert body["mcp_url"] == "http://testserver/mcp" and body["version"] == gate.SURFACE_VERSION
     by_name = {t["name"]: t for t in body["tools"]}
-    assert len(by_name) == 27 and "whoami" not in by_name and "start" not in by_name
+    assert len(by_name) == 28 and "whoami" not in by_name and "start" not in by_name
     assert by_name["get_site_templates"]["class"] == "RO" and by_name["get_site_templates"]["scope"] == "read"
     assert by_name["get_marketing_state"]["class"] == "RO" and by_name["get_marketing_state"]["approval"] == "none"
     assert by_name["launch_marketing_plan"]["class"] == "P" and by_name["launch_marketing_plan"]["approval"] == "code"
@@ -183,7 +183,7 @@ def test_the_tool_list_builds_in_a_process_that_imported_connect_first():
         [sys.executable, "-c", code], cwd=REPO, capture_output=True, text=True, timeout=120, check=False
     )
     assert done.returncode == 0, done.stderr
-    assert done.stdout.split() == ["27", "get_marketing_state"]
+    assert done.stdout.split() == ["28", "get_marketing_state"]
 
 
 def test_docs_teach_oauth_and_google_sign_in(client):

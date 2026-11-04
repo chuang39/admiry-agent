@@ -570,6 +570,7 @@ from . import (  # noqa: F401 - imported to register the commands
     tools_business,
     tools_channels,
     tools_consult,
+    tools_creatives,
     tools_hosting,
     tools_insights,
     tools_pages,

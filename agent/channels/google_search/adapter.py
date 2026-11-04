@@ -51,6 +51,7 @@ from ... import (
     wallet,
 )
 from ...config import Settings
+from ...creatives import studio
 from .. import registry
 from ..base import (
     Account,
@@ -910,6 +911,8 @@ class GoogleSearchAdapter:
                 # line Google refused, by its exact text, whichever version it was refused in -- read once, here;
                 # never by editing the version the owner agreed to
                 "dropped": ads_refusal.dropped(conn, business_id, settings=settings),
+                # the owner's accepted creative set (hackathon spec 2026-11-04 §5), None when there is none
+                "creatives": studio.accepted(conn, business_id),
             },
             summary={
                 "daily_usd": google_ads.from_micros(ads_launch.daily_micros(ch["monthly_usd"])),

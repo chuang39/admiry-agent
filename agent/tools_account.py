@@ -54,6 +54,8 @@ VERBS = {  # tool -> (past tense with placeholders, infinitive for failures)
     "build_site": ("{who} asked Admiry to build the site", "build the site"),
     "get_site": ("{who} looked at the site Admiry builds", "look at the site Admiry builds"),
     "get_site_templates": ("{who} looked at the looks a site can have", "look at the looks a site can have"),
+    # hackathon 2026-11-04 Task 6: ads made from the business's own photos -- a set started or read, or accepted
+    "ad_creatives": ("{who} asked for ads made from the business's photos", "ask for ads made from the photos"),
     "answer": ("{who} answered the consultation questions", "answer the consultation questions"),
     "recommend": ("{who} built plan v{version} from the consultation", "build a plan from the consultation"),
     "adjust": ("{who} adjusted the plan into v{version}", "adjust the plan"),

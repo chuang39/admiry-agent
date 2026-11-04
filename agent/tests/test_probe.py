@@ -217,7 +217,7 @@ def test_the_probe_walks_the_server_in_process_through_the_sdk_client(client, co
         "plan card on ['get_marketing_plan', 'update_marketing_budget', 'update_marketing_plan']"
         in by_id["P4"].observed
     )
-    assert "27 tools" in by_id["P4"].observed and "commands hidden True" in by_id["P4"].observed
+    assert "28 tools" in by_id["P4"].observed and "commands hidden True" in by_id["P4"].observed
     assert by_id["P4"].observed.endswith("; the names /connect/tools.json publishes")
     assert "text/html;profile=mcp-app" in by_id["P5"].observed
     # the website first (the walk's words name none: its first option is the fixture site the reading saw, read), the

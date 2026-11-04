@@ -110,7 +110,7 @@ def test_a_business_with_nothing_is_told_to_begin(client, conn):
     env = _state(client, key)
     d = env["data"]
     assert tuple(d) == tools_state.STATE_KEYS
-    assert d["surface_version"] == gate.SURFACE_VERSION == "2026-10-15"
+    assert d["surface_version"] == gate.SURFACE_VERSION == "2026-11-04"
     assert d["caller"]["class"] == "business" and d["caller"]["scopes"] == ["read", "manage"]
     assert d["business"] == {"id": "biz_1", "name": None, "trade": None, "claim_state": "claimed", "locale": "en-US"}
     assert (d["consultation"], d["goal"], d["plan"], d["money"]) == (None, None, None, None)

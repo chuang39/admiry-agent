@@ -280,6 +280,8 @@ EXPLICIT: frozenset[str] = frozenset(
         "update_page",
         "revise_page",
         "contact_support",
+        # hackathon 2026-11-04 Task 6: ad_creatives' say follows its set's status (making, ready, needs photos, ...).
+        "ad_creatives",
         # G1 Task 4: business_profile's say names the business and counts its services, which vary by call.
         "business_profile",
         # G1 Task 5: performance's say carries the period's own money and counts, which vary by call.

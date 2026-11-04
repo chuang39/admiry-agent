@@ -13,4 +13,12 @@ def load() -> None:
     end of `mcp_app`'s import when every command module has loaded, and by `create_app()` always, so the serving
     process has the public tools whichever module it imported first. Later tasks add their modules here and nowhere
     else."""
-    from . import context, outcomes, plan, run, supporting, told  # noqa: F401 - imported to register the surface
+    from . import (  # noqa: F401 - imported to register the surface
+        context,
+        creatives,
+        outcomes,
+        plan,
+        run,
+        supporting,
+        told,
+    )

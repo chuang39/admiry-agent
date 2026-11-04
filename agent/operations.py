@@ -83,6 +83,9 @@ SAFE: frozenset[str] = frozenset(
         "request_site_upload",
         "check_landing_page",
         "request_connect_link",
+        # ads made from the owner's photos and facts (hackathon 2026-11-04): a set to look at, and the owner's accepting
+        # of one -- nothing is shown to the public or spent until a launch the owner approves
+        "ad_creatives",
         # stopping spend is always allowed (R26 of M1); Admiry's own team
         "pause",
         "contact_support",

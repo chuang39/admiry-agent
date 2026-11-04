@@ -2,7 +2,7 @@
 name: admiry-marketing
 description: Plan, launch, run and report on advertising for a local or service business through Admiry. Use when the owner wants more customers, calls or bookings, wants to advertise or promote a service or an offer, asks how their ads or leads are doing, or wants to pause, resume or change their advertising budget.
 metadata:
-  version: "2026-10-15"
+  version: "2026-11-04"
 ---
 
 # Working with Admiry
@@ -59,4 +59,4 @@ If you can run commands (Claude Code, Codex, Cursor and the like), you can build
 
 ## If you saved this
 
-This guide is version 2026-10-15. `get_marketing_state` returns `surface_version`: when it differs, or when a tool answers that it was replaced, read this guide and the tool list again before you go on.
+This guide is version 2026-11-04. `get_marketing_state` returns `surface_version`: when it differs, or when a tool answers that it was replaced, read this guide and the tool list again before you go on.
