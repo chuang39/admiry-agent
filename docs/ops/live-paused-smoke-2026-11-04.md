@@ -97,3 +97,22 @@ Before `--create` can build the campaign for `biz_hackroofer`:
 
 Then `--create`, then `--readback` (expect PAUSED, 6 `AD_IMAGE`, 2 `CALLOUT`, 1 `CALL`, and the 15 accepted
 headlines in each ad).
+
+## 6. Second round (ruling R28: product tools and operator commands only, no Stripe) — stopped at step 2
+
+Read-only checks; nothing was changed in this round.
+
+| R28 step | what the product needs | state |
+|---|---|---|
+| 1. publish the page (`update_landing_page`) | a preview `token` to publish, then a passing page check | `get_landing_page` → "No landing page is set yet". For a home-services business `write` starts `build_site`: look, facts, the logo (or wordmark) and one real photo, then a preview to publish. Not started, because step 2 blocks the create anyway |
+| 2. managed + funded (`agent.ops`) | a Google Ads account bound to the business | **blocked.** `adjust` credits a balance but "an operator's credit is no payment". `google-account bind` and the launch's allocator both refuse a business that never paid by card (`wallet.has_paid`: a `topup` entry, written only by Stripe's webhook; "never forced"). Without a binding, `check_account` answers FIRST_PAYMENT and the approval is refused |
+| 3. approve the plan | `claim_state` verified, then the owner's approval code | the business is `claimed`, not verified (`agent.ops verify` exists; a card payment also verifies a prepaid business). The code is shown on the owner's signed-in plan page; `agent.ops issue-code` prints one "to read to the owner" |
+
+The ways forward, either one:
+
+- **Prepaid:** the owner makes one Stripe **test-mode** top-up. The sandbox path for allowlisted owners is in main as of
+  `684146e`/`6f73da3`. That one payment verifies the business and lets the launch bind it to the pool account. The
+  page, the approval, then `--create` and `--readback` follow.
+- **Own account:** `agent.ops ads-link biz_hackroofer <customer_id> --status active` with a client account under
+  Admiry's manager account that is not a pool account (pool accounts are refused as links), after the owner accepts
+  the current management agreement.
