@@ -11,11 +11,17 @@ secret verified only when its business's owner is a sandbox user (`sandbox_user`
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 
 import psycopg
 
 from . import config
+
+log = logging.getLogger(__name__)
+# Stripe's test-mode secret keys (standard, restricted): the only keys used as the sandbox -- a live key pasted into
+# STRIPE_SANDBOX_SECRET_KEY must never charge an allowlisted owner real money labelled sandbox (review, money safety)
+TEST_KEY_PREFIXES = ("sk_test_", "rk_test_")
 
 
 @dataclass(frozen=True)
@@ -36,13 +42,17 @@ def sandbox_user(settings: config.Settings, owner_email: str | None) -> bool:
 
 
 def for_owner(settings: config.Settings, owner_email: str | None) -> StripeKeys:
-    """The sandbox keys when the owner is a sandbox user and both sandbox keys are set; the regular keys otherwise."""
-    if (
-        sandbox_user(settings, owner_email)
-        and settings.stripe_sandbox_secret_key
-        and settings.stripe_sandbox_webhook_secret
-    ):
-        return StripeKeys(settings.stripe_sandbox_secret_key, settings.stripe_sandbox_webhook_secret, sandbox=True)
+    """The sandbox keys when the owner is a sandbox user and both sandbox keys are set, the secret key a test-mode
+    one (TEST_KEY_PREFIXES); the regular keys otherwise -- a sandbox secret key that is not a test key is never used,
+    with one warning (the key itself is never logged)."""
+    sandbox_key = settings.stripe_sandbox_secret_key
+    if sandbox_user(settings, owner_email) and sandbox_key and settings.stripe_sandbox_webhook_secret:
+        if sandbox_key.startswith(TEST_KEY_PREFIXES):
+            return StripeKeys(sandbox_key, settings.stripe_sandbox_webhook_secret, sandbox=True)
+        log.warning(
+            "stripe_mode: STRIPE_SANDBOX_SECRET_KEY is not a test-mode key (sk_test_ or rk_test_); the allowlisted "
+            "owner pays with the regular keys"
+        )
     return StripeKeys(settings.stripe_secret_key, settings.stripe_webhook_secret, sandbox=False)
 
 

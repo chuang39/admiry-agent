@@ -5,6 +5,7 @@ with the sandbox one, and applies a sandbox-only event only for an allowlisted o
 `stripe` fixture's mock; no network."""
 
 import base64
+import json
 import logging
 
 import pytest
@@ -43,6 +44,14 @@ def key_of(request) -> str:
 
 def pay_logs(caplog) -> list[str]:
     return [r.getMessage() for r in caplog.records if r.name == "agent.pay"]
+
+
+def sandbox_event(livemode=False, **kw) -> bytes:
+    """test_stripe_hook's event with the `livemode` a sandbox (test-mode) event carries; None leaves it out."""
+    e = json.loads(event(**kw))
+    if livemode is not None:
+        e["livemode"] = livemode
+    return json.dumps(e).encode()
 
 
 def test_allowlisted_owner_gets_sandbox_keys(monkeypatch, sandbox):
@@ -107,13 +116,13 @@ def test_checkout_for_other_owner_uses_regular_key(client, conn, stripe, google,
 def test_webhook_sandbox_signature_credits_allowlisted_owner(client, conn, stripe, google, sandbox, monkeypatch):
     no_regular_keys(monkeypatch)  # prod today: only the sandbox keys
     started(client, conn, google)
-    r = deliver(client, event(), secret=SANDBOX_WHSEC)
+    r = deliver(client, sandbox_event(), secret=SANDBOX_WHSEC)
     assert r.status_code == 200 and r.json() == {"received": True, "credited": True}
     assert wallet.balance_cents(conn, "biz_1") == 50000 and status(conn) == "paid"
     (a,) = conn.execute(
         "SELECT actor, args_redacted AS args, result FROM agent_action WHERE tool = 'web.topup'"
     ).fetchall()
-    assert a["actor"] == "stripe" and a["args"]["sandbox"] == "true"
+    assert a["actor"] == "stripe" and (a["args"]["sandbox"], a["args"]["livemode"]) == ("true", "false")
     assert a["result"] == {"amount_usd": 500.0, "verified_now": True}  # recorded like any other payment
 
 
@@ -133,7 +142,7 @@ def test_webhook_sandbox_signature_ignored_for_other_owner(
     monkeypatch.setenv("AGENT_LAUNCH_ALLOWLIST", "founder@example.com")
     started(client, conn, google)  # owner@example.com, not on the list: a regular Checkout
     caplog.set_level(logging.INFO, logger="agent.pay")
-    r = deliver(client, event(kind=kind, payment_status=payment_status), secret=SANDBOX_WHSEC)
+    r = deliver(client, sandbox_event(kind=kind, payment_status=payment_status), secret=SANDBOX_WHSEC)
     assert r.status_code == 200 and r.json() == {"received": True, "ignored": "sandbox"}
     assert status(conn) == "open" and wallet.balance_cents(conn, "biz_1") == 0
     assert count(conn, "SELECT count(*) AS n FROM wallet_entry") == 0
@@ -164,6 +173,7 @@ def test_webhook_regular_signature_unchanged(client, conn, stripe, google, sandb
     [
         ("checkout.session.completed", "paid"),
         ("checkout.session.completed", "unpaid"),
+        ("checkout.session.async_payment_succeeded", "paid"),
         ("checkout.session.async_payment_failed", "unpaid"),
         ("checkout.session.expired", "unpaid"),
     ],
@@ -176,12 +186,81 @@ def test_webhook_unknown_session_is_ignored_with_200(
     the end disable the endpoint), one log line, nothing written."""
     started(client, conn, google)
     caplog.set_level(logging.INFO, logger="agent.pay")
-    r = deliver(client, event(kind=kind, payment_status=payment_status, session_id="cs_other_box"), secret=secret)
+    payload = sandbox_event(kind=kind, payment_status=payment_status, session_id="cs_other_box")
+    r = deliver(client, payload, secret=secret)
     assert r.status_code == 200 and r.json() == {"received": True, "ignored": "unknown session"}
     assert status(conn) == "open" and count(conn, "SELECT count(*) AS n FROM wallet_entry") == 0
     assert count(conn, "SELECT count(*) AS n FROM agent_action WHERE tool = 'web.topup'") == 0
     (line,) = pay_logs(caplog)
     assert "cs_other_box" in line
+
+
+def test_live_key_in_sandbox_slot_is_not_used_as_sandbox(monkeypatch, sandbox, caplog):
+    """A live key pasted into STRIPE_SANDBOX_SECRET_KEY must never charge an allowlisted owner real money labelled
+    sandbox: only an sk_test_ or rk_test_ key is used as the sandbox; anything else falls back to the regular keys,
+    with one warning that never quotes the key."""
+    monkeypatch.setenv("STRIPE_SECRET_KEY", "sk_live_regular")
+    monkeypatch.setenv("STRIPE_WEBHOOK_SECRET", "whsec_regular")
+    regular = stripe_mode.StripeKeys(secret_key="sk_live_regular", webhook_secret="whsec_regular", sandbox=False)
+    caplog.set_level(logging.WARNING, logger="agent.stripe_mode")
+    for live in ("sk_live_pasted_by_mistake", "rk_live_restricted", "pk_test_publishable", "whsec_wrong_line"):
+        monkeypatch.setenv("STRIPE_SANDBOX_SECRET_KEY", live)
+        caplog.clear()
+        assert stripe_mode.for_owner(config.load(), "owner@example.com") == regular
+        (line,) = [r.getMessage() for r in caplog.records if r.name == "agent.stripe_mode"]
+        assert "STRIPE_SANDBOX_SECRET_KEY" in line and live not in line and live[:8] not in line
+    monkeypatch.setenv("STRIPE_SANDBOX_SECRET_KEY", "rk_test_restricted")  # a restricted test key is a sandbox key
+    caplog.clear()
+    assert stripe_mode.for_owner(config.load(), "owner@example.com").sandbox
+    assert not [r for r in caplog.records if r.name == "agent.stripe_mode"]
+
+
+@pytest.mark.parametrize("livemode", [True, None, "false", 0], ids=["live", "missing", "text", "zero"])
+def test_sandbox_only_event_with_livemode_true_is_refused_400(
+    client, conn, stripe, google, sandbox, monkeypatch, caplog, livemode
+):
+    """An event only the sandbox secret verified must say livemode false, exactly: anything else is refused 400 (a
+    live event can never pass as sandbox; Stripe retries and alerts, as for a wrong secret), one error line, nothing
+    written -- for an allowlisted owner's own Checkout too."""
+    no_regular_keys(monkeypatch)
+    started(client, conn, google)  # cs_test_1, by the sandbox key
+    caplog.set_level(logging.INFO, logger="agent.pay")
+    for kind, paid in (("checkout.session.completed", "paid"), ("checkout.session.expired", "unpaid")):
+        caplog.clear()
+        r = deliver(client, sandbox_event(livemode, kind=kind, payment_status=paid), secret=SANDBOX_WHSEC)
+        assert r.status_code == 400
+        (rec,) = [r for r in caplog.records if r.name == "agent.pay"]
+        assert rec.levelno == logging.ERROR and SANDBOX_WHSEC not in rec.getMessage()
+    assert status(conn) == "open" and count(conn, "SELECT count(*) AS n FROM wallet_entry") == 0
+    assert count(conn, "SELECT count(*) AS n FROM agent_action WHERE tool = 'web.topup'") == 0
+
+
+def test_both_secrets_set_sandbox_verifies_allowlisted_owner_event(client, conn, stripe, google, sandbox):
+    """dev: the regular keys and the sandbox keys both set. An allowlisted owner's sandbox Checkout is credited by
+    the event its sandbox endpoint signs; another owner's regular one by the regular endpoint's, unmarked."""
+    started(client, conn, google)  # owner@example.com, allowlisted: cs_test_1 by the sandbox key
+    assert key_of(stripe.sent[-1]) == SANDBOX_KEY
+    r = deliver(client, sandbox_event(), secret=SANDBOX_WHSEC)
+    assert r.status_code == 200 and r.json() == {"received": True, "credited": True}
+    assert wallet.balance_cents(conn, "biz_1") == 50000
+    (a,) = conn.execute("SELECT args_redacted AS args FROM agent_action WHERE tool = 'web.topup'").fetchall()
+    assert (a["args"]["sandbox"], a["args"]["livemode"]) == ("true", "false")
+
+
+def test_equal_secrets_are_regular_verified_with_a_warning(client, conn, stripe, google, sandbox, monkeypatch, caplog):
+    """The two webhook secrets the same string: the event counts as verified by the regular secret (so the sandbox
+    rules -- livemode false, R18's allowlist gate -- are never what decides it), with one warning per event."""
+    monkeypatch.setenv("STRIPE_SANDBOX_WEBHOOK_SECRET", WHSEC)
+    monkeypatch.setenv("AGENT_LAUNCH_ALLOWLIST", "founder@example.com")
+    started(client, conn, google)  # not allowlisted: a regular Checkout
+    caplog.set_level(logging.INFO, logger="agent.pay")
+    r = deliver(client, event(), secret=WHSEC)  # no livemode at all, as before
+    assert r.status_code == 200 and r.json() == {"received": True, "credited": True}
+    (a,) = conn.execute("SELECT args_redacted AS args FROM agent_action WHERE tool = 'web.topup'").fetchall()
+    assert a["args"] == {"session_id": "cs_test_1", "event_id": "evt_1"}  # regular: no sandbox mark
+    (rec,) = [r for r in caplog.records if r.name == "agent.pay" and r.levelno >= logging.WARNING]  # not the mail's
+    assert rec.levelno == logging.WARNING and "STRIPE_SANDBOX_WEBHOOK_SECRET" in rec.getMessage()
+    assert WHSEC not in rec.getMessage()
 
 
 def test_payment_step_offered_to_allowlisted_owner_without_regular_keys(

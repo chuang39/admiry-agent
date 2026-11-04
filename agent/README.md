@@ -366,17 +366,20 @@ AGENT_LLM_LIVE=1 $PY -m pytest agent/tests/test_llm_live.py -q   # two Muse Spar
   webhook secret is set; the Stripe endpoint is
   `<AGENT_PUBLIC_BASE_URL>/hooks/stripe` with events `checkout.session.completed`,
   `checkout.session.async_payment_succeeded`, `checkout.session.expired`),
-  `STRIPE_SANDBOX_SECRET_KEY` / `STRIPE_SANDBOX_WEBHOOK_SECRET` (Task 8b: with both set, the owners on
+  `STRIPE_SANDBOX_SECRET_KEY` / `STRIPE_SANDBOX_WEBHOOK_SECRET` (Task 8b: with both set -- the key a test-mode one,
+  `sk_test_`/`rk_test_`, else it is ignored with a warning -- the owners on
   `AGENT_LAUNCH_ALLOWLIST` pay with Stripe's sandbox -- checkout, expiry, refunds -- and everyone else with the keys
   above; `/hooks/stripe` verifies with the regular secret, else the sandbox one, and applies a sandbox-only event just
-  for an allowlisted owner's business; an event naming a Checkout this box did not make is answered 200 and ignored;
+  for an allowlisted owner's business and only with `livemode` false (else 400); an event naming a Checkout this
+  box did not make is answered 200 and ignored;
   `agent/stripe_mode.py`), `AGENT_TOPUP_MIN_USD` / `AGENT_TOPUP_MAX_USD`
   (one top-up's bounds in whole dollars, default 200 / 5000; `0 < min ≤ max` or the service refuses to boot),
   `AGENT_EXEC_<CHANNEL>` (M0: `off` | `validate` | `live` per channel — `AGENT_EXEC_GOOGLE_SEARCH`,
   `AGENT_EXEC_NEWSBREAK`, …; unset = `off`, anything else refuses to boot; while `AGENT_EXEC_GOOGLE_SEARCH` is unset,
   A3's `AGENT_ADS_EXECUTION` answers for Google Search alone, one release), `AGENT_LAUNCH_ALLOWLIST` (owners' e-mails,
   comma-separated: set, only their businesses launch while a switch is on and every other one runs as under `off`;
-  empty = no list), `ADS_OPS_DAILY_BUDGET` (Google Search's
+  empty = no list. Owners on the list pay with Stripe sandbox (test cards) when the sandbox keys are set, so never put a
+  real customer on that list on a box with sandbox keys), `ADS_OPS_DAILY_BUDGET` (Google Search's
   operations a day, default 2300), `NEWSBREAK_ACCESS_TOKEN` / `NEWSBREAK_ORG_ID` (M1: Admiry's NewsBreak token, an Org
   Admin's, and its Organization's id; either unset = NewsBreak is not configured and nothing calls it; the token never
   leaves `settings`), `AGENT_KEY_ENCRYPTION_KEY` (seals owner-side tokens in

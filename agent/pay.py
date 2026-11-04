@@ -55,7 +55,9 @@ def handle_event(payload: bytes, signature: str | None) -> JSONResponse:
     so every sandbox event reaches both boxes) is acknowledged with one log line and nothing written -- never a 4xx
     or 5xx, which Stripe retries and in the end disables the endpoint for. One the sandbox secret alone verified is
     applied only when its business's owner pays with the sandbox (stripe_mode: on AGENT_LAUNCH_ALLOWLIST), else
-    likewise acknowledged and ignored; its credit's audit row is marked sandbox."""
+    likewise acknowledged and ignored; its credit's audit row is marked sandbox. A sandbox-only event must carry
+    `livemode` false, exactly: anything else is refused 400 with one error line and nothing written (a live event can
+    never pass as sandbox; Stripe retries and alerts, as for a wrong secret)."""
     settings = config.load()
     if not (settings.stripe_webhook_secret or settings.stripe_sandbox_webhook_secret):
         return JSONResponse({"error": "payments are not set up"}, status_code=503)
@@ -64,6 +66,12 @@ def handle_event(payload: bytes, signature: str | None) -> JSONResponse:
         event = json.loads(payload)
     except (stripe_client.BadSignature, ValueError):
         return JSONResponse({"error": "bad signature"}, status_code=400)
+    if sandbox and not (isinstance(event, dict) and event.get("livemode") is False):
+        log.error(
+            "pay: an event only the sandbox secret verified is not a test-mode event (livemode %r); refused",
+            event.get("livemode") if isinstance(event, dict) else None,
+        )
+        return JSONResponse({"error": "not a test-mode event"}, status_code=400)
     kind = event.get("type") if isinstance(event, dict) else None
     data = event.get("data") if isinstance(event, dict) else None
     obj = data.get("object") if isinstance(data, dict) else None
@@ -118,9 +126,15 @@ def handle_event(payload: bytes, signature: str | None) -> JSONResponse:
 
 def _verify(settings: config.Settings, payload: bytes, signature: str | None) -> bool:
     """Whether only the sandbox secret verified the event (False: the regular one did). BadSignature when neither
-    does; an unset secret verifies nothing."""
+    does; an unset secret verifies nothing. The two secrets equal: verified by the regular one, never sandbox-only,
+    with one warning (the sandbox's livemode and allowlist rules are not what decides such an event)."""
     try:
         stripe_client.verify_signature(payload, signature, settings.stripe_webhook_secret or "")
+        if settings.stripe_webhook_secret == settings.stripe_sandbox_webhook_secret:
+            log.warning(
+                "pay: STRIPE_WEBHOOK_SECRET and STRIPE_SANDBOX_WEBHOOK_SECRET are the same; the event counts as "
+                "verified by the regular secret"
+            )
         return False
     except stripe_client.BadSignature:
         if not settings.stripe_sandbox_webhook_secret:
