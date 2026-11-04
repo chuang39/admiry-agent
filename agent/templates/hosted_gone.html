@@ -1,0 +1,14 @@
+{#- The 410 a tenant host answers with once its page is unpublished (agent/hosted.py:_gone, H3). Context:
+    name (the business's vouched name, else "the business" -- leads.business_name). One sentence, no
+    business data beyond that name. -#}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page unavailable</title>
+<style>body{font-family:ui-sans-serif,system-ui,sans-serif;max-width:32rem;margin:4rem auto;padding:0 1rem;line-height:1.5;color:#1c1f2a}</style>
+</head>
+<body>
+<p>{{ name }}'s page is not available right now.</p>
+</body>
+</html>

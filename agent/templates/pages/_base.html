@@ -1,0 +1,192 @@
+{#- A landing page Admiry writes itself (agent/page_builder.py `render`; spec 2026-09-28 §7, plan H12): one file,
+    mobile first, no navigation, one goal (the call, or the form), the recipe's sections in the recipe's order.
+    Every value is escaped by autoescape -- the model's words are untrusted text -- except the tracking snippet,
+    which landing.snippet escapes itself. No inline event handlers, no inline scripts, nothing loaded from anywhere
+    else: the page must pass hosted.sanitise and the 14-rule check (landing.check) exactly as rendered -- the
+    footer carries the business's phone (nothing when there is none -- never the owner's sign-in address, which is the
+    owner's to publish) and the Terms and Privacy links, which the check's `contact`, `terms` and `privacy` rules look
+    for (/terms and /privacy are served by hosted.serve). A tree's template overrides the small blocks below (a
+    label, the time field, the button, the note under it). -#}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+{%- if copy.subheadline %}
+<meta name="description" content="{{ copy.subheadline }}">
+{%- endif %}
+{%- if canonical %}
+<link rel="canonical" href="{{ canonical }}">
+{%- endif %}
+<style>
+{% include "pages/hosted.css" %}
+</style>
+</head>
+<body>
+<main>
+{%- for s in sections %}
+{%- if s == "hero" %}
+{%- block hero scoped %}
+<header class="hero">
+  {%- if name %}
+  <p class="brand">{{ name }}</p>
+  {%- endif %}
+  <h1>{{ copy.headline }}</h1>
+  {%- if copy.subheadline %}
+  <p class="lead">{{ copy.subheadline }}</p>
+  {%- endif %}
+  {%- if copy.offer_line %}
+  <p class="offer">{{ copy.offer_line }}</p>
+  {%- endif %}
+  <p class="actions">
+    {%- if tel %}
+    <a class="button call" href="tel:{{ tel }}" data-admiry="call">{{ copy.cta_label }} <span class="number">{{ phone }}</span></a>
+    {%- else %}
+    <a class="button call" href="#request">{{ titles.form }}</a>
+    {%- endif %}
+    {%- if cta == "call_or_book" and booking_url %}
+    <a class="button second" href="{{ booking_url }}" data-admiry="book">Book online</a>
+    {%- elif cta == "call_or_quote" and tel %}
+    <a class="button second" href="#request">{{ titles.form }}</a>
+    {%- endif %}
+  </p>
+</header>
+{%- endblock %}
+{%- elif s == "trust" %}
+{%- block trust scoped %}
+{%- if copy.trust_points or photos %}
+<section class="trust">
+  <h2>{{ titles.trust }}</h2>
+  {%- if copy.trust_points %}
+  <ul>
+    {%- for point in copy.trust_points %}
+    <li>{{ point }}</li>
+    {%- endfor %}
+  </ul>
+  {%- endif %}
+  {%- if photos %}
+  <div class="photos">
+    {%- for p in photos %}
+    <img src="{{ p.src }}" alt="{{ name or 'Our work' }}" loading="lazy" width="{{ p.width }}" height="{{ p.height }}">
+    {%- endfor %}
+  </div>
+  {%- endif %}
+</section>
+{%- endif %}
+{%- endblock %}
+{%- elif s == "service" %}
+{%- block service scoped %}
+<section class="service">
+  <h2>{{ titles.service }}</h2>
+  {%- for paragraph in copy.service_paragraphs %}
+  <p>{{ paragraph }}</p>
+  {%- endfor %}
+</section>
+{%- endblock %}
+{%- elif s == "form" %}
+{%- block form scoped %}
+<section class="request" id="request">
+  <h2>{{ titles.form }}</h2>
+  <form method="post" action="{{ form.action }}" data-admiry-intent="{{ form.intent }}">
+    {%- for field in form.fields %}
+    {%- if field == "name" %}
+    <label for="f-name">Your name</label>
+    <input id="f-name" name="name" type="text" autocomplete="name" required>
+    {%- elif field == "phone" %}
+    <label for="f-phone">Phone</label>
+    <input id="f-phone" name="phone" type="tel" autocomplete="tel" required>
+    {%- elif field == "email" %}
+    <label for="f-email">E-mail</label>
+    <input id="f-email" name="email" type="email" autocomplete="email">
+    {%- elif field == "service" %}
+    <label for="f-service">{% block service_label %}What do you need?{% endblock %}</label>
+    {%- if form.services %}
+    <select id="f-service" name="service">
+      {%- for option in form.services %}
+      <option>{{ option }}</option>
+      {%- endfor %}
+    </select>
+    {%- else %}
+    <input id="f-service" name="service" type="text">
+    {%- endif %}
+    {%- elif field == "preferred_time" %}
+    {%- block time_field %}
+    <label for="f-time">When should we call?</label>
+    <select id="f-time" name="preferred_time">
+      <option>Morning</option>
+      <option>Afternoon</option>
+      <option>Evening</option>
+    </select>
+    {%- endblock %}
+    {%- elif field == "zip" %}
+    <label for="f-zip">ZIP code</label>
+    <input id="f-zip" name="zip" type="text" inputmode="numeric" autocomplete="postal-code">
+    {%- elif field == "message" %}
+    <label for="f-message">Anything else?</label>
+    <textarea id="f-message" name="message" rows="3"></textarea>
+    {%- endif %}
+    {%- endfor %}
+    <p class="trap" aria-hidden="true">
+      <label for="f-website2">Leave this empty</label>
+      <input id="f-website2" name="website2" type="text" tabindex="-1" autocomplete="off">
+    </p>
+    <button type="submit">{% block form_button %}Request a call{% endblock %}</button>
+    <p class="note">{% block form_note %}We call you back as soon as we can.{% endblock %}</p>
+  </form>
+  <p class="small">What you send goes to {{ name or "the business" }} only. <a href="/privacy">Privacy notice</a></p>
+</section>
+{%- endblock %}
+{%- elif s == "faq" %}
+{%- block faq scoped %}
+{%- if copy.faq %}
+<section class="faq">
+  <h2>{{ titles.faq }}</h2>
+  {%- for item in copy.faq %}
+  <details>
+    <summary>{{ item.q }}</summary>
+    <p>{{ item.a }}</p>
+  </details>
+  {%- endfor %}
+</section>
+{%- endif %}
+{%- endblock %}
+{%- elif s == "hours" %}
+{%- block where scoped %}
+<section class="where">
+  <h2>{{ titles.hours }}</h2>
+  {%- if hours %}
+  <p>{{ hours }}</p>
+  {%- endif %}
+  {%- if location or city %}
+  <p>{{ location or city }}{% if map_url %} · <a href="{{ map_url }}">Map</a>{% endif %}</p>
+  {%- endif %}
+  {%- if tel %}
+  <p><a href="tel:{{ tel }}" data-admiry="call">{{ phone }}</a></p>
+  {%- endif %}
+</section>
+{%- endblock %}
+{%- elif s == "footer" %}
+{%- block footer scoped %}
+<footer>
+  {%- if name %}
+  <p>{{ name }}</p>
+  {%- endif %}
+  {%- if tel %}
+  <p><a href="tel:{{ tel }}" data-admiry="call">{{ phone }}</a></p>
+  {%- endif %}
+  {%- for line in required_lines %}
+  <p class="required">{{ line }}</p>
+  {%- endfor %}
+  <p><a href="/terms">Terms of use</a> · <a href="/privacy">Privacy notice</a></p>
+</footer>
+{%- endblock %}
+{%- endif %}
+{%- endfor %}
+</main>
+{%- if tel %}
+<p class="callbar"><a href="tel:{{ tel }}" data-admiry="call">{{ copy.cta_label }} · {{ phone }}</a></p>
+{%- endif %}
+{{ snippet|safe }}
+</body>
+</html>

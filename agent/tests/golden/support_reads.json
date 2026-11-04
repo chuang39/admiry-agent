@@ -1,0 +1,22 @@
+[
+  {"text": "Can I talk to a real person?", "support": "human"},
+  {"text": "I'd like someone to call me about this", "support": "human"},
+  {"text": "Is there a representative I can speak with?", "support": "human"},
+  {"text": "我想找人工客服", "support": "human"},
+  {"text": "能让你们的人给我打个电话吗", "support": "human"},
+  {"text": "How do I get a refund of my prepaid balance?", "support": "help"},
+  {"text": "I can't sign in to my account, can you help?", "support": "help"},
+  {"text": "I need help, my ads stopped and I don't know why", "support": "help"},
+  {"text": "我的账户登录不了，需要帮助", "support": "help"},
+  {"text": "This plan is useless, it has nothing to do with my business", "support": "dissatisfied"},
+  {"text": "Your answers are wrong and this is a waste of my time", "support": "dissatisfied"},
+  {"text": "This is not what I asked for at all", "support": "dissatisfied"},
+  {"text": "你们这个方案完全没用", "support": "dissatisfied"},
+  {"text": "The budget is too high", "support": "none"},
+  {"text": "Make it 10 miles", "support": "none"},
+  {"text": "Let's go with the cheaper one", "support": "none"},
+  {"text": "预算太高了，降到每天20美元", "support": "none"},
+  {"text": "Add a 10% off first visit offer", "support": "none"},
+  {"text": "Sounds good, build it", "support": "none"},
+  {"text": "We mostly want more phone calls", "support": "none"}
+]

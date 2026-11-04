@@ -1,0 +1,92 @@
+{
+  "id": "attorneys-3",
+  "vertical": "attorneys",
+  "opening": "Coastline Family Law in downtown San Diego: divorce and custody. Consultation requests within 25 miles, $2,000 a month.",
+  "monthly_budget_usd": 2000,
+  "knowledge": {
+    "name": "Coastline Family Law",
+    "category": "attorneys",
+    "category_detail": "family law attorney",
+    "service_area": [
+      "San Diego",
+      "Chula Vista",
+      "La Mesa"
+    ],
+    "services": [
+      {
+        "name": "Divorce",
+        "intent_phrases": [
+          "divorce lawyer san diego",
+          "uncontested divorce attorney",
+          "how to file for divorce in california"
+        ],
+        "price_hint": "flat fee when uncontested"
+      },
+      {
+        "name": "Child custody",
+        "intent_phrases": [
+          "child custody lawyer san diego",
+          "custody modification attorney"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Fri 8-6",
+    "phone": "619-555-0137",
+    "website": null,
+    "pricing_hints": [
+      "flat-fee uncontested divorce"
+    ],
+    "typical_customer_value_usd": 6000,
+    "usp": [
+      "Flat-fee uncontested divorce",
+      "Consultations in Spanish"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "legal"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": 6,
+      "monthly_budget_usd": 2000,
+      "focus_services": [
+        "Divorce"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_attorneys_3",
+      "name": "Coastline Family Law",
+      "address": "401 B St, San Diego, CA 92101",
+      "lat": 32.7176,
+      "lng": -117.1625,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Coastline Family Law"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "enquiries"
+    },
+    "service": {
+      "choice": "svc_divorce"
+    },
+    "customer_value": {
+      "choice": "3000_10000"
+    },
+    "radius": {
+      "choice": "r25"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

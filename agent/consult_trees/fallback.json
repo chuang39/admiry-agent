@@ -1,0 +1,65 @@
+{
+  "name": "fallback",
+  "defaults": {"customer_value_usd": 800, "footnote_noun": "local businesses", "lead_to_booking": 0.5, "booking_to_customer": 0.5},
+  "corrections": [
+    {
+      "patterns": ["everyone", "all people", "anyone interested", "every person", "all customers", "all patients"],
+      "say": "One honest note first: no ad platform can hand us a list of everyone interested in your business. What we can do is combine signals: people near you who are searching for what you offer right now, visitors to your website, and careful expansion from there, all inside your area."
+    }
+  ],
+  "questions": [
+    {
+      "id": "listing", "input": "single", "known_fact": null, "options_from": "listing",
+      "prompt": "Is your business one of these on Google Maps?",
+      "options": [],
+      "why": null
+    },
+    {
+      "id": "objective", "input": "single", "known_fact": "objective",
+      "prompt": "What do you want most from your ads?",
+      "options": [
+        {"id": "bookings", "label": "Bookings", "sublabel": "Appointments booked online or by phone"},
+        {"id": "calls", "label": "Phone calls", "sublabel": "People calling you"},
+        {"id": "enquiries", "label": "Enquiries", "sublabel": "Forms and chat on your site"},
+        {"id": "awareness", "label": "Awareness", "sublabel": "More people nearby know your business"},
+        {"id": "any", "label": "Any of these"}
+      ],
+      "why": null
+    },
+    {
+      "id": "service", "input": "multi", "known_fact": "service", "options_from": "services",
+      "prompt": "Which service should the ads lead with?",
+      "options": [
+        {"id": "svc_main", "label": "My main service", "generic": true}, {"id": "svc_new", "label": "A new service", "generic": true},
+        {"id": "svc_offer", "label": "A special offer", "generic": true}
+      ],
+      "why": null
+    },
+    {
+      "id": "customer_value", "input": "single", "known_fact": "customer_value_usd",
+      "prompt": "Roughly, what is one new {service} customer worth to you?",
+      "options": [
+        {"id": "lt_500", "label": "Under $500", "usd": 300}, {"id": "500_1500", "label": "$500 to 1,500", "usd": 1000},
+        {"id": "1500_5000", "label": "$1,500 to 5,000", "usd": 3000}, {"id": "5000_plus", "label": "$5,000 and up", "usd": 7500},
+        {"id": "estimate", "label": "Not sure, estimate for me"}
+      ],
+      "why": "I use this to show on the plan what the new customers could be worth to you."
+    },
+    {
+      "id": "location", "input": "address", "known_fact": "address",
+      "prompt": "Where should the ads centre? A street address, or the city and ZIP code. If you would rather say later, just say so.",
+      "prompt_stated": "You said {stated}. Where in {stated} is your business? A street address or ZIP code keeps the ads close to you.",
+      "options": [],
+      "why": null
+    },
+    {
+      "id": "radius", "input": "radius", "known_fact": "radius_miles",
+      "prompt": "How far around {place} should the ads reach?", "place_default": "your business",
+      "options": [
+        {"id": "r5", "label": "5 miles", "miles": 5}, {"id": "r10", "label": "10 miles", "miles": 10},
+        {"id": "r25", "label": "25 miles", "miles": 25}
+      ],
+      "why": null
+    }
+  ]
+}

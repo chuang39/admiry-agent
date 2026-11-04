@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admiry — marketing plumbing for the agent era</title>
+<meta name="description" content="Investor deck, September 2026. Confidential draft.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --midnight: #0D1220;
+    --deep: #141B2E;
+    --ink: #EAEEFA;
+    --ink-2: #9AA5C4;
+    --signal: #5B78FF;
+    --glow: #A9B8FF;
+    --line: rgba(154, 165, 196, 0.22);
+    --w: 1280px;
+    --h: 720px;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--midnight);
+    color: var(--ink);
+    font-family: Geist, "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    font-size: 20px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  p { margin: 0; }
+  ul, ol { margin: 0; padding: 0; list-style: none; }
+  strong { font-weight: 500; }
+
+  /* ---------- stage ---------- */
+  .deck { position: fixed; inset: 0; }
+  .stage {
+    position: absolute; left: 50%; top: 50%; width: var(--w); height: var(--h);
+    transform: translate(-50%, -50%) scale(var(--s, 1)); transform-origin: center;
+    overflow: hidden;
+    background:
+      radial-gradient(70% 55% at 18% -10%, rgba(91, 120, 255, 0.22), transparent 62%),
+      linear-gradient(rgba(154, 165, 196, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(154, 165, 196, 0.05) 1px, transparent 1px),
+      var(--midnight);
+    background-size: auto, 64px 64px, 64px 64px, auto;
+  }
+  .slide {
+    position: absolute; inset: 0; padding: 64px 80px 104px;
+    opacity: 0; visibility: hidden; transition: opacity .28s ease, visibility 0s linear .28s;
+  }
+  .slide.is-active { opacity: 1; visibility: visible; transition-delay: 0s; }
+
+  /* ---------- type scale ---------- */
+  .display { font-size: 84px; line-height: 1.02; font-weight: 600; letter-spacing: -0.025em; max-width: 960px; margin: 0; }
+  .title { font-size: 42px; line-height: 1.12; font-weight: 500; letter-spacing: -0.015em; margin: 0 0 32px; max-width: 980px; }
+  .lead { font-size: 24px; line-height: 1.4; max-width: 860px; }
+  .body { font-size: 20px; max-width: 560px; }
+  .small { font-size: 15px; line-height: 1.4; color: var(--ink-2); }
+  .muted { color: var(--ink-2); }
+  .figure { font-size: 88px; line-height: 1; font-weight: 600; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .figure.mid { font-size: 64px; }
+  .figure-label { font-size: 18px; line-height: 1.35; color: var(--ink-2); margin-top: 10px; max-width: 300px; }
+
+  /* ---------- layout helpers ---------- */
+  .cols { display: grid; gap: 64px; align-items: start; }
+  .cols.c-7-5 { grid-template-columns: 7fr 5fr; }
+  .cols.c-5-7 { grid-template-columns: 5fr 7fr; }
+  .cols.c-3 { grid-template-columns: repeat(3, 1fr); gap: 48px; }
+  .rule { border: 0; border-top: 1px solid var(--line); margin: 0; }
+  .list > li { padding: 14px 0; border-top: 1px solid var(--line); }
+  .list > li:last-child { border-bottom: 1px solid var(--line); }
+  .bottom { position: absolute; left: 80px; right: 80px; bottom: 112px; }
+
+  /* the pipe glyph: the deck's one motif, reused as a bullet */
+  .pipe-glyph { display: inline-block; width: 28px; height: 10px; vertical-align: middle; margin-right: 12px; }
+  .pipe-glyph line { stroke: var(--signal); stroke-width: 3; stroke-linecap: round; }
+  .pipe-glyph circle { fill: var(--glow); }
+
+  /* ---------- cover ---------- */
+  .brand { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 500; }
+  .brand svg { width: 26px; height: 26px; color: var(--signal); }
+  #s1 .display { margin-top: 92px; }
+  #s1 .conduit { display: block; width: 1120px; height: 40px; margin: 28px 0 24px -80px; overflow: visible; }
+  #s1 .meta { display: flex; gap: 40px; margin-top: 56px; }
+
+  /* ---------- chips (the eight vendors) ---------- */
+  .chips { display: flex; flex-wrap: wrap; gap: 10px 12px; max-width: 700px; }
+  .chips span { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-size: 17px; color: var(--ink-2); }
+
+  /* ---------- steps (real sequences only) ---------- */
+  .steps { counter-reset: step; }
+  .steps > li { position: relative; padding: 0 0 26px 56px; }
+  .steps > li::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: 0; top: 2px; width: 34px; height: 34px; border-radius: 50%;
+    border: 1.5px solid var(--signal); color: var(--glow); font-size: 16px; font-weight: 500;
+    display: grid; place-items: center;
+  }
+  .steps h3 { margin: 0 0 6px; font-size: 24px; font-weight: 500; line-height: 1.2; }
+
+  /* ---------- transcript ---------- */
+  .transcript { border-left: 2px solid var(--line); padding-left: 24px; }
+  .transcript p { margin: 0 0 14px; font-size: 18px; line-height: 1.4; max-width: 440px; }
+  .transcript .who { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 2px; }
+  .transcript .muse { color: var(--ink); }
+  .transcript .you { color: var(--ink-2); }
+
+  /* ---------- pipes grid ---------- */
+  .pipes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px 48px; }
+  .pipes h3 { margin: 0 0 6px; font-size: 24px; font-weight: 500; }
+  .pipes p { font-size: 17px; line-height: 1.4; color: var(--ink-2); }
+  .valves { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .valves p { font-size: 18px; line-height: 1.35; }
+
+  /* ---------- timeline (revenue) ---------- */
+  .timeline { position: relative; padding-left: 128px; }
+  .timeline::before { content: ""; position: absolute; left: 100px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+  .timeline > li { position: relative; padding: 0 0 26px; }
+  .timeline .when { position: absolute; left: -128px; top: 1px; width: 92px; text-align: right; font-size: 15px; color: var(--ink-2); line-height: 1.3; }
+  .timeline > li::before { content: ""; position: absolute; left: -33px; top: 8px; width: 12px; height: 12px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 10px rgba(91,120,255,.9); }
+  .timeline h3 { margin: 0 0 4px; font-size: 22px; font-weight: 500; }
+  .timeline p { font-size: 17px; color: var(--ink-2); max-width: 520px; }
+
+  /* ---------- roadmap ---------- */
+  .roadmap { position: relative; padding-left: 36px; }
+  .roadmap::before { content: ""; position: absolute; left: 7px; top: 10px; bottom: 10px; width: 2px; background: var(--line); }
+  .roadmap > li { position: relative; padding: 0 0 16px; font-size: 19px; line-height: 1.3; }
+  .roadmap > li::before { content: ""; position: absolute; left: -33px; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-2); }
+  .roadmap > li.now::before { width: 12px; height: 12px; left: -35px; top: 6px; background: var(--signal); box-shadow: 0 0 10px rgba(91,120,255,.9); }
+  .roadmap b { font-weight: 500; color: var(--ink); margin-right: 8px; }
+  .roadmap span { color: var(--ink-2); }
+
+  /* ---------- diagrams ---------- */
+  svg text { font-family: inherit; fill: var(--ink); }
+  svg .t2 { fill: var(--ink-2); }
+  .diagram { display: block; overflow: visible; }
+  .ring-flow { stroke: var(--glow); stroke-width: 4; fill: none; stroke-linecap: round; filter: url(#glow); }
+  @media (prefers-reduced-motion: no-preference) {
+    #s7.is-active .ring-flow { animation: turn 9s linear infinite; }
+  }
+  @keyframes turn { to { stroke-dashoffset: -1319; } }
+
+  /* ---------- hud: the pipe that fills as you go ---------- */
+  .hud { position: absolute; left: 80px; right: 80px; bottom: 52px; display: flex; align-items: center; gap: 24px; font-size: 14px; color: var(--ink-2); }
+  .hud .mark { display: flex; align-items: center; gap: 8px; color: var(--ink-2); }
+  .hud .mark svg { width: 16px; height: 16px; color: var(--signal); }
+  .pipe { flex: 1; height: 6px; border-radius: 3px; background: rgba(154,165,196,.16); overflow: hidden; }
+  .pipe .flow { height: 100%; width: calc(var(--p, 0) * 100%); border-radius: 3px; background: linear-gradient(90deg, var(--signal), var(--glow)); box-shadow: 0 0 14px rgba(91,120,255,.85); transition: width .35s ease; }
+  .hud .count { font-variant-numeric: tabular-nums; min-width: 60px; text-align: right; }
+  .hint { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); font-size: 12px; color: var(--ink-2); opacity: .7; }
+  @media (prefers-reduced-motion: reduce) { .slide, .pipe .flow { transition: none; } }
+
+  /* ---------- print: one slide per page, 16:9 ---------- */
+  @page { size: 13.333in 7.5in; margin: 0; }
+  @media print {
+    html, body { overflow: visible; height: auto; background: var(--midnight); }
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .deck { position: static; }
+    .stage { position: static; transform: none !important; width: auto; height: auto; overflow: visible; background: none; }
+    .slide {
+      position: relative; inset: auto; opacity: 1; visibility: visible; transition: none;
+      width: 1280px; height: 720px; overflow: hidden; page-break-after: always; break-after: page;
+      background:
+        radial-gradient(70% 55% at 18% -10%, rgba(91, 120, 255, 0.22), transparent 62%),
+        linear-gradient(rgba(154, 165, 196, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(154, 165, 196, 0.05) 1px, transparent 1px),
+        var(--midnight);
+      background-size: auto, 64px 64px, 64px 64px, auto;
+    }
+    .slide:last-child { page-break-after: auto; break-after: auto; }
+    .hud, .hint { display: none; }
+    .slide::after { content: attr(data-n) " / 12"; position: absolute; right: 80px; bottom: 52px; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+    .ring-flow { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="glow" x="-20%" y="-200%" width="140%" height="500%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <symbol id="mark" viewBox="0 0 24 24">
+      <path d="M12 20.5C12 20.5 3.5 15.2 3.5 8.9A4.4 4.4 0 0 1 12 6.9a4.4 4.4 0 0 1 8.5 2A9 9 0 0 1 18 15" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="12" cy="10.8" r="2.7" fill="currentColor"/>
+    </symbol>
+    <symbol id="pipe-glyph" viewBox="0 0 28 10">
+      <line x1="1" y1="5" x2="20" y2="5" stroke="var(--signal)" stroke-width="3" stroke-linecap="round"/><circle cx="23" cy="5" r="3.5" fill="var(--glow)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 · cover -->
+    <section class="slide" id="s1" data-n="1" aria-roledescription="slide" aria-label="1 of 12">
+      <div class="brand"><svg><use href="#mark"/></svg>Admiry</div>
+      <h1 class="display">Marketing plumbing<br>for the agent era.</h1>
+      <svg class="conduit" viewBox="0 0 1120 40" aria-hidden="true">
+        <line x1="0" y1="20" x2="1120" y2="20" stroke="rgba(154,165,196,.18)" stroke-width="2"/>
+        <line x1="0" y1="20" x2="700" y2="20" stroke="var(--signal)" stroke-width="5" stroke-linecap="round" filter="url(#glow)"/>
+        <circle cx="704" cy="20" r="8" fill="var(--glow)" filter="url(#glow)"/>
+      </svg>
+      <p class="lead">Tell Admiry what you do. It finds your customers.</p>
+      <div class="meta small"><span>Investor deck</span><span>September 2026</span><span>Confidential draft</span></div>
+    </section>
+
+    <!-- 2 · problem -->
+    <section class="slide" id="s2" data-n="2" aria-roledescription="slide" aria-label="2 of 12">
+      <h2 class="title">Marketing is run well for the few who can afford to run it.</h2>
+      <div class="cols c-7-5">
+        <div>
+          <p class="body" style="max-width:600px">Large advertisers have agencies, platform reps and measurement teams. A small business has the owner, after closing time.</p>
+          <div style="margin-top:44px">
+            <div class="figure">36.2M</div>
+            <p class="figure-label" style="max-width:420px">US small businesses. Half have nobody dedicated to marketing.</p>
+          </div>
+        </div>
+        <ul class="list">
+          <li>Doesn't know where to buy</li>
+          <li>Has no data</li>
+          <li>Gets poor results</li>
+          <li>Can't sustain or scale what works</li>
+        </ul>
+      </div>
+      <div class="bottom">
+        <div class="chips"><span>Google Ads</span><span>Meta Ads</span><span>SEO agency</span><span>Web developer</span><span>Designer</span><span>Analytics</span><span>CRM</span><span>Consultant</span></div>
+        <p class="lead" style="margin-top:18px">Eight tools and vendors. Nobody owns the result.</p>
+      </div>
+    </section>
+
+    <!-- 3 · why now -->
+    <section class="slide" id="s3" data-n="3" aria-roledescription="slide" aria-label="3 of 12">
+      <h2 class="title">Personal agents just arrived. They can talk. They can't plumb.</h2>
+      <div class="cols c-3">
+        <div>
+          <div class="figure mid">Sep 18</div>
+          <p class="figure-label">Meta Muse launched on Sep 8, 2026 and opened third-party connectors ten days later. ChatGPT and Claude take the same connector through MCP, an open standard.</p>
+        </div>
+        <div>
+          <div class="figure mid">45%</div>
+          <p class="figure-label">of US consumers used AI tools for local recommendations in 2026. A year earlier: 6%.</p>
+        </div>
+        <div>
+          <div class="figure mid">9M</div>
+          <p class="figure-label">small businesses already make ad creative with Meta's AI tools.</p>
+        </div>
+      </div>
+      <div class="bottom">
+        <hr class="rule">
+        <p class="lead" style="margin-top:22px;max-width:1000px">An assistant can plan and analyze. It cannot buy media, host a landing page, update a Google Business Profile, answer a tracked phone line or reconcile spend to bookings. That plumbing does not exist for the long tail.</p>
+      </div>
+    </section>
+
+    <!-- 4 · thesis diagram -->
+    <section class="slide" id="s4" data-n="4" aria-roledescription="slide" aria-label="4 of 12">
+      <h2 class="title">The assistant is the interface. Admiry is the pipes.</h2>
+      <svg class="diagram" viewBox="0 0 1120 380" width="1120" height="380" role="img" aria-label="Diagram: the owner's assistant connects through one connector to six Admiry pipes: channels, presence, landing, creative, conversion and data; the data pipe returns to the assistant.">
+        <!-- assistant node -->
+        <rect x="0" y="120" width="250" height="118" rx="10" fill="var(--deep)" stroke="var(--line)"/>
+        <text x="24" y="166" font-size="22" font-weight="500">Your assistant</text>
+        <text x="24" y="196" font-size="16" class="t2">Muse, ChatGPT, Claude,</text>
+        <text x="24" y="218" font-size="16" class="t2">any agent that speaks MCP</text>
+        <!-- one connector -->
+        <line x1="250" y1="179" x2="430" y2="179" stroke="var(--signal)" stroke-width="6" stroke-linecap="round" filter="url(#glow)"/>
+        <text x="340" y="160" font-size="15" class="t2" text-anchor="middle">one connector</text>
+        <!-- manifold -->
+        <line x1="430" y1="40" x2="430" y2="320" stroke="var(--signal)" stroke-width="6" stroke-linecap="round" filter="url(#glow)"/>
+        <!-- six pipes -->
+        <g stroke="var(--signal)" stroke-width="3" stroke-linecap="round" opacity=".85">
+          <line x1="430" y1="40" x2="620" y2="40"/>
+          <line x1="430" y1="96" x2="620" y2="96"/>
+          <line x1="430" y1="152" x2="620" y2="152"/>
+          <line x1="430" y1="208" x2="620" y2="208"/>
+          <line x1="430" y1="264" x2="620" y2="264"/>
+          <line x1="430" y1="320" x2="620" y2="320"/>
+        </g>
+        <g fill="var(--glow)">
+          <circle cx="624" cy="40" r="5"/><circle cx="624" cy="96" r="5"/><circle cx="624" cy="152" r="5"/>
+          <circle cx="624" cy="208" r="5"/><circle cx="624" cy="264" r="5"/><circle cx="624" cy="320" r="5"/>
+        </g>
+        <g font-size="20" font-weight="500">
+          <text x="646" y="47">Channels</text>
+          <text x="646" y="103">Presence</text>
+          <text x="646" y="159">Landing</text>
+          <text x="646" y="215">Creative</text>
+          <text x="646" y="271">Conversion</text>
+          <text x="646" y="327">Data</text>
+        </g>
+        <g font-size="16" class="t2">
+          <text x="790" y="47" class="t2">Google Search and Meta, later the Network</text>
+          <text x="790" y="103" class="t2">Business Profile, reviews, AI search</text>
+          <text x="790" y="159" class="t2">a storefront, one page per service</text>
+          <text x="790" y="215" class="t2">from the assistant or Admiry, checked</text>
+          <text x="790" y="271" class="t2">calls, forms, bookings, orders</text>
+          <text x="790" y="327" class="t2">one ledger, back to the assistant</text>
+        </g>
+        <!-- data returns to the assistant -->
+        <path d="M624 320 V362 H125 V238" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="6 6"/>
+        <path d="M118 250 L125 238 L132 250" fill="none" stroke="var(--ink-2)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <p class="small" style="margin-top:22px">Built for Meta Muse first. ChatGPT, Claude and any MCP-capable assistant use the same connector.</p>
+    </section>
+
+    <!-- 5 · how it works -->
+    <section class="slide" id="s5" data-n="5" aria-roledescription="slide" aria-label="5 of 12">
+      <h2 class="title">Tell. Approve. Run.</h2>
+      <div class="cols c-7-5">
+        <ol class="steps">
+          <li><h3>Tell</h3><p class="body">"I run a dental practice in San Jose. I want more Invisalign patients."</p></li>
+          <li><h3>Approve</h3><p class="body">One plan: budget split, pages, tracking, an estimated lead range with its basis. The owner approves once, in the assistant or on one web page.</p></li>
+          <li><h3>Run and report</h3><p class="body">Pages go live, tracking turns on, campaigns launch in the owner's own accounts. Every week, a summary in plain English.</p></li>
+        </ol>
+        <div class="transcript">
+          <p class="small" style="margin-bottom:18px">Example, in Meta Muse</p>
+          <p class="you"><span class="who">You</span>How did my ads do this week?</p>
+          <p class="muse"><span class="who">Muse, from Admiry</span>$318 spent. 11 new-patient calls, 4 booked appointments. Google Search brought 8 of the 11.</p>
+          <p class="you"><span class="who">You</span>Can we get more calls next week?</p>
+          <p class="muse"><span class="who">Muse, from Admiry</span>Admiry suggests moving $50 a week from Meta to Google Search. Total stays $1,500 a month. Approve?</p>
+          <p class="you"><span class="who">You</span>Yes.</p>
+          <p class="muse"><span class="who">Muse, from Admiry</span>Done. Admiry applied it.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · pipes + valves -->
+    <section class="slide" id="s6" data-n="6" aria-roledescription="slide" aria-label="6 of 12">
+      <h2 class="title">Six pipes. One plan. One approval.</h2>
+      <div class="pipes">
+        <div><h3><svg class="pipe-glyph"><use href="#pipe-glyph"/></svg>Channels</h3><p>Google Search and Meta in the owner's own accounts; later the Admiry Network, our own ad platform.</p></div>
+        <div><h3><svg class="pipe-glyph"><use href="#pipe-glyph"/></svg>Presence</h3><p>Google Business Profile sync, review replies, discoverability on Google, Maps and AI search.</p></div>
+        <div><h3><svg class="pipe-glyph"><use href="#pipe-glyph"/></svg>Landing</h3><p>A hosted storefront with a page per service, or the owner's existing site.</p></div>
+        <div><h3><svg class="pipe-glyph"><use href="#pipe-glyph"/></svg>Creative</h3><p>From the owner's assistant or from Admiry; policy-checked, sized, uploaded.</p></div>
+        <div><h3><svg class="pipe-glyph"><use href="#pipe-glyph"/></svg>Conversion</h3><p>Tracked calls, forms, bookings and orders; leads to the owner in a minute; conversions fed back to Google and Meta.</p></div>
+        <div><h3><svg class="pipe-glyph"><use href="#pipe-glyph"/></svg>Data</h3><p>One ledger of spend, leads, bookings and revenue, returned to the assistant in plain English.</p></div>
+      </div>
+      <div class="bottom valves">
+        <p>A monthly limit no assistant can raise.</p>
+        <p>An out-of-band code for any spend increase.</p>
+        <p>Every action audited, readable by the owner.</p>
+      </div>
+    </section>
+
+    <!-- 7 · flywheel -->
+    <section class="slide" id="s7" data-n="7" aria-roledescription="slide" aria-label="7 of 12">
+      <h2 class="title">Every job feeds the next.</h2>
+      <div class="cols c-5-7" style="align-items:center">
+        <div>
+          <p class="body">Conversion feeds reviews and the platforms' own optimizers. Optimization feeds the next plan. The loop closes inside one agent; a stack of eight vendors never closes it.</p>
+          <p class="body muted" style="margin-top:22px">Your business feeds business knowledge, which drives SEO and GEO, ads and the website. Those create discovery, traffic, conversion, leads and bookings, revenue and optimization, which feeds back into the plan.</p>
+        </div>
+        <svg class="diagram" viewBox="0 0 700 520" width="700" height="520" role="img" aria-label="Flywheel: your business, business knowledge, SEO/GEO, ads and website, discovery, traffic, conversion, leads and bookings, revenue, optimization, and back to the start." style="margin-top:-40px">
+          <g transform="translate(70,-20)">
+            <circle cx="280" cy="280" r="210" fill="none" stroke="var(--line)" stroke-width="2"/>
+            <circle class="ring-flow" cx="280" cy="280" r="210" stroke-dasharray="220 1099" transform="rotate(-90 280 280)"/>
+            <g fill="var(--glow)">
+              <circle cx="280" cy="70" r="6"/><circle cx="415" cy="119" r="6"/><circle cx="487" cy="243" r="6"/>
+              <circle cx="462" cy="385" r="6"/><circle cx="352" cy="477" r="6"/><circle cx="208" cy="477" r="6"/>
+              <circle cx="98" cy="385" r="6"/><circle cx="73" cy="243" r="6"/><circle cx="145" cy="119" r="6"/>
+            </g>
+            <g font-size="17">
+              <text x="280" y="48" text-anchor="middle">Your business</text>
+              <text x="432" y="112">Business knowledge</text>
+              <text x="506" y="238">SEO/GEO, ads,</text><text x="506" y="258">website</text>
+              <text x="480" y="396">Discovery</text>
+              <text x="366" y="500">Traffic</text>
+              <text x="196" y="500" text-anchor="end">Conversion</text>
+              <text x="82" y="396" text-anchor="end">Leads and bookings</text>
+              <text x="56" y="248" text-anchor="end">Revenue</text>
+              <text x="130" y="112" text-anchor="end">Optimization</text>
+            </g>
+            <text x="280" y="286" text-anchor="middle" font-size="20" font-weight="500">One agent, one loop</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 8 · business model -->
+    <section class="slide" id="s8" data-n="8" aria-roledescription="slide" aria-label="8 of 12">
+      <h2 class="title">Free for the small business. The profit is the platform's.</h2>
+      <div class="cols c-5-7">
+        <div>
+          <ul class="list" style="max-width:420px">
+            <li>No subscription</li>
+            <li>No percentage of Google or Meta spend</li>
+            <li>No agency markup</li>
+            <li>Google and Meta bill the owner directly</li>
+            <li>A prepaid top-up carries only its payment cost, at cost</li>
+          </ul>
+          <p class="small" style="margin-top:22px;max-width:420px">Free removes the adoption barrier. The small business is our acquisition and data layer, budgeted at about $11 a business a month.</p>
+        </div>
+        <ol class="timeline">
+          <li><span class="when">once live</span><h3>Mid-size and large advertisers</h3><p>Our own DSP: the profit engine, once the platform is live with SSP supply and has data.</p></li>
+          <li><span class="when">month 4–8</span><h3>Admiry Network media</h3><p>The same platform, priced like any external platform and labelled to the owner; only when its cost per lead beats the best channel; at most 20% of a plan.</p></li>
+          <li><span class="when">later</span><h3>New services</h3><p>Add-ons, payments and booking, leads and referrals: each priced separately when it is introduced.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 9 · unit economics -->
+    <section class="slide" id="s9" data-n="9" aria-roledescription="slide" aria-label="9 of 12">
+      <h2 class="title">Cheap to serve. The Network offsets it.</h2>
+      <div class="cols c-7-5" style="align-items:center">
+        <div>
+          <div class="cols c-3" style="gap:32px">
+            <div><div class="figure mid">$11</div><p class="figure-label">cost to serve, per business per month</p></div>
+            <div><div class="figure mid">4.5%</div><p class="figure-label">of an average $900 plan through the Network to break even</p></div>
+            <div><div class="figure mid">+$38</div><p class="figure-label">per business per month at the 20% cap; about $38k a month per 1,000 businesses</p></div>
+          </div>
+          <p class="body muted" style="margin-top:40px;max-width:640px">The free tier is a budget, not a profit line: 100 businesses, about $1.1k a month of burn, raised only deliberately. Where the Network wins on cost per lead it offsets that. All figures are estimates; the basis is in the design spec.</p>
+        </div>
+        <figure style="margin:0">
+          <svg class="diagram" viewBox="0 0 460 270" width="460" height="270" role="img" aria-label="Bar chart, contribution per business per month by Network share: minus 11 dollars at 0 percent, plus 13 dollars at 10 percent, plus 38 dollars at 20 percent.">
+            <text x="0" y="18" font-size="15" class="t2">Contribution per business per month, by Network share</text>
+            <line x1="0" y1="180" x2="460" y2="180" stroke="var(--line)" stroke-width="1"/>
+            <path d="M40 180 V209 Q40 213 44 213 H100 Q104 213 104 209 V180 Z" fill="var(--ink-2)" opacity=".7"><title>0% share: −$11 per business per month</title></path>
+            <path d="M190 180 V145 Q190 141 194 141 H250 Q254 141 254 145 V180 Z" fill="var(--signal)"><title>10% share: +$13 per business per month</title></path>
+            <path d="M340 180 V70 Q340 66 344 66 H400 Q404 66 404 70 V180 Z" fill="var(--signal)"><title>20% share (cap): +$38 per business per month</title></path>
+            <g font-size="17" font-weight="500" font-variant-numeric="tabular-nums">
+              <text x="72" y="235" text-anchor="middle">−$11</text>
+              <text x="222" y="132" text-anchor="middle">+$13</text>
+              <text x="372" y="57" text-anchor="middle">+$38</text>
+            </g>
+            <g font-size="14" class="t2">
+              <text x="72" y="258" text-anchor="middle" class="t2">0% share</text>
+              <text x="222" y="200" text-anchor="middle" class="t2">10%</text>
+              <text x="372" y="200" text-anchor="middle" class="t2">20% (cap)</text>
+            </g>
+          </svg>
+        </figure>
+      </div>
+    </section>
+
+    <!-- 10 · market -->
+    <section class="slide" id="s10" data-n="10" aria-roledescription="slide" aria-label="10 of 12">
+      <h2 class="title">A $186 billion local market, sold one owner at a time.</h2>
+      <div class="cols c-3">
+        <div><div class="figure mid">$186B</div><p class="figure-label">US local advertising in 2026</p></div>
+        <div><div class="figure mid">$45B</div><p class="figure-label">of it on mobile</p></div>
+        <div><div class="figure mid">59%</div><p class="figure-label">of small businesses expect acquiring customers to be a challenge this year</p></div>
+      </div>
+      <div class="bottom">
+        <hr class="rule">
+        <div class="cols c-7-5" style="margin-top:22px">
+          <p class="body" style="max-width:640px"><strong>Beachhead:</strong> single-location US service businesses (home services, dental and health, legal, beauty, education) spending $300–5,000 a month, whose next customer is a call, a form or a booking.</p>
+          <p class="body">Distribution is the assistant: the owner installs nothing. The last mile is ours.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · where we are + roadmap -->
+    <section class="slide" id="s11" data-n="11" aria-roledescription="slide" aria-label="11 of 12">
+      <h2 class="title">The hard part is built.</h2>
+      <div class="cols c-7-5">
+        <div>
+          <p class="small" style="margin-bottom:6px">Today, September 2026</p>
+          <ul class="list" style="max-width:600px">
+            <li>Our own ad platform (bidder, CTR model, tracking, pacing, reporting) runs end to end in validation. Production rollout began 2026-09-17.</li>
+            <li>Product page live at admiry.ai/local.</li>
+            <li>Agent service under construction; Muse validation and the Google and Meta API applications are next.</li>
+            <li>First cohort: 20 US service businesses, capped at 100.</li>
+          </ul>
+        </div>
+        <div>
+          <p class="small" style="margin-bottom:14px">Next</p>
+          <ol class="roadmap">
+            <li class="now"><b>A1</b><span>Connector: a sentence in Muse becomes a plan</span></li>
+            <li><b>A2</b><span>Storefront and leads</span></li>
+            <li><b>A3</b><span>Google Search in the owner's account</span></li>
+            <li><b>A4</b><span>Optimization and the weekly report</span></li>
+            <li><b>A5</b><span>Meta and creative</span></li>
+            <li><b>A6</b><span>AI-search discoverability score</span></li>
+            <li><b>A7</b><span>Admiry Network</span></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · closing -->
+    <section class="slide" id="s12" data-n="12" aria-roledescription="slide" aria-label="12 of 12">
+      <h2 class="title">Why Admiry wins</h2>
+      <div class="cols c-7-5">
+        <ul class="list" style="font-size:21px">
+          <li>The last mile is ours: ad platform, tracking, storefront, ledger.</li>
+          <li>Assistant-agnostic: Muse first, then every agent that speaks MCP.</li>
+          <li>$0 fee at about $11 to serve removes the adoption barrier.</li>
+          <li>Safety by construction: limits, approval codes, audit. What assistants and regulators will require.</li>
+          <li>Every conversion compounds into better plans and better Network targeting.</li>
+        </ul>
+        <div style="padding-top:14px">
+          <div class="brand" style="margin-bottom:14px"><svg><use href="#mark"/></svg>Admiry</div>
+          <p class="lead" style="max-width:360px">Tell Admiry what you do. It finds your customers.</p>
+          <p class="small" style="margin-top:12px">admiry.ai/local</p>
+        </div>
+      </div>
+      <div class="bottom">
+        <p class="small" style="font-size:13px;max-width:1120px">Sources: SBA Advocacy FAQ 2026; BIA Advisory U.S. Local Advertising Forecast 2026, September update; BrightLocal Local Consumer Review Survey 2026; LocaliQ Small Business Marketing Trends 2026; Meta Q2 2026 earnings call; Meta Muse launch post and muse.ai/platform. Estimates from the 2026-09-24 design spec.</p>
+      </div>
+    </section>
+
+    <div class="hud" aria-hidden="true">
+      <div class="mark"><svg><use href="#mark"/></svg><span>Admiry</span></div>
+      <div class="pipe"><div class="flow" id="flow"></div></div>
+      <div class="count" id="count">1 / 12</div>
+    </div>
+  </div>
+</div>
+<div class="hint">Arrow keys or click to move. F for full screen. Print for a PDF, one slide per page.</div>
+<div id="live" aria-live="polite" style="position:absolute;left:-9999px"></div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var stage = document.getElementById('stage');
+  var flow = document.getElementById('flow');
+  var count = document.getElementById('count');
+  var live = document.getElementById('live');
+  var n = slides.length, i = 0;
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.setProperty('--s', s);
+  }
+  function go(k, replace) {
+    i = Math.max(0, Math.min(n - 1, k));
+    slides.forEach(function (el, j) { el.classList.toggle('is-active', j === i); });
+    flow.style.setProperty('--p', (i + 1) / n);
+    count.textContent = (i + 1) + ' / ' + n;
+    live.textContent = 'Slide ' + (i + 1) + ' of ' + n;
+    var h = '#' + (i + 1);
+    if (location.hash !== h) { replace ? history.replaceState(null, '', h) : history.pushState(null, '', h); }
+  }
+  function fromHash() { var k = parseInt(location.hash.slice(1), 10); return isNaN(k) ? 0 : k - 1; }
+
+  window.addEventListener('resize', fit);
+  window.addEventListener('popstate', function () { go(fromHash(), true); });
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': case 'Enter': e.preventDefault(); go(i + 1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': case 'Backspace': e.preventDefault(); go(i - 1); break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End': e.preventDefault(); go(n - 1); break;
+      case 'f': case 'F':
+        if (document.fullscreenElement) { document.exitFullscreen(); } else if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen(); }
+        break;
+    }
+  });
+  stage.addEventListener('click', function (e) {
+    var r = stage.getBoundingClientRect();
+    go((e.clientX - r.left) / r.width < 0.3 ? i - 1 : i + 1);
+  });
+  var x0 = null;
+  document.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) go(dx < 0 ? i + 1 : i - 1);
+  }, { passive: true });
+
+  fit();
+  go(fromHash(), true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{#- The industry site gallery's index (A3p-6 batch 1 Q22; agent/sites/gallery.py `build`): the six looks, each with its
+    name, a line on its style, its three screenshots and a link into the site under its own prefix (Q23). One page
+    the founder opens to review them; the kit's snippet last, the one value not escaped here. -#}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admiry site styles: six looks to review</title>
+<style>
+body{margin:0;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1f2937;background:#f6f7f9}
+main{max-width:1200px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:2rem;line-height:1.2;margin:0 0 12px}
+.intro{max-width:760px;color:#374151}
+.look{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px;margin:28px 0}
+.look h2{margin:0 0 6px;font-size:1.35rem}
+.look p{margin:0 0 14px;color:#374151}
+.shots{display:flex;gap:16px;align-items:flex-start;overflow-x:auto}
+.shots figure{margin:0;flex:0 0 auto}
+.shots img{display:block;border:1px solid #d1d5db;border-radius:6px;height:auto}
+.shots .phone img{width:130px}.shots .tablet img{width:220px}.shots .desktop img{width:380px}
+.shots figcaption{font-size:.85rem;color:#4b5563;margin-top:4px}
+.open{display:inline-block;margin-top:14px;padding:10px 18px;border-radius:8px;background:#14213d;color:#fff;text-decoration:none;font-weight:600}
+.missing{color:#6b7280;font-style:italic}
+</style>
+</head>
+<body>
+<main>
+<h1>Six looks for Admiry's industry sites</h1>
+<p class="intro">These are the two sample businesses, a roofer in Charlotte and a dental practice in San Jose, each
+built in the three styles of its family. A family's three sites share one structure; each has its own type, colours,
+corners and opening layout, and its words follow its own board on the design canvas. The businesses are made up, and
+every photo is from Admiry's stock library and carries the "Replace with your photo" label a preview shows. Open each
+site and look at it on a phone, a tablet and a computer: the call bar at the bottom of a phone, every page and every
+form.</p>
+{%- for look in looks %}
+<section class="look" id="{{ look.name }}">
+<h2>{{ look.title }}</h2>
+<p>{{ look.line }}</p>
+{%- if look.shots %}
+<div class="shots">
+{%- for size, label in look.shots %}
+<figure class="{{ size }}"><img src="/shots/{{ look.name }}-{{ size }}.jpg" alt="{{ look.title }} on {{ label }}" loading="lazy"><figcaption>On {{ label }}</figcaption></figure>
+{%- endfor %}
+</div>
+{%- else %}
+<p class="missing">No screenshots: the render check is not set up on this server.</p>
+{%- endif %}
+<a class="open" href="/{{ look.name }}/">Open {{ look.title }}</a>
+</section>
+{%- endfor %}
+</main>
+{{ snippet|safe }}
+</body>
+</html>

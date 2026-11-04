@@ -1,0 +1,90 @@
+{
+  "id": "home_services-8",
+  "vertical": "home_services",
+  "opening": "North Star Furnace & Cooling in Minneapolis. When the heat goes out people call us, day or night. Phone calls within 10 miles, $1,000 a month.",
+  "monthly_budget_usd": 1000,
+  "knowledge": {
+    "name": "North Star Furnace & Cooling",
+    "category": "home_services",
+    "category_detail": "HVAC contractor",
+    "service_area": [
+      "Minneapolis",
+      "St. Paul",
+      "Edina"
+    ],
+    "services": [
+      {
+        "name": "Furnace repair",
+        "intent_phrases": [
+          "furnace repair minneapolis",
+          "furnace not working",
+          "no heat emergency service"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "Furnace replacement",
+        "intent_phrases": [
+          "new furnace cost minneapolis",
+          "furnace replacement near me"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "24/7",
+    "phone": "612-555-0177",
+    "website": null,
+    "pricing_hints": [
+      "no overtime charge on weekends"
+    ],
+    "typical_customer_value_usd": 500,
+    "usp": [
+      "24/7 no-heat service",
+      "Upfront pricing"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": null,
+      "monthly_budget_usd": 1000,
+      "focus_services": [
+        "Furnace repair"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_home_services_8",
+      "name": "North Star Furnace & Cooling",
+      "address": "250 Marquette Ave, Minneapolis, MN 55401",
+      "lat": 44.9792,
+      "lng": -93.2672,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "North Star Furnace & Cooling"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "calls"
+    },
+    "service": {
+      "choice": "svc_furnace_repair"
+    },
+    "customer_value": {
+      "choice": "300_1000"
+    },
+    "radius": {
+      "choice": "r10"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

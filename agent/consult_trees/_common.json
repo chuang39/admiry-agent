@@ -1,0 +1,23 @@
+{
+  "questions": [
+    {
+      "id": "website", "input": "website", "common": true, "known_fact": null,
+      "prompt": "Does the business have a website? Paste its address and I'll read it, or tap No website.",
+      "placeholder": "Paste your website's address",
+      "options": [{"id": "none", "label": "No website"}],
+      "why": null
+    },
+    {
+      "id": "business_name", "input": "text", "common": true, "known_fact": "business_name",
+      "prompt": "What is the business called?", "placeholder": "Business name",
+      "options": [],
+      "why": null
+    },
+    {
+      "id": "services_offered", "input": "text", "common": true, "known_fact": null,
+      "prompt": "What do you offer? A few words are enough, like {examples}.", "placeholder": "A few of your services",
+      "options": [],
+      "why": null
+    }
+  ]
+}

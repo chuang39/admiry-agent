@@ -1,0 +1,50 @@
+{#- The services page (blueprint §4.4): the category and the city with both calls, the trust facts, the problem
+    picker, a block per service (its own page for a lead service), the urgent help when offered, the owner's terms
+    (free estimate, financing, warranty), how it works, reviews, where we work, the final call. -#}
+{% extends "sites/_layout.html" %}
+{% import "sites/_components.html" as c with context %}
+{% block main %}
+{{ c.page_hero(none, none, w.services.intro) }}
+{{ c.trust_strip() }}
+{{ c.problem_picker() }}
+<section class="service-blocks" data-section="services">
+  <div class="wrap">
+    {%- for s in services %}
+    <article class="svc-block" id="svc-{{ s.slug }}">
+      {{ c.photo(s.photo, card_sizes) }}
+      <div class="svc-copy">
+        <h2>{% if s.lead %}<a href="{{ s.url }}">{{ s.name }}</a>{% else %}{{ s.name }}{% endif %}</h2>
+        {%- if s.summary %}
+        <p>{{ s.summary }}</p>
+        {%- endif %}
+        {%- if s.includes %}
+        <ul class="checks">
+          {%- for item in s.includes %}
+          <li>{{ item }}</li>
+          {%- endfor %}
+        </ul>
+        {%- endif %}
+        {%- if s.price_line %}
+        <p class="price">{{ s.price_line }}</p>
+        {%- endif %}
+        <p class="actions">{{ c.button(quote_url, actions.header) }}</p>
+      </div>
+    </article>
+    {%- endfor %}
+  </div>
+</section>
+{{ c.emergency() }}
+{%- if f.free_estimate or f.financing or f.warranty %}
+<section class="terms-notes" data-section="notes">
+  <ul class="wrap notes">
+    {%- for line in (f.free_estimate, f.financing, f.warranty) if line %}
+    <li>{{ line }}</li>
+    {%- endfor %}
+  </ul>
+</section>
+{%- endif %}
+{{ c.steps(w.home.how_heading, w.home.steps) }}
+{{ c.reviews(f.reviews[:3], w.home.reviews_heading) }}
+{{ c.area(w.home.area_heading, "", with_hours=false) }}
+{{ c.cta_band() }}
+{% endblock %}

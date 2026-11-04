@@ -1,0 +1,47 @@
+{#- The daily digest's HTML part (digest spec 2026-09-30 §4.1; plan 2026-10-07-agent-k2 Task 9): the same words as
+    the text part, autoescaped everywhere, inline styles only (mail clients drop stylesheets). -#}
+<div style="font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;color:#1f2430;line-height:1.5;max-width:640px">
+<p style="margin:0 0 1em">{{ sentence }}</p>
+{%- if rows or page %}
+<table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 1em">
+{%- for r in rows %}
+<tr><td style="padding:4px 12px 4px 0;font-weight:600;vertical-align:top">{{ r.label }}</td><td style="padding:4px 0">{{ r.line }}{% if r.state_text %}<br><span style="color:#5b6172">{{ r.state_text }}</span>{% endif %}</td></tr>
+{%- endfor %}
+{%- if page %}
+<tr><td colspan="2" style="padding:4px 0">{{ page }}</td></tr>
+{%- endif %}
+</table>
+{%- endif %}
+{%- if items %}
+<p style="margin:1em 0 0.25em;font-weight:600">{{ needs_you_label }}</p>
+<ul style="margin:0 0 1em;padding-left:1.2em">
+{%- for i in items %}
+<li style="margin:0 0 0.4em">{{ i.text }}{% if i.link %} <a href="{{ i.link.url }}">{{ i.link.label }}</a>{% endif %}</li>
+{%- endfor %}
+</ul>
+{%- endif %}
+{%- if note %}
+<p style="margin:1em 0"><strong>{{ take_label }}:</strong> {{ note }}</p>
+{%- endif %}
+{%- if recs %}
+<p style="margin:1em 0 0.25em;font-weight:600">{{ suggests_label }}</p>
+<ul style="margin:0 0 1em;padding-left:1.2em">
+{%- for r in recs %}
+<li style="margin:0 0 0.4em">{{ r }}</li>
+{%- endfor %}
+</ul>
+{%- endif %}
+{%- if week %}
+<p style="margin:1em 0 0.25em;font-weight:600">{{ week_label }}</p>
+{%- for line in week %}
+<p style="margin:0 0 0.4em">{{ line }}</p>
+{%- endfor %}
+{%- endif %}
+{%- if operator %}
+<pre style="background:#f4f5f8;padding:8px;font-size:0.85em;white-space:pre-wrap">{{ operator|join("\n") }}</pre>
+{%- endif %}
+<p style="color:#5b6172;font-size:0.9em;margin:1.5em 0 0.4em">{{ frequency_line }}{% for link in footer_links %} {% if link.url %}<a href="{{ link.url }}">{{ link.label }}</a>{% else %}{{ link.label }}{% endif %}{% if not loop.last %} ·{% endif %}{% endfor %}</p>
+<p style="color:#5b6172;font-size:0.9em;margin:0 0 0.4em">{{ ask }} {% if open_admiry.url %}<a href="{{ open_admiry.url }}">{{ open_admiry.label }}</a>{% else %}{{ open_admiry.label }}{% endif %}</p>
+<p style="color:#5b6172;font-size:0.9em;margin:0 0 0.4em">{{ disclosure }}</p>
+<p style="color:#5b6172;font-size:0.9em;margin:0">{{ footer }}</p>
+</div>

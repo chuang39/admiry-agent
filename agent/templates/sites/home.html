@@ -1,0 +1,66 @@
+{#- The home page (A3p-6 batch 1 Q3, home services): hero, the emergency band (when offered), trust strip, the problem
+    picker (when two or more problems match a service), services, why us, reviews, recent work, how it works, where
+    we work, questions, the final call; each only with the facts it needs. -#}
+{% extends "sites/_layout.html" %}
+{% import "sites/_components.html" as c with context %}
+{% block main %}
+{{ c.page_hero(w.home.eyebrow, hero_photo) }}
+{{ c.emergency() }}
+{{ c.trust_strip() }}
+{{ c.problem_picker() }}
+<section class="services" data-section="services">
+  <div class="wrap">
+    {{ c.heading(w.home.services_heading) }}
+    {%- if w.home.services_lead %}
+    <p class="section-lead">{{ w.home.services_lead }}</p>
+    {%- endif %}
+    <ul class="cards">
+      {%- for s in services %}
+      {{ c.service_card(s) }}
+      {%- endfor %}
+    </ul>
+  </div>
+</section>
+{%- if w.home.why_points or w.home.about_text or f.warranty or team_photo %}
+<section class="why" data-section="why">
+  <div class="wrap why-in">
+    <div class="why-copy">
+      {{ c.heading(w.home.why_heading) }}
+      {%- if w.home.about_text %}
+      <p>{{ w.home.about_text }}</p>
+      {%- endif %}
+      {%- if w.home.why_points %}
+      <ul class="checks">
+        {%- for point in w.home.why_points %}
+        <li>{{ point }}</li>
+        {%- endfor %}
+      </ul>
+      {%- endif %}
+      {%- if f.warranty %}
+      <p class="callout">{{ f.warranty }}</p>
+      {%- endif %}
+    </div>
+    {%- if team_photo %}
+    <div class="why-media">{{ c.photo(team_photo, card_sizes) }}</div>
+    {%- endif %}
+  </div>
+</section>
+{%- endif %}
+{{ c.reviews(f.reviews[:3], w.home.reviews_heading) }}
+{%- if work %}
+<section class="work" data-section="work">
+  <div class="wrap">
+    {{ c.heading(w.home.work_heading) }}
+    <div class="gallery">
+      {%- for p in work %}
+      {{ c.photo(p, card_sizes) }}
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+{%- endif %}
+{{ c.steps(w.home.how_heading, w.home.steps) }}
+{{ c.area(w.home.area_heading, w.home.area_text) }}
+{{ c.faq(w.home.faq, w.home.faq_heading) }}
+{{ c.cta_band() }}
+{% endblock %}

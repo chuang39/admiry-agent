@@ -1,0 +1,5 @@
+{#- Macros Settings and "Your ads" share: a time as the pages write one, "last used", and the session's csrf field.
+    Import `with context` (csrf_field reads `session`). -#}
+{% macro at(t) %}{% if t.iso %}<time datetime="{{ t.iso }}" title="{{ t.abs }}">{{ t.rel }}</time>{% else %}never{% endif %}{% endmacro %}
+{% macro used(t) %}{% if t.iso %}last used {{ at(t) }}{% else %}not used yet{% endif %}{% endmacro %}
+{% macro csrf_field() %}<input type="hidden" name="csrf" value="{{ session.csrf }}">{% endmacro %}

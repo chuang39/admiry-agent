@@ -1,0 +1,157 @@
+Everything to build the landing page for {{ kit.facts.name }}'s {{ kit.facts.service }} ads: the facts, the
+words the ads use, the page's sections in order, the rules, the tracking snippet, and the checklist the page
+is judged by. Build it anywhere -- your own site, a page builder, or hand this to whoever builds pages for
+you -- then tell Admiry where it is.
+
+FACTS
+Name: {{ kit.facts.name }}
+Category: {{ kit.facts.category }}
+Service: {{ kit.facts.service }}
+{% if kit.facts.services -%}
+Also offers: {{ kit.facts.services | join(", ") }}
+{% endif -%}
+{% if kit.facts.location -%}
+Location: {{ kit.facts.location }}
+{% endif -%}
+Area served: {{ kit.facts.area }}
+{% if kit.facts.phone -%}
+Phone: {{ kit.facts.phone }}
+{% endif -%}
+{% if kit.facts.hours -%}
+Hours: {{ kit.facts.hours }}
+{% endif -%}
+{% if kit.facts.offer -%}
+Offer: {{ kit.facts.offer }}
+{% endif -%}
+{% if kit.facts.usp -%}
+What makes it different: {{ kit.facts.usp | join("; ") }}
+{% endif -%}
+{% if kit.facts.pricing_hints -%}
+Pricing: {{ kit.facts.pricing_hints | join("; ") }}
+{% endif -%}
+{% if kit.facts.reviews_summary -%}
+Reviews: {{ kit.facts.reviews_summary }}
+{% endif -%}
+{% if kit.facts.website -%}
+Current website: {{ kit.facts.website }}
+{% endif %}
+
+{# YOUR WEBSITE (A3p-5 batch 2, spec 3.2; rulings R0-e, R1-f, R2-b): the plan's row for the page the ads use; while
+    it needs Admiry's code, the four ways as links to the homepage's card, the steps and the code. No website of its
+    own: no section. -#}
+{% if website -%}
+YOUR WEBSITE
+{{ website.say }}
+{% for way in website.ways -%}
+- {{ way.label }}: {{ way.url }}
+{% endfor -%}
+{% if website.ways and kit.install %}
+{% if kit.install.requirement -%}
+{{ kit.install.requirement }}
+{% endif -%}
+On {{ kit.install.name }}:
+{% if kit.install.steps | length == 1 -%}
+{{ kit.install.steps[0] }}
+{% else -%}
+{% for step in kit.install.steps -%}
+{{ loop.index }}. {{ step }}
+{% endfor -%}
+{% endif -%}
+{% if kit.install.help_url -%}
+Help: {{ kit.install.help_url }}
+{% endif %}
+```
+{{ kit.install.snippet }}
+```
+{% endif %}
+
+{% endif -%}
+THE WORDS THE ADS USE
+Headline: {{ kit.message.headline_pattern }}
+{% if kit.message.offer -%}
+Offer: {{ kit.message.offer }}
+{% endif -%}
+{% if kit.message.headlines -%}
+Headlines: {{ kit.message.headlines | join(" / ") }}
+{% endif -%}
+{% if kit.message.descriptions -%}
+Descriptions: {{ kit.message.descriptions | join(" / ") }}
+{% endif -%}
+{% if kit.message.example_searches -%}
+People search: {{ kit.message.example_searches | join(", ") }}
+{% endif %}
+
+THE PAGE, IN ORDER
+{% for s in kit.structure -%}
+{{ loop.index }}. {{ s.title }} -- {{ s.guide }}
+{% if s.example -%}
+   Example: {{ s.example }}
+{% endif -%}
+{% endfor %}
+
+QUESTIONS TO ANSWER ON THE PAGE
+{% for q in kit.faq -%}
+- {{ q }}
+{% endfor %}
+
+RULES
+{% for r in kit.rules.google -%}
+- {{ r }}
+{% endfor -%}
+- {{ kit.rules.mobile }}
+- {{ kit.rules.speed }}
+{% if kit.rules.sensitive_note -%}
+- {{ kit.rules.sensitive_note }}
+{% endif -%}
+{% for line in kit.rules.required_lines -%}
+{% if line.text -%}
+- Required wording ({{ line.when }}): "{{ line.text }}"
+{% else -%}
+- {{ line.when }}
+{% endif -%}
+{% endfor -%}
+{% if kit.rules.banned_words -%}
+- Never claim: {{ kit.rules.banned_words | join(", ") }}
+{% endif -%}
+- Form fields: {{ kit.rules.form_fields | join(", ") }}
+{% for r in kit.rules.form_rules -%}
+- {{ r }}
+{% endfor -%}
+- {{ kit.rules.consent }}
+- {{ kit.rules.reviews }}
+
+TRACKING
+{{ kit.tracking.where }}
+
+```
+{{ kit.tracking.snippet }}
+```
+
+Form: {{ kit.tracking.form }}
+{{ kit.tracking.mark_links }}
+{% if kit.tracking.intent -%}
+{{ kit.tracking.intent }}
+{{ kit.tracking.booking }}
+{{ kit.tracking.phone }}
+{% endif -%}
+{{ kit.tracking.note }}
+
+CHECKLIST -- what the page is judged by
+{% for c in kit.checklist -%}
+- {{ c.title }}
+{% endfor %}
+{% if kit.hosting -%}
+HOSTING ON ADMIRY
+{{ kit.hosting.free_while }} A page on your own site, or anywhere else, is not affected.
+
+{% endif -%}
+{% if kit.bundle -%}
+A WHOLE SITE ON ADMIRY
+{{ kit.bundle.what }}
+{% for line in kit.bundle.build -%}
+- {{ line }}
+{% endfor -%}
+- Limits: {{ kit.bundle.limits_text }}
+
+{% endif -%}
+Nothing is spent until you approve the plan.

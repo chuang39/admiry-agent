@@ -1,0 +1,21 @@
+Your landing page check: {{ passed }} of {{ total }} checks pass{{ "" if report.ok else " -- not clear to launch yet" }}.
+
+Page: {{ report.url }}
+
+{% for r in rules -%}
+{{ r.mark }} {{ r.title }} -- {{ r.detail }}
+   Why: {{ r.why }}
+{% if r.fix -%}
+   Fix: {{ r.fix }}
+{% endif -%}
+{% endfor %}
+{% if shots -%}
+Attached: your site on a phone, on a tablet and on a computer, as Admiry's check opened it.
+
+{% endif -%}
+{% if report.ok -%}
+Nothing here is blocking: you're clear to launch.
+{% else -%}
+Fix the items marked ✗ above before spending on ads; a ! is a warning, not a blocker on its own, but some
+warnings (marked in the detail) still need to be cleared before launch.
+{% endif -%}

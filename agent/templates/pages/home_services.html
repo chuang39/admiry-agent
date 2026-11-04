@@ -1,0 +1,14 @@
+{#- Home services (agent/page_recipes/home_services.json): Call, with the quote form beside it; the form asks the
+    ZIP code (is it in the service area?) and when the work is needed: today, this week, or flexible. -#}
+{% extends "pages/_base.html" %}
+{% block service_label %}What needs doing?{% endblock %}
+{% block time_field %}
+    <label for="f-time">When do you need it?</label>
+    <select id="f-time" name="preferred_time">
+      <option>Today</option>
+      <option>This week</option>
+      <option>Flexible</option>
+    </select>
+{%- endblock %}
+{% block form_button %}Request a quote{% endblock %}
+{% block form_note %}We call you back to agree on a time.{% endblock %}

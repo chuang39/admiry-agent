@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — your plan</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+{#- The e-mail channel's link (/m/{token}), almost always opened on a phone from the mail app (page.css; the mobile
+    audit, 2026-09-30): each choice a whole row, See my plan the one primary button. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main" id="main">
+<div class="page-head">
+<h1>Your plan for {{ name }} is ready</h1>
+<p class="muted">Signed in as {{ email }}. This Google account becomes the business's account with Admiry.</p>
+</div>
+<form class="page-form" method="post" action="/m/{{ token }}">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  {% if ask %}
+  <section class="card">
+  <fieldset class="choices">
+    <legend>The plan was started by e-mail from {{ address }}</legend>
+    <label class="choice"><input type="checkbox" name="allow" value="yes" checked> <span>Allow {{ address }} to work with Admiry for {{ name }} by e-mail</span></label>
+    <p class="help">It will not be able to spend more, approve launches, or manage keys. It may:</p>
+    {% for s in scopes %}
+    <label class="choice">
+      <input type="checkbox" name="scopes" value="{{ s.id }}" checked{% if s.fixed %} disabled{% endif %}> <span>{{ s.words }}</span>
+      {% if s.fixed %}<input type="hidden" name="scopes" value="{{ s.id }}">{% endif %}
+    </label>
+    {% endfor %}
+  </fieldset>
+  </section>
+  {% endif %}
+  <div class="actions"><button class="btn btn-primary" type="submit">See my plan</button></div>
+  <p class="muted">Nothing is published or spent without your approval.</p>
+</form>
+</main>
+</body>
+</html>

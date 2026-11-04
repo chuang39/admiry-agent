@@ -1,0 +1,291 @@
+{
+  "family": "home_services",
+  "trade": "plumbing",
+  "facts": {
+    "name": "Clearwater Plumbing",
+    "phone": "(704) 555-0188",
+    "city": "Charlotte",
+    "state": "NC",
+    "service_area": [
+      "Charlotte",
+      "Matthews",
+      "Mint Hill",
+      "Huntersville",
+      "Concord",
+      "Pineville",
+      "Indian Trail"
+    ],
+    "storefront": false,
+    "hours": [
+      "Monday to Friday, 7 am to 6 pm",
+      "Saturday, 8 am to 2 pm",
+      "Sunday, closed"
+    ],
+    "about": "Clearwater Plumbing is a family-run plumbing company in Charlotte. We fix leaks, clear drains and install water heaters for homes across the area.",
+    "services": [
+      {
+        "slug": "leak-repair",
+        "name": "Leak repair",
+        "lead": true,
+        "summary": "Leaks found and fixed at the source, behind walls and under floors.",
+        "includes": [
+          "Leak tracing",
+          "Pipe and fitting repair",
+          "A check of the water pressure"
+        ],
+        "signs": [
+          "A water bill that keeps going up",
+          "Damp spots on walls or ceilings",
+          "The sound of running water"
+        ]
+      },
+      {
+        "slug": "drain-cleaning",
+        "name": "Drain cleaning",
+        "lead": true,
+        "summary": "Slow and blocked drains cleared, with a camera look when it keeps coming back.",
+        "includes": [
+          "Snaking or hydro-jetting",
+          "A camera check of the line",
+          "Advice to keep it clear"
+        ],
+        "signs": [
+          "Water that drains slowly",
+          "Gurgling sounds",
+          "A bad smell from the drain"
+        ]
+      },
+      {
+        "slug": "water-heaters",
+        "name": "Water heaters",
+        "lead": true,
+        "summary": "Tank and tankless water heaters repaired or replaced, often the same day.",
+        "includes": [
+          "Removal of the old heater",
+          "Safety valve and venting check",
+          "Start-up and a walk-through"
+        ],
+        "signs": [
+          "No hot water",
+          "Rusty water",
+          "A leak around the tank"
+        ]
+      },
+      {
+        "slug": "repiping",
+        "name": "Repiping",
+        "summary": "Old or failing pipes replaced with new lines, room by room."
+      },
+      {
+        "slug": "fixtures",
+        "name": "Fixture installation",
+        "summary": "Faucets, toilets, sinks and showers installed and sealed right."
+      },
+      {
+        "slug": "sewer-lines",
+        "name": "Sewer line repair",
+        "summary": "Sewer lines checked by camera and repaired or replaced."
+      }
+    ],
+    "licence": "NC License #00000",
+    "years": 18,
+    "warranty": "1-year workmanship warranty",
+    "insured": true,
+    "free_estimate": "Free estimates",
+    "reviews": [
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      }
+    ]
+  },
+  "words": {
+    "home": {
+      "eyebrow": "family-run plumbing company in Charlotte",
+      "headline": "Leak repair in Charlotte",
+      "lead": "We find leaks, clear drains and work on water heaters for homes nearby.",
+      "services_heading": "Our services",
+      "services_lead": "Leaks, drains and water heaters, plus piping, fixtures and sewer lines.",
+      "why_heading": "Why call Clearwater Plumbing",
+      "why_points": [
+        "A family-run company with 18 years of work.",
+        "Licensed and general liability insured for home plumbing work.",
+        "Free estimates and a 1-year workmanship warranty."
+      ],
+      "how_heading": "How it works",
+      "steps": [
+        {
+          "title": "Reach out",
+          "text": "Tell us about the leak, drain or water heater and where you see it."
+        },
+        {
+          "title": "We check it",
+          "text": "We look at the job, trace the issue and give a free estimate."
+        },
+        {
+          "title": "We fix it",
+          "text": "We do the repair or install and walk you through the result."
+        }
+      ],
+      "about_heading": "About Clearwater Plumbing",
+      "about_text": "Clearwater Plumbing is a family-run plumbing company in Charlotte. We fix leaks, clear drains and install water heaters for homes across the area.",
+      "area_heading": "Where we work",
+      "area_text": "We serve homes in Charlotte, Matthews, Mint Hill, Huntersville, Concord, Pineville and Indian Trail.",
+      "faq": [
+        {
+          "q": "How do you fix a leak in my home?",
+          "a": "We trace the leak to its source, behind walls or under floors, then repair the pipe and fitting. We also check the water pressure."
+        },
+        {
+          "q": "How do you clear a slow or blocked drain?",
+          "a": "We clear slow and blocked drains by snaking or hydro-jetting. When it keeps coming back, we take a camera look at the line."
+        },
+        {
+          "q": "Do you repair or replace water heaters?",
+          "a": "We repair tank and tankless water heaters or replace them, often the same day. We remove the old heater and check safety valves and venting."
+        },
+        {
+          "q": "Do you give free estimates?",
+          "a": "We give free estimates for our work. Tell us what you see and we will help you plan the next step."
+        },
+        {
+          "q": "Is your work backed by a warranty?",
+          "a": "Our work is backed by a 1-year workmanship warranty. The business answers questions about coverage on the phone."
+        }
+      ],
+      "cta_heading": "See a leak or have no hot water?",
+      "reviews_heading": "",
+      "work_heading": "",
+      "faq_heading": "Common questions",
+      "new_patients_heading": "",
+      "insurance_heading": "",
+      "office_heading": "",
+      "cta_text": "Tell us what you see and we will help you plan the next step."
+    },
+    "about": {
+      "headline": "A family-run plumbing company",
+      "lead": "We fix leaks, clear drains and install water heaters for homes.",
+      "story": [
+        "Clearwater Plumbing is a family-run plumbing company in Charlotte. We fix leaks, clear drains and install water heaters for homes across the area.",
+        "We have 18 years of work behind us. We give free estimates and back our work with a 1-year workmanship warranty."
+      ],
+      "values_heading": "What guides our work",
+      "values": [
+        "Family-run service for local homes.",
+        "Fix the leak at its source.",
+        "Clear drains and give advice to keep them clear."
+      ],
+      "community": "We serve homeowners in Charlotte and nearby towns such as Matthews, Mint Hill and Concord."
+    },
+    "services": {
+      "headline": "Plumbing services in Charlotte",
+      "lead": "Leaks, drains, water heaters, piping, fixtures and sewer lines.",
+      "intro": "Clearwater Plumbing is a family-run company serving homes in Charlotte and nearby towns. We focus on leaks, drains and water heaters, and also handle piping, fixtures and sewer lines."
+    },
+    "contact": {
+      "headline": "Contact Clearwater Plumbing",
+      "lead": "Tell us about your leak, drain or water heater and we will reply.",
+      "response_line": "We read every message and reply as soon as we can."
+    },
+    "service_pages": [
+      {
+        "slug": "leak-repair",
+        "lead": "Leaks found and fixed at the source, behind walls and under floors.",
+        "what": "We find leaks at the source and fix the pipe and fitting. We look behind walls and under floors, then check the water pressure.",
+        "signs": [
+          "A water bill that keeps going up",
+          "Damp spots on walls or ceilings",
+          "The sound of running water"
+        ],
+        "includes": [
+          "Leak tracing",
+          "Pipe and fitting repair",
+          "A check of the water pressure"
+        ],
+        "faq": [
+          {
+            "q": "How do you find a hidden leak?",
+            "a": "We trace the leak to its source, behind walls or under floors. Then we repair the pipe and fitting and check the water pressure."
+          },
+          {
+            "q": "What are signs I may have a leak?",
+            "a": "Damp spots, a bill that keeps going up, or the sound of running water can point to a leak. The business answers questions on the phone."
+          }
+        ],
+        "signs_heading": "Signs you may need it",
+        "includes_heading": "What is included",
+        "faq_heading": "Leak repair questions"
+      },
+      {
+        "slug": "drain-cleaning",
+        "lead": "Slow and blocked drains cleared, with a camera look when it returns.",
+        "what": "We clear slow and blocked drains. When a drain keeps blocking, we take a camera look at the line to find the cause.",
+        "signs": [
+          "Water that drains slowly",
+          "Gurgling sounds",
+          "A bad smell from the drain"
+        ],
+        "includes": [
+          "Snaking or hydro-jetting",
+          "A camera check of the line",
+          "Advice to keep it clear"
+        ],
+        "faq": [
+          {
+            "q": "How do you clear a blocked drain?",
+            "a": "We clear the drain by snaking or hydro-jetting. We give advice to help keep it clear."
+          },
+          {
+            "q": "What if the blockage keeps coming back?",
+            "a": "When a blockage keeps coming back, we take a camera look at the line to see what is going on."
+          }
+        ],
+        "signs_heading": "Signs you may need it",
+        "includes_heading": "What is included",
+        "faq_heading": "Drain cleaning questions"
+      },
+      {
+        "slug": "water-heaters",
+        "lead": "Tank and tankless water heaters repaired or replaced, often the same day.",
+        "what": "We repair tank and tankless water heaters or replace them. We remove the old heater, check the safety valve and venting, then start it up.",
+        "signs": [
+          "No hot water",
+          "Rusty water",
+          "A leak around the tank"
+        ],
+        "includes": [
+          "Removal of the old heater",
+          "Safety valve and venting check",
+          "Start-up and a walk-through"
+        ],
+        "faq": [
+          {
+            "q": "Do you work on tank and tankless heaters?",
+            "a": "We work on tank and tankless water heaters. We repair them or replace them, often the same day."
+          },
+          {
+            "q": "What are signs my water heater needs help?",
+            "a": "No hot water, rusty water, or a leak around the tank can point to heater trouble. The business answers questions on the phone."
+          }
+        ],
+        "signs_heading": "Signs you may need it",
+        "includes_heading": "What is included",
+        "faq_heading": "Water heater questions"
+      }
+    ],
+    "cta_label": "Call now",
+    "book_label": "Book a visit"
+  },
+  "style_words": {}
+}

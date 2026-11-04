@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — grade the golden set</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+<link rel="stylesheet" href="/static/eval.css">
+</head>
+{#- The founder's grading page, its list (K5): every frozen plan in a fixed mixed order, how many of its dimensions
+    are graded. Dev only (agent/eval_web.py). -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main" id="main">
+<section class="panel">
+  <h1>Grade the golden set</h1>
+  <p class="muted">{{ done }} of {{ total }} plans graded on all {{ dims }} dimensions. Each plan is shown as Admiry's
+  judge reads it. Grade each dimension 1 to 5 and say why when it is under 4; your grades are saved as you give them.</p>
+  <ol class="eval-list">
+  {% for r in rows %}
+    <li><a href="/ops/eval/plan/{{ r.key }}">Plan {{ r.n }}: {{ r.name }}</a>
+      <span class="muted">{{ r.trade }}</span>
+      <span class="{{ 'eval-done' if r.graded == dims else 'muted' }}">{{ r.graded }} of {{ dims }}</span></li>
+  {% endfor %}
+  </ol>
+  <p class="fine"><a href="/ops/eval/export.json">Download the grades (JSON)</a> — <code>python -m agent.eval export --from</code> writes them into the case files.</p>
+</section>
+</main>
+</body>
+</html>

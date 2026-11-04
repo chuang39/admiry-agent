@@ -1,0 +1,96 @@
+{#- The owner's own upload page (agent/uploads.py, A3p-2 Task 6, H13/H37): a phone-friendly link create_page mints.
+    Context: name (the business), token (this page's own upload token: every form here posts back to
+    /u/{token}), message (a one-line success note, or None), link (an address the note offers, or None) and link_label
+    (the words of its button), error (a one-line refusal, or None); then, for the one-page starter page, kinds None and
+    photos (thumbnails already resolved to the page's own newest preview -- each {id, src}, [] when there is nothing to
+    show yet), count (sections["photos"]'s own length, which can be ahead of len(photos) in the one defensive case no
+    preview could be found), max_photos; or, for an industry site's page (A3p-6 batch 2 Task 3), kinds: the family's
+    photo kinds in order, each {id, label, need, have, photos: [{id, src}], left, blocks} -- `left` how many empty
+    squares the kind still offers (the logo always one: a new logo replaces the one before), `blocks` whether the site
+    waits for it before going live -- and gate (the sentence saying what the site still needs before it goes live, or
+    None).
+    The phone redesign (2026-10-15): every photo the site uses is a square -- a photo that is in, with its Remove, or
+    the picker for one that is not: its own form, naming the kind, so nothing is chosen from a list. upload.js sends a
+    chosen photo at once (the CSP lets in this origin's scripts, never an inline one); without it the square offers
+    Upload (upload.css, on :has(input:valid)). Every action is still a plain form post that shows this page again. -#}
+{%- macro square(token, kind_id, words, several) -%}
+  <li class="slot">
+    <form method="post" action="/u/{{ token }}" enctype="multipart/form-data">
+      {%- if kind_id %}
+      <input type="hidden" name="kind" value="{{ kind_id }}">
+      {%- endif %}
+      <label class="pick">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1-2h6l1 2"/></svg>
+        <span class="spin" aria-hidden="true"></span>
+        <input type="file" name="photos" accept="image/*"{% if several %} multiple{% endif %} required class="sr">
+        <span class="pick-words">{{ words }}</span>
+        <span class="sending-words">Sending…</span>
+      </label>
+      <button class="btn btn-dark send" type="submit">Upload</button>
+    </form>
+  </li>
+{%- endmacro %}
+{%- macro photo(token, p) -%}
+  <li class="slot">
+    <img src="{{ p.src }}" alt="">
+    <form class="rm" method="post" action="/u/{{ token }}">
+      <input type="hidden" name="action" value="remove">
+      <input type="hidden" name="photo" value="{{ p.id }}">
+      <button class="remove" type="submit" aria-label="Remove"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </form>
+  </li>
+{%- endmacro %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Add photos — {{ name }}</title>
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+<link rel="stylesheet" href="/static/upload.css">
+<script src="/static/upload.js" defer></script>
+</head>
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main" id="main">
+<section class="card">
+<h1>Add photos for {{ name }}</h1>
+{%- if error %}
+<div class="status error"><p class="error">{{ error }}</p></div>
+{%- elif message %}
+<div class="status"><p class="done">{{ message }}</p>{% if link %}<a class="btn" href="{{ link }}" target="_blank" rel="noopener">{{ link_label }}</a>{% endif %}</div>
+{%- endif %}
+{%- if kinds is none %}
+<p class="upload-note">Tap a square to add a photo from your phone. Add up to {{ max_photos }} photos of your work, your team or your place. You have added {{ count }} of {{ max_photos }}.</p>
+{%- set left = max_photos - count if max_photos > count else 0 %}
+<ul class="slots">
+  {%- for p in photos %}{{ photo(token, p) }}{% endfor %}
+  {%- for _ in range(left) %}{{ square(token, none, "Add", left > 1) }}{% endfor %}
+</ul>
+{%- else %}
+<p class="upload-note">Tap a square to add a photo from your phone.{% if gate %} <strong>{{ gate }}</strong>{% endif %}</p>
+{%- for k in kinds %}
+<section class="kind{% if k.id == 'logo' %} logo{% endif %}" id="kind-{{ k.id }}">
+<div class="kind-head">
+  <h2>{{ k.label }}</h2>
+  <div class="kind-meta">
+    {%- if k.blocks %}<span class="badge badge-need">Needed to go live</span>{% endif %}
+    <span class="badge {% if k.have >= k.need %}badge-done{% else %}badge-neutral{% endif %}">{{ k.have }} of {{ k.need }}</span>
+  </div>
+</div>
+<ul class="slots">
+  {%- for p in k.photos %}{{ photo(token, p) }}{% endfor %}
+  {%- for _ in range(k.left) %}{{ square(token, k.id, "Replace" if k.id == "logo" and k.have else "Add", k.left > 1) }}{% endfor %}
+</ul>
+</section>
+{%- endfor %}
+{%- endif %}
+{#- back to the home, where the conversation and the site card are (the founder's dev walk, 2026-10-08) #}
+<div class="actions done-row"><a class="btn btn-dark" href="/">Done</a></div>
+</section>
+</main>
+</body>
+</html>

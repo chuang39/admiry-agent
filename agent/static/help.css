@@ -1,0 +1,59 @@
+/* The Help button (spec 2026-10-12 §3.2, the approved mockup): a white pill bottom right, 44px tall, the site's border
+   and shadow; a card above it, a sheet from the bottom on a phone. Loaded by every page that includes _help.html, over
+   base.css's tokens -- every token carries its fallback, as support.css's do. No rule may restyle a page it is not
+   for: every selector is the button's own (#help…, .help…) or the homepage's dock reached through its body class
+   (body.talking .help-pill); a scoping test pins it. */
+.help-pill { position: fixed; right: 24px; bottom: 24px; z-index: 30; display: inline-flex; align-items: center;
+  gap: 8px; height: 44px; padding: 0 16px 0 12px; border: 1px solid var(--line, #DBDEE2); border-radius: 22px;
+  background: var(--card, #FFFFFF); color: var(--fg, #0B0F1A); font: inherit; font-size: 14px; font-weight: 500;
+  box-shadow: 0 1px 2px rgba(28, 31, 42, 0.06), 0 8px 24px rgba(28, 31, 42, 0.10); cursor: pointer; }
+.help-pill svg { color: var(--accent, #345BFF); }
+.help-pill[aria-expanded="true"] { border-color: var(--accent, #345BFF); background: var(--accent-bg, #EEF2FF);
+  color: var(--accent-ink, #1B387B); }
+.help-card { position: fixed; right: 24px; bottom: 80px; z-index: 31; width: 380px; max-width: calc(100vw - 48px);
+  box-sizing: border-box; padding: 20px; border: 1px solid var(--line, #DBDEE2); border-radius: 20px;
+  background: var(--card, #FFFFFF); color: var(--fg, #0B0F1A);
+  box-shadow: 0 2px 4px rgba(28, 31, 42, 0.06), 0 16px 48px rgba(28, 31, 42, 0.16); }
+.help-backdrop { display: none; }
+.help-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.help-title { margin: 0; font-size: 18px; font-weight: 600; }
+.help-sub { margin: 4px 0 0; font-size: 14px; color: var(--muted, #596275); }
+.help-close { width: 44px; height: 44px; margin: -10px -10px 0 0; border: 0; border-radius: 12px; background: none;
+  color: var(--muted, #596275); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  cursor: pointer; }
+.help-form { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+.help-form textarea, .help-email input { width: 100%; box-sizing: border-box; padding: 12px; font: inherit;
+  font-size: 15px; line-height: 1.45; color: var(--fg, #0B0F1A); border: 1px solid var(--edge, #B9BDD0);
+  border-radius: 12px; background: var(--card, #FFFFFF); }
+.help-form textarea { resize: none; }
+.help-email { display: flex; flex-direction: column; gap: 6px; }
+.help-email label { font-size: 14px; font-weight: 500; }
+.help-email input { height: 44px; padding: 0 12px; }
+.help-hint, .help-note { margin: 0; font-size: 13px; line-height: 1.45; color: var(--muted, #596275); }
+.help-error { margin: 0; font-size: 14px; color: var(--error, #A12C2C); }
+.help-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.help-btn { height: 44px; padding: 0 16px; border: 1px solid var(--line, #DBDEE2); border-radius: 12px;
+  background: var(--card, #FFFFFF); color: var(--fg, #0B0F1A); font: inherit; font-size: 15px; cursor: pointer; }
+.help-send { padding: 0 20px; border-color: var(--accent, #345BFF); background: var(--accent, #345BFF);
+  color: #FFFFFF; font-weight: 600; }
+.help-send:disabled { opacity: 0.6; cursor: default; }
+.help-sent { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 14px;
+  text-align: center; }
+.help-check { width: 48px; height: 48px; border-radius: 24px; background: #E6F4EC; color: var(--ok, #1F7A4D);
+  display: flex; align-items: center; justify-content: center; }
+.help-sent-title { margin: 0; font-size: 18px; font-weight: 600; }
+.help-sent-text { margin: 0; font-size: 15px; line-height: 1.5; color: var(--soft, #3D4356); }
+.help-sent .help-btn { width: 100%; }
+/* display: flex above would beat the hidden attribute's own display: none */
+.help-form[hidden], .help-email[hidden], .help-sent[hidden] { display: none; }
+@media (max-width: 720px) {
+  /* above the homepage's fixed dock while a conversation is under way (home.css: 10px, the composer, 10px, the safe
+     area); 24px from the corner on every other page and on the home's first visit */
+  body.talking .help-pill { bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .help.open .help-backdrop { display: block; position: fixed; inset: 0; z-index: 31;
+    background: rgba(11, 15, 26, 0.32); }
+  .help-card { right: 0; bottom: 0; left: 0; width: auto; max-width: none; max-height: 92dvh; overflow-y: auto;
+    z-index: 32; border-radius: 24px 24px 0 0; padding: 20px 16px calc(24px + env(safe-area-inset-bottom)); }
+  .help.open .help-pill { display: none; } /* the sheet covers the corner; the pill is back when it closes */
+  .help-form textarea, .help-email input { font-size: 16px; } /* under 16px iOS Safari zooms in on focus (home.css) */
+}

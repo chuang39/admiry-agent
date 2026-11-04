@@ -1,0 +1,90 @@
+{
+  "id": "home_services-3",
+  "vertical": "home_services",
+  "opening": "Gulf Breeze Heating & Air in Tampa. It's AC season and we want the phone to ring for AC repairs, within 20 miles. $2,500 a month.",
+  "monthly_budget_usd": 2500,
+  "knowledge": {
+    "name": "Gulf Breeze Heating & Air",
+    "category": "home_services",
+    "category_detail": "HVAC contractor",
+    "service_area": [
+      "Tampa",
+      "Brandon",
+      "Clearwater"
+    ],
+    "services": [
+      {
+        "name": "AC repair",
+        "intent_phrases": [
+          "ac repair tampa",
+          "air conditioner not cooling",
+          "emergency ac repair near me"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "AC replacement",
+        "intent_phrases": [
+          "new ac unit cost tampa",
+          "ac replacement near me"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Sat 7-7",
+    "phone": "813-555-0172",
+    "website": null,
+    "pricing_hints": [
+      "$89 diagnostic visit, waived with the repair"
+    ],
+    "typical_customer_value_usd": 900,
+    "usp": [
+      "Same-day AC repair",
+      "NATE-certified technicians"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": null,
+      "monthly_budget_usd": 2500,
+      "focus_services": [
+        "AC repair"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_home_services_3",
+      "name": "Gulf Breeze Heating & Air",
+      "address": "4200 W Cypress St, Tampa, FL 33607",
+      "lat": 27.9506,
+      "lng": -82.5135,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Gulf Breeze Heating & Air"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "calls"
+    },
+    "service": {
+      "choice": "svc_ac_repair"
+    },
+    "customer_value": {
+      "choice": "300_1000"
+    },
+    "radius": {
+      "choice": "r20"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+{% if refresh %}<meta http-equiv="refresh" content="{{ refresh }}">{% endif %}
+<title>Admiry — agree and pay</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+{#- The agree page (/agree/{plan_id}; founder's ruling 3, 2026-10-13), opened from the first payment's link an assistant
+    gives the owner, usually on a phone: the plan's summary, the documents to tick (never pre-ticked) and one button to
+    Stripe -- the home's own Agree and pay; back from Stripe, the payment being confirmed, then paid. No script. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main narrow" id="main">
+<section class="panel" aria-labelledby="title">
+{% if view == "form" %}
+  <div class="page-head">
+    <h1 id="title">Agree and pay</h1>
+    <p class="muted">The plan for {{ name }}. Admiry runs its ads from your prepaid balance.</p>
+  </div>
+  <div class="wide"><table>
+    <tr><th>Where the ads run</th><td>{{ channels | join(" · ") }}</td></tr>
+    <tr><th>Monthly budget</th><td>{{ monthly }} a month</td></tr>
+    {% if area %}<tr><th>Area</th><td>{{ area }}</td></tr>{% endif %}
+    <tr><th>You pay now</th><td>{{ price }} by card, which includes a {{ fee }} transaction fee</td></tr>
+    <tr><th>Adds to your balance</th><td>{{ credit }}{% if days %}, about {{ days }} days of ads{% endif %}</td></tr>
+  </table></div>
+  <form class="page-form" method="post" action="/agree/{{ plan_id }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    {% if documents %}
+    <fieldset class="choices">
+      <legend>Before you pay</legend>
+      {% for d in documents %}
+      <label class="choice">
+        <input type="checkbox" name="{{ d.id }}" value="{{ d.version }}"> <span>I accept the <a href="/legal/{{ d.id }}" target="_blank" rel="noopener">{{ d.title }}</a> <span class="muted">({{ d.version }})</span></span></label>
+      {% endfor %}
+    </fieldset>
+    {% endif %}
+    {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+    <button class="btn btn-dark" type="submit">Agree and pay</button>
+  </form>
+  {% if switches %}<p class="fine">{{ switches }}</p>{% endif %}
+  <p class="fine">{% if review %}Paying approves this plan: Admiry checks it, then your ads go live.{% else %}Once you have paid, approve the plan and your ads start.{% endif %}
+  Admiry adds no fee: the transaction fee is what Stripe charges to process the payment, and it is not refunded. The
+  balance is spent on the ads at the platform's exact cost; what is unspent is refundable.</p>
+{% elif view == "confirming" %}
+  <h1 id="title">Confirming your payment</h1>
+  <p role="status">{{ said }}</p>
+  <p class="fine">{{ back_line }}</p>
+{% else %}
+  <h1 id="title">{{ title }}</h1>
+  <p>{{ said }}</p>
+  <p>{{ back_line }}</p>
+{% endif %}
+</section>
+</main>
+</body>
+</html>

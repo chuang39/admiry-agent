@@ -1,0 +1,23 @@
+{
+  "tree": "home_services",
+  "sensitive": false,
+  "cta": "call_or_quote",
+  "sections": [
+    {"id": "hero", "title": "Above the fold", "guide": "One headline: the service and the city, exactly as the ads say it. Under it, same-day service or a free estimate in one line, and the phone as a tap-to-call button. Say 'licensed' only when the licence number appears on the page; name the coverage whenever the page mentions insurance ('general liability insured'), and never say 'bonded': California disciplines an insurance mention that names no coverage, and 'bonded', on a website too.", "example": "HVAC Repair in Austin — same-day service. Call (512) 555-0100."},
+    {"id": "trust", "title": "Why this business", "guide": "Three short reasons taken from the business's own facts: the licence number, years in business, the insurance coverage named ('general liability insured'), photos of work already done. Real reviews with the reviewer's first name and the source; never a review the business did not receive.", "example": "Licensed · general liability insured · 12 years in Austin · 4.8★ (86 reviews)"},
+    {"id": "service", "title": "What happens when you call", "guide": "Three or four plain sentences: the arrival window, the price or that the estimate is free, and what is included. No promises about results.", "example": "Call before noon and we're there the same day. Estimates are free and the price is confirmed before any work starts."},
+    {"id": "form", "title": "Request a quote", "guide": "Name, phone, the service, the ZIP code, and when the work is needed. One line under the button saying when the business calls back.", "example": "We call back within one business day."},
+    {"id": "faq", "title": "Questions people ask", "guide": "Four to six questions with one-paragraph answers: the price or the estimate, how soon someone can arrive, whether there is emergency service, what the warranty covers, which areas are served.", "example": "Do you offer emergency service? Yes, evenings and weekends at no extra call-out fee."},
+    {"id": "hours", "title": "Hours and where", "guide": "Opening hours, the service area with a map link, the phone again.", "example": "Mon–Sat 7–7 · Serving Austin and nearby"},
+    {"id": "footer", "title": "Footer", "guide": "The business's name, a Terms link, the Privacy notice link (required when the page has a form), the business's phone or e-mail, and the licence number — required on every page and ad in California, Florida, Texas (HVAC) and Washington.", "example": "Cool Air HVAC · License #TACLA00000C · Terms · Privacy · (512) 555-0100"}
+  ],
+  "form_intent": "quote",
+  "form_fields": ["name", "phone", "service", "zip", "preferred_time"],
+  "form_rules": ["Ask for the ZIP code so the assistant can confirm the service area.", "Ask when the work is needed: today, this week, or flexible.", "Say when the business calls back."],
+  "required_lines": [
+    {"text": "License #", "when": "California, Florida, Texas (HVAC), Washington: the contractor licence number on every page and ad", "always": false}
+  ],
+  "banned": ["guaranteed", "guarantee", "best", "#1", "cheapest", "lowest price"],
+  "negatives": ["jobs", "salary", "diy", "how to", "course", "free"],
+  "faq": ["What does it cost?", "How soon can you get here?", "Do you offer emergency service?", "Is the work under warranty?", "What areas do you serve?"]
+}

@@ -1,0 +1,16 @@
+Your page did not open for Admiry's hourly check twice in a row, so Admiry paused your ads on {{ labels }}: clicks
+you pay for should never land on a page that does not open, and ads whose page is down stop being shown.
+
+Page: {{ url }}
+What Admiry saw: {{ detail }}
+Not opening since: {{ since }}
+
+{{ status }}
+
+{% if hosted -%}
+Admiry hosts this page, so there is nothing for you to fix: Admiry is on it. Your ads come back on within the
+hour after the page opens again.
+{% else -%}
+Open the page on your phone. Once it opens again, Admiry turns your ads back on within the hour; there is nothing
+else to do. If the page has moved to a new address, tell your assistant the new one.
+{% endif -%}

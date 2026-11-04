@@ -1,0 +1,11 @@
+{#- The bundle's 404 page (Q26): the header, "That page isn't here." and the way home. Nothing links it; the bundle
+    serving answers a path it does not have with it and a 404. -#}
+{% extends "sites/_layout.html" %}
+{% block main %}
+<section class="missing" data-section="missing">
+  <div class="wrap">
+    <h1>{{ h1 }}</h1>
+    <p><a class="btn btn-primary" href="{{ base }}/">Back to the home page</a></p>
+  </div>
+</section>
+{% endblock %}

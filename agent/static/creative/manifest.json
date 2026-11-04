@@ -1,0 +1,11 @@
+{
+  "schema": {
+    "file": "The picture's path under this folder, such as dentists/1.jpg. A JPEG or a PNG, at least 1200 x 627 pixels (16:9 is best), at most 5 MB.",
+    "category": "The trade it suits: one of home_services, attorneys, finance_insurance, real_estate, dentists, physicians, health_fitness, automotive_repair, animals_pets, personal_services, fallback.",
+    "services": "The services it suits, such as Invisalign, matched without regard to capitals. Empty means a general picture of the trade. The first picture listed for a trade is the one used when no service matches.",
+    "licence": "Who licensed it to Admiry, and on what terms.",
+    "source": "Where it came from: an address or a licence number.",
+    "alt": "What the picture shows, in one plain sentence. The assistant reads it to owners who cannot see the picture, so say only what is there."
+  },
+  "entries": []
+}

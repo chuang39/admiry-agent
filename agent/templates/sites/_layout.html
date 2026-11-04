@@ -1,0 +1,130 @@
+{#- An Admiry industry site's page (A3p-6 batch 1 Q5, Q18, Q23, Q25; agent/sites/render.py `bundle`): the head, the
+    header with its <details> menu, the page, the footer, the phone bar, the site's own script and, last, the kit's
+    snippet -- the one value not escaped here (landing.snippet escapes its own). Every path starts with `base` but
+    Admiry's notices (/privacy, /terms) and the agent's addresses; nothing is loaded from anywhere else. The header's
+    brand is the owner's logo when `logo` is set (batch 2 Q10: only in a light header, `render.header_is_light`), else
+    the business's name -- the footer's, on its dark ground, is always the name. -#}
+{%- import "sites/_components.html" as c with context -%}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ title }}</title>
+{%- if description %}
+<meta name="description" content="{{ description }}">
+{%- endif %}
+{%- if canonical %}
+<link rel="canonical" href="{{ canonical }}">
+{%- endif %}
+<link rel="stylesheet" href="{{ base }}/{{ css_path }}">
+<script type="application/ld+json">{{ ld|tojson }}</script>
+<script src="{{ base }}/{{ js_path }}" defer></script>
+</head>
+<body class="page-{{ kind }}">
+<a class="skip" href="#main">Skip to content</a>
+{%- if style.topbar %}
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <span>{{ place if f.storefront else ", ".join(towns[:3]) }}</span>
+    {%- if f.hours %}
+    <span class="topbar-hours">{{ f.hours[0] }}</span>
+    {%- endif %}
+    {{ c.call(phone, "topbar-call") }}
+  </div>
+</div>
+{%- endif %}
+<header class="header">
+  <div class="wrap header-in">
+    {%- if logo %}
+    <a class="brand" href="{{ base }}/">{{ c.brand_logo() }}</a>
+    {%- elif "two-line-wordmark" in style.features %}
+    <a class="brand brand--wordmark" href="{{ base }}/"><span class="wordmark-name">{{ f.name }}</span><span class="wordmark-line">{{ wordmark_line }}</span></a>
+    {%- else %}
+    <a class="brand" href="{{ base }}/">{{ f.name }}</a>
+    {%- endif %}
+    <nav class="nav-wide" aria-label="Main">
+      <ul>
+        <li><a href="{{ base }}/"{% if kind == "home" %} aria-current="page"{% endif %}>Home</a></li>
+        <li><a href="{{ base }}/services/"{% if kind in ("services", "service") %} aria-current="page"{% endif %}>Services</a></li>
+        <li><a href="{{ base }}/about/"{% if kind == "about" %} aria-current="page"{% endif %}>About</a></li>
+        <li><a href="{{ base }}/contact/"{% if kind == "contact" %} aria-current="page"{% endif %}>Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      {{ c.call("Call", "btn btn-call", number=true) }}
+      {{ c.button(quote_url, actions.header, "btn btn-primary header-quote") }}
+    </div>
+    <details class="menu">
+      <summary>Menu</summary>
+      <div class="menu-panel">
+        <p class="menu-actions">
+          {{ c.call("Call " ~ phone, "btn btn-primary") }}
+          {{ c.button(quote_url, actions.header) }}
+        </p>
+        <nav aria-label="Menu">
+          <ul>
+            <li><a href="{{ base }}/">Home</a></li>
+            <li><a href="{{ base }}/services/">Services</a>
+              {%- if lead_services %}
+              <ul>
+                {%- for s in lead_services %}
+                <li><a href="{{ s.url }}">{{ s.name }}</a></li>
+                {%- endfor %}
+              </ul>
+              {%- endif %}
+            </li>
+            <li><a href="{{ base }}/about/">About</a></li>
+            <li><a href="{{ base }}/contact/">Contact</a></li>
+          </ul>
+        </nav>
+        {%- if f.hours %}
+        {{ c.hours_list(f.hours) }}
+        {%- endif %}
+      </div>
+    </details>
+  </div>
+</header>
+<main id="main">
+{%- block main %}{% endblock %}
+</main>
+<footer class="footer">
+  <div class="wrap footer-in">
+    <div class="footer-about">
+      <p class="brand">{{ f.name }}</p>
+      <p>{{ c.call(phone, "footer-call") }}</p>
+      {%- if f.email %}
+      <p><a href="mailto:{{ f.email }}">{{ f.email }}</a></p>
+      {%- endif %}
+      {%- if f.storefront and f.address %}
+      <p>{{ f.address }}</p>
+      {%- elif towns %}
+      <p>{{ ", ".join(towns) }}</p>
+      {%- endif %}
+      {%- if f.licence %}
+      <p>{{ f.licence }}</p>
+      {%- endif %}
+    </div>
+    <ul class="footer-links">
+      {%- for s in services %}
+      <li><a href="{{ s.url }}">{{ s.name }}</a></li>
+      {%- endfor %}
+    </ul>
+    {%- if f.hours %}
+    {{ c.hours_list(f.hours) }}
+    {%- endif %}
+    <ul class="footer-links">
+      <li><a href="{{ base }}/about/">About</a></li>
+      <li><a href="{{ base }}/contact/">Contact</a></li>
+      <li><a href="/privacy">Privacy notice</a></li>
+      <li><a href="/terms">Terms of use</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="actionbar">
+  {{ c.call("Call", "btn btn-call") }}
+  {{ c.button(quote_url, actions.bar, "btn btn-primary") }}
+</div>
+{{ snippet|safe }}
+</body>
+</html>

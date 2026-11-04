@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+{#- A one-line notice (web.notice: a sign-in link gone, a refusal) in the home's card, with the way back. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main narrow" id="main">
+<section class="panel">
+  <p>{{ message }}</p>
+  <a class="btn btn-dark" href="{{ back }}">{{ back_text }}</a>
+</section>
+</main>
+</body>
+</html>

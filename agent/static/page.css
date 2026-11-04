@@ -1,0 +1,111 @@
+/* The pages an owner acts on from an e-mail or an assistant, usually on a phone (the mobile audit, 2026-09-30): the
+   plan (/plan/{id}), the consent (/oauth/consent) and the e-mail link (/m/{token}). base.css's tokens, header, cards
+   and buttons (linked first); here one narrow column, labelled rows that are whole targets, actions that stand out.
+   Phones (<=720px): 44px targets, the actions full width and stacked, no sideways scroll at 320px. */
+
+/* every button names its own colours (a dark-mode iPhone once drew system-white text on a white button); :where()
+   keeps this at element weight so .btn-primary keeps its own */
+:where(.page) button { -webkit-appearance: none; appearance: none; background: var(--card); color: var(--fg); }
+
+.page-main {
+  max-width: 720px; margin: 0 auto; padding: 32px 24px 64px; display: flex; flex-direction: column; gap: 16px;
+}
+.page-main h1 { font: 600 28px/1.2 var(--sans); letter-spacing: -0.015em; overflow-wrap: anywhere; }
+.page-main h1 .badge { vertical-align: middle; }
+.page-main h2 { font: 600 20px/1.3 var(--sans); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.page-main h3 {
+  font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+}
+.page-main p, .page-main li { overflow-wrap: anywhere; } /* a long address or URL wraps */
+/* a cell breaks a long value only when it must: `anywhere` would shrink its min-content and squeeze the columns
+   instead of letting the table scroll inside .wide */
+.page-main td { overflow-wrap: break-word; }
+.page-main ul, .page-main ol { margin: 0; padding-left: 22px; }
+.page-main li + li { margin-top: 6px; }
+.page-main code { font: 13px/1.4 var(--mono); }
+.page-main .card > * + * { margin-top: 12px; }
+.page-head { display: flex; flex-direction: column; gap: 8px; }
+/* the picture a channel shows with the ad (the plan, M1 Task 7): as wide as the card, at its own proportions */
+.ad-image { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.ad-image img { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+.page-form { display: flex; flex-direction: column; gap: 16px; margin: 0; }
+
+/* a table scrolls inside itself, never the page */
+.wide { max-width: 100%; overflow-x: auto; }
+.wide table { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+.wide th, .wide td { padding: 10px 12px 10px 0; border-top: 1px solid var(--line-soft); text-align: left; vertical-align: top; }
+.wide th { font-weight: 500; color: var(--soft); }
+
+/* choices (a radio or a checkbox with its words): the whole row is the label, the words hang beside the box */
+.choices { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.choices legend { margin-bottom: 8px; padding: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.choice {
+  display: flex; align-items: flex-start; gap: 12px; min-height: 44px; padding: 11px 14px; font-size: 15px;
+  line-height: 1.45; background: var(--card); border: 1px solid var(--line); border-radius: 10px; cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.choice input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+.choice:has(input:checked) { border-color: var(--accent); background: var(--accent-bg); }
+.choice:has(input:disabled) { cursor: default; }
+.help { font-size: 14px; color: var(--muted); }
+
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.actions form { margin: 0; }
+.actions .btn { min-height: 44px; padding: 0 18px; justify-content: center; }
+
+/* ------------------------------------------------------------ phones: one column, 44px targets */
+
+@media (max-width: 720px) {
+  .page-main { padding: 20px 16px 48px; }
+  .page-main h1 { font-size: 24px; }
+  .card { padding: 16px; }
+  .btn { min-height: 44px; }
+  .actions { flex-direction: column; align-items: stretch; }
+  .actions > form, .actions .btn { width: 100%; }
+}
+
+/* ------------------------------------------------------------ Admiry's other pages (founder's ruling, 2026-10-07):
+   the front page's look everywhere -- one thing to say or do sits in the home's sign-in card (home.css .wall),
+   a document in a card of prose, code and prompts in the well */
+
+.page-main pre {
+  margin: 0; padding: 14px 16px; background: var(--well); border: 1px solid var(--line-soft); border-radius: 10px;
+  font: 13px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.page-main td code { overflow-wrap: break-word; }
+
+/* sign-in, a notice, a new key, an approval code: one card, centred under the header */
+.page-main.narrow { max-width: 520px; padding-top: 7vh; }
+.panel {
+  display: flex; flex-direction: column; gap: 18px; padding: 32px; background: var(--card);
+  border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(28, 31, 42, 0.04), 0 12px 32px rgba(28, 31, 42, 0.06);
+}
+.panel h1 { font-size: 26px; }
+.btn-dark {
+  justify-content: center; min-height: 48px; padding: 0 18px; border-radius: 12px; border-color: var(--fg);
+  background: var(--fg); color: #FFFFFF; font-size: 15px;
+}
+.btn-dark:hover { background: #2A2E3D; color: #FFFFFF; }
+.fine { font-size: 13px; line-height: 1.5; color: var(--muted); }
+.center { text-align: center; }
+/* what to copy: an approval code to read out, a key shown once */
+.code-box {
+  display: block; padding: 18px; background: var(--well); border: 1px solid var(--line-soft); border-radius: 12px;
+  font: 600 32px/1.2 var(--mono); letter-spacing: 0.12em; text-align: center; overflow-wrap: anywhere;
+}
+.key-box {
+  display: block; padding: 14px 16px; background: var(--well); border: 1px solid var(--line-soft); border-radius: 10px;
+  font: 15px/1.5 var(--mono); overflow-wrap: anywhere;
+}
+
+/* the legal texts and the connector docs: prose in a card */
+.prose > * + * { margin-top: 12px; }
+.prose h2 { margin-top: 28px; }
+.prose table code { font-size: 12px; }
+
+/* the words of a note: a change made, a refusal (the photo upload page, agent/uploads.py, whose squares and pickers
+   are upload.css's since the phone redesign of 2026-10-15; the agree page's error) */
+.done { color: var(--ok); }
+.error { color: var(--error); }

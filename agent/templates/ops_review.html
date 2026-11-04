@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — review {{ d.review.id }}</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+<link rel="stylesheet" href="/static/ops.css">
+</head>
+{#- One first launch in review (L1, agent/ops_web.py): what the owner agreed to, what the Reviewer found, and while it is
+    open, the three decisions. The Critic's grades are read here and nowhere an owner reads. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main ops" id="main">
+<p class="ops-nav"><a href="/ops/review">All launches in review</a> · <a href="/ops/tasks">Tasks</a> · <a href="/ops/rules">Rules</a></p>
+<h1>{{ d.business.name or d.business.id }} · plan v{{ d.plan.version if d.plan else "?" }}</h1>
+{% if notice %}<p class="ops-notice" role="alert">{{ notice }}</p>{% endif %}
+{% if done == "approve" %}<p class="ops-done">Approved: its ads are launching.</p>
+{% elif done == "return" %}<p class="ops-done">Returned to the owner.</p>
+{% elif done == "reject" %}<p class="ops-done">Rejected.</p>{% endif %}
+
+<section class="panel">
+  <h2>The review</h2>
+  <table class="ops-table">
+    <tr><th>State</th><td class="ops-{{ d.review.state }}">{{ d.review.state }}</td></tr>
+    {% if d.review.hold_reason %}<tr><th>Why it waits</th><td>{{ d.review.hold_reason }}</td></tr>{% endif %}
+    <tr><th>The owner's yes</th><td>{{ d.review.approval.kind or "" }} · {{ d.review.created_at }}</td></tr>
+    {% if d.review.decided_by %}<tr><th>Decided</th><td>{{ d.review.decided_by }} · {{ d.review.decided_at }}{% if d.review.note %} · “{{ d.review.note }}”{% endif %}</td></tr>{% endif %}
+  </table>
+  {% for s in d.review.steps %}
+  <details class="ops-step"><summary>{{ "✓" if s.ok else "!" }} {{ s.name }} · {{ s.at }}</summary><pre>{{ s.detail | tojson(indent=2) }}</pre></details>
+  {% endfor %}
+</section>
+
+<section class="panel">
+  <h2>The business</h2>
+  <table class="ops-table">
+    <tr><th>Owner</th><td>{{ d.business.owner_email or "" }}</td></tr>
+    <tr><th>Phone</th><td>{{ d.business.phone or "—" }}</td></tr>
+    <tr><th>Address</th><td>{{ d.business.address or "—" }}</td></tr>
+  </table>
+</section>
+
+{% if d.plan %}
+<section class="panel">
+  <h2>The plan as agreed</h2>
+  <ul>{% for line in d.plan.lines.values() %}<li>{{ line }}</li>{% endfor %}</ul>
+  <p class="fine"><a href="{{ d.plan.url }}">Its plan page</a></p>
+  <h3>Google Search</h3>
+  <table class="ops-table">
+    <tr><th>A month</th><td>{{ d.ads.monthly_usd or "—" }}</td></tr>
+    <tr><th>Headlines</th><td>{{ (d.ads.headlines or []) | join(" · ") }}</td></tr>
+    <tr><th>Descriptions</th><td>{{ (d.ads.descriptions or []) | join(" · ") }}</td></tr>
+    <tr><th>Searches</th><td>{{ (d.ads.themes or []) | join(", ") }}</td></tr>
+    <tr><th>Left out</th><td>{{ (d.ads.negatives or []) | join(", ") }}</td></tr>
+  </table>
+</section>
+{% endif %}
+
+<section class="panel">
+  <h2>The Critic's look</h2>
+  {% if d.critic %}
+  <p>{{ d.critic.verdict }} · score {{ "%.2f" | format(d.critic.score) }} · {{ d.critic.created_at }}</p>
+  <p>{{ d.critic.review.summary }}</p>
+  <ul>{% for c in d.critic.review.checks %}<li>{{ "✓" if c.ok else "!" }} {{ c.topic }}: {{ c.text }}</li>{% endfor %}</ul>
+  <ul>{% for g in d.critic.review.grades %}<li>{{ g.dimension }}: {{ g.grade }} — {{ g.note }}</li>{% endfor %}</ul>
+  {% else %}<p class="muted">No look yet.</p>{% endif %}
+</section>
+
+<section class="panel">
+  <h2>The page</h2>
+  <p>{{ d.page.url or "No page." }}</p>
+  {% if d.page.report %}
+  <ul>{% for r in d.page.report.rules if r.ok is not sameas true %}<li>{{ r.id }}: {{ "fails" if r.ok is sameas false else "warns" }}{% if r.fix %} — {{ r.fix }}{% endif %}</li>{% endfor %}</ul>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h2>Google's refusals</h2>
+  {#- spec 2026-10-11 §6: each refusal Google answered this review with, as recorded (ads_refusal): Google's code and
+      topic, the text, its class and what Admiry did -- read here and on the admin MCP, nowhere an owner reads -#}
+  {% if d.refusals %}
+  <table class="ops-table">
+    <tr><th>When</th><th>What</th><th>Text</th><th>Code</th><th>Topic</th><th>Class</th><th>Admiry</th></tr>
+    {% for r in d.refusals %}<tr><td>{{ r.created_at }}</td><td>{{ r.kind }} · {{ r.field }}</td><td>{{ r.text or "—" }}</td><td>{{ r.code }}</td><td>{{ r.topic or "—" }}{% if r.type %} ({{ r.type }}){% endif %}</td><td>{{ r["class"] }}</td><td>{{ r.action }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="muted">None.</p>{% endif %}
+</section>
+
+{% if d.review.state in ("queued", "creative", "configured", "checked", "held") %}
+<section class="panel ops-decide">
+  <h2>Decide</h2>
+  <form method="post" action="/ops/review/{{ d.review.id }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <button class="btn btn-primary" type="submit" name="action" value="approve">Approve and launch</button>
+  </form>
+  <form method="post" action="/ops/review/{{ d.review.id }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>What the owner should change<textarea name="note" maxlength="500" required></textarea></label>
+    <button class="btn" type="submit" name="action" value="return">Return to the owner</button>
+    <button class="btn" type="submit" name="action" value="reject">Reject</button>
+  </form>
+</section>
+{% endif %}
+</main>
+</body>
+</html>

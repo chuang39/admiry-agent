@@ -1,0 +1,21 @@
+{
+  "tree": "fallback",
+  "sensitive": false,
+  "cta": "call",
+  "sections": [
+    {"id": "hero", "title": "Above the fold", "guide": "One headline: the service and the city, exactly as the ads say it. Under it the offer in one line and the phone as a tap-to-call button.", "example": "Service in Your City — free estimate. Call (555) 555-0100."},
+    {"id": "trust", "title": "Why this business", "guide": "A few short reasons taken from the business's own facts: years in business, what makes it different, real reviews with the reviewer's first name and the source; never a review the business did not receive.", "example": "10 years in business · 4.8★ (60 reviews)"},
+    {"id": "service", "title": "What to expect", "guide": "A few plain sentences on the service: what happens, how long it takes, and the price or that the estimate is free. No promises about results.", "example": "Call and we'll walk you through the next step and the price before anything starts."},
+    {"id": "form", "title": "Request a call", "guide": "Name, phone, the service, and a ZIP code. One line under the button saying when the business calls back.", "example": "We call back within one business day."},
+    {"id": "faq", "title": "Questions people ask", "guide": "Four to six questions with one-paragraph answers: the price, how the service works, timing, and the service area.", "example": "What does it cost? It depends on the job; call for a free estimate."},
+    {"id": "hours", "title": "Hours and where", "guide": "Opening hours, the address or service area with a map link, the phone again.", "example": "Mon–Fri 9–5 · Serving the local area"},
+    {"id": "footer", "title": "Footer", "guide": "The business's name, a Terms link and the Privacy notice link (the privacy link is required when the page has a form), and the business's phone or e-mail.", "example": "Your Business · Terms · Privacy · (555) 555-0100"}
+  ],
+  "form_intent": "consult",
+  "form_fields": ["name", "phone", "service", "zip"],
+  "form_rules": ["Say when the business calls back."],
+  "required_lines": [],
+  "banned": ["guaranteed", "guarantee", "best", "#1"],
+  "negatives": ["jobs", "salary", "free", "diy"],
+  "faq": ["What does it cost?", "How does it work?", "How long does it take?", "Do you serve my area?", "How do I get started?"]
+}

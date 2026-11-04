@@ -1,0 +1,49 @@
+{#- The Help button (spec 2026-10-12 §3, the approved mockup): a pill bottom right on every page an owner or a visitor
+    reads, and the card it opens -- words only, plus what Admiry adds by itself (the page, the plan, the last few
+    messages). Included once, last in <body>, by each page of the spec's §3.1 (home, plan, Your ads, Settings, sign-in,
+    the legal texts), shown while AGENT_SUPPORT is on (`help` in the context: web.page() and pages.py set it from
+    settings.support). Never on a hosted page, a preview, the admin pages or the website. static/help.js changes words
+    below only through textContent; every sentence is owner words (conftest.JARGON, the never column). -#}
+{% if help %}
+<div id="help" class="help">
+  <div class="help-backdrop" id="help-backdrop"></div>
+  <section id="help-card" class="help-card" role="region" aria-labelledby="help-title" hidden>
+    <div class="help-head">
+      <div>
+        <h2 id="help-title" class="help-title">What's wrong, or what do you need?</h2>
+        <p class="help-sub">A person at Admiry reads every message.</p>
+      </div>
+      <button type="button" class="help-close" id="help-close" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <form id="help-form" class="help-form">
+      <label for="help-text" class="sr">Say it in your own words: what you were doing, and what happened.</label>
+      <textarea id="help-text" rows="4" maxlength="2000" required placeholder="Say it in your own words: what you were doing, and what happened."></textarea>
+      <div class="help-email" id="help-email-row">
+        <label for="help-email">Your e-mail</label>
+        <input id="help-email" type="email" maxlength="254" autocomplete="email" placeholder="you@yourbusiness.com">
+        <p class="help-hint">So a person can write back. Signed in, we already have it.</p>
+      </div>
+      <p class="help-note">We add the page you are on and your last few messages, so you don't have to explain them.</p>
+      <p class="help-error" id="help-error" role="alert" hidden></p>
+      <div class="help-actions">
+        <button type="button" class="help-btn" id="help-cancel">Cancel</button>
+        <button type="submit" class="help-btn help-send" id="help-send">Send</button>
+      </div>
+    </form>
+    <div class="help-sent" id="help-sent" role="status" hidden>
+      <span class="help-check" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+      <p class="help-sent-title">Sent.</p>
+      <p class="help-sent-text" id="help-sent-text"></p>
+      <button type="button" class="help-btn" id="help-done">Done</button>
+    </div>
+  </section>
+  <button type="button" id="help-pill" class="help-pill" aria-expanded="false" aria-controls="help-card">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9.6 9.5a2.5 2.5 0 0 1 4.8 1c0 1.6-2.4 2-2.4 3.2"/><path d="M12 16.6h.01"/></svg>
+    <span>Help</span>
+  </button>
+</div>
+<link rel="stylesheet" href="/static/help.css">
+<script src="/static/help.js" defer></script>
+{% endif %}

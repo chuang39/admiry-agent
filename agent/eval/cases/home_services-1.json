@@ -1,0 +1,89 @@
+{
+  "id": "home_services-1",
+  "vertical": "home_services",
+  "opening": "Summit Roofing in Denver: roof replacements and storm repairs. We want more quote requests within 20 miles.",
+  "monthly_budget_usd": 3000,
+  "knowledge": {
+    "name": "Summit Roofing",
+    "category": "home_services",
+    "category_detail": "roofer",
+    "service_area": [
+      "Denver",
+      "Aurora",
+      "Lakewood"
+    ],
+    "services": [
+      {
+        "name": "Roof replacement",
+        "intent_phrases": [
+          "roof replacement denver",
+          "new roof cost"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "Storm damage repair",
+        "intent_phrases": [
+          "hail damage roof repair",
+          "roof leak repair near me"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Sat 7-6",
+    "phone": "303-555-0199",
+    "website": null,
+    "pricing_hints": [
+      "free estimates"
+    ],
+    "typical_customer_value_usd": 9000,
+    "usp": [
+      "Insurance claim help",
+      "Licensed and insured"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": 10,
+      "monthly_budget_usd": 3000,
+      "focus_services": [
+        "Roof replacement"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_home_services_1",
+      "name": "Summit Roofing",
+      "address": "1550 Wewatta St, Denver, CO 80202",
+      "lat": 39.753,
+      "lng": -105.0002,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Summit Roofing"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "enquiries"
+    },
+    "service": {
+      "choice": "svc_roof_replacement"
+    },
+    "customer_value": {
+      "choice": "3000_plus"
+    },
+    "radius": {
+      "choice": "r20"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

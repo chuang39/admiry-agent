@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — tasks</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+<link rel="stylesheet" href="/static/ops.css">
+</head>
+{#- The back office's task list (spec 2026-10-12 §4, agent/ops_web.py): the support tickets by tab, newest activity
+    first. Admiry's team only (AGENT_ADMIN_EMAILS). Ticket text is a customer's: shown as text. No Help button here. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main ops" id="main">
+<p class="ops-nav"><a href="/ops/review">Launches in review</a> · <a href="/ops/tasks" aria-current="page">Tasks</a> · <a href="/ops/rules">Rules</a></p>
+<h1>Tasks</h1>
+<div class="ops-tabs" role="group" aria-label="Which tasks">
+  <a class="ops-tab{% if q.tab == 'open' %} current{% endif %}" href="/ops/tasks?tab=open">Open · {{ q.counts.open }}</a>
+  <a class="ops-tab{% if q.tab == 'waiting' %} current{% endif %}" href="/ops/tasks?tab=waiting">Waiting on the owner · {{ q.counts.waiting }}</a>
+  <a class="ops-tab{% if q.tab == 'closed' %} current{% endif %}" href="/ops/tasks?tab=closed">Closed · {{ q.counts.closed }}</a>
+</div>
+{% if q.rows %}
+<ul class="ops-tasks">
+  {% for r in q.rows %}
+  <li class="ops-task">
+    <div class="ops-task-meta"><span>{{ r.origin }}</span><span>{{ r.age }}</span></div>
+    <a class="ops-task-who" href="/ops/tasks/{{ r.id }}">{% if r.name %}{{ r.name }}{% elif r.business_id %}{{ r.business_id }}{% else %}A visitor · {{ r.contact or "no address" }}{% endif %}</a>
+    {% if r.contact and not r.verified %}<span class="ops-unverified">not verified</span>{% endif %}
+    {% if r.status == "awaiting_contact" %}<span class="muted">waiting for an address</span>{% endif %}
+    {% if r.resolution %}<span class="muted">{{ r.resolution }}</span>{% endif %}
+    <p class="ops-task-line">{{ r.first_line }}</p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="muted">Nothing here.</p>
+{% endif %}
+</main>
+</body>
+</html>

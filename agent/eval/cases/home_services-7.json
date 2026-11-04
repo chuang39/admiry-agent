@@ -1,0 +1,90 @@
+{
+  "id": "home_services-7",
+  "vertical": "home_services",
+  "opening": "Plumbing company in Salt Lake City, mostly water heaters. Homeowners with no hot water should call us; within 10 miles.",
+  "monthly_budget_usd": null,
+  "knowledge": {
+    "name": "Wasatch Water Heaters & Plumbing",
+    "category": "home_services",
+    "category_detail": "residential plumber",
+    "service_area": [
+      "Salt Lake City",
+      "Murray",
+      "Sandy"
+    ],
+    "services": [
+      {
+        "name": "Water heater installation",
+        "intent_phrases": [
+          "water heater replacement salt lake city",
+          "no hot water plumber",
+          "water heater installer near me"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "Tankless water heaters",
+        "intent_phrases": [
+          "tankless water heater installation",
+          "tankless water heater cost"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Fri 7-6, Sat 8-2",
+    "phone": "801-555-0119",
+    "website": null,
+    "pricing_hints": [
+      "flat-rate installation"
+    ],
+    "typical_customer_value_usd": 1800,
+    "usp": [
+      "Same-day water heater replacement",
+      "Upfront flat-rate pricing"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": null,
+      "monthly_budget_usd": null,
+      "focus_services": [
+        "Water heater installation"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_home_services_7",
+      "name": "Wasatch Water Heaters & Plumbing",
+      "address": "350 S 400 E, Salt Lake City, UT 84111",
+      "lat": 40.7616,
+      "lng": -111.8812,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Wasatch Water Heaters & Plumbing"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "calls"
+    },
+    "service": {
+      "choice": "svc_water_heater_installation"
+    },
+    "customer_value": {
+      "choice": "1000_3000"
+    },
+    "radius": {
+      "choice": "r10"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

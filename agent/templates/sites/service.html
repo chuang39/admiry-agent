@@ -1,0 +1,93 @@
+{#- A lead service's page (blueprint §4.4 add-on; Q4: the H1 is "{service} in {city}", set here, never by the
+    model): the trail, both calls, its photo, what it is, the signs, what it includes, its price line, how it works,
+    reviews, its questions, the form beside it (a sidebar on a desktop; the phone bar on a phone), related services,
+    where we work, the final call. -#}
+{% extends "sites/_layout.html" %}
+{% import "sites/_components.html" as c with context %}
+{% block main %}
+<nav class="crumbs wrap" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="{{ base }}/">Home</a></li>
+    <li><a href="{{ base }}/services/">Services</a></li>
+    <li aria-current="page">{{ svc.name }}</li>
+  </ol>
+</nav>
+{{ c.page_hero(none, svc.photo) }}
+<div class="wrap svc-layout">
+  <div class="svc-main">
+    {%- if sw and sw.what %}
+    <section class="prose" data-section="what">
+      <p>{{ sw.what }}</p>
+    </section>
+    {%- endif %}
+    {%- set signs = (sw.signs if sw and sw.signs else svc.signs) %}
+    {%- if signs %}
+    <section data-section="signs">
+      {{ c.heading(sw.signs_heading if sw else "") }}
+      <ul class="checks">
+        {%- for item in signs %}
+        <li>{{ item }}</li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+    {%- set includes = (sw.includes if sw and sw.includes else svc.includes) %}
+    {%- if includes %}
+    <section data-section="includes">
+      {{ c.heading(sw.includes_heading if sw else "") }}
+      <ul class="checks">
+        {%- for item in includes %}
+        <li>{{ item }}</li>
+        {%- endfor %}
+      </ul>
+    </section>
+    {%- endif %}
+    {%- if svc.price_line or f.free_estimate or f.financing %}
+    <ul class="notes" data-section="notes">
+      {%- for line in (svc.price_line, f.free_estimate, f.financing) if line %}
+      <li>{{ line }}</li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+    {%- if w.home.steps %}
+    <section data-section="how">
+      {{ c.heading(w.home.how_heading) }}
+      <ol class="steps steps--narrow">
+        {%- for s in w.home.steps %}
+        <li><h3>{{ s.title }}</h3><p>{{ s.text }}</p></li>
+        {%- endfor %}
+      </ol>
+    </section>
+    {%- endif %}
+    {%- if sw and sw.faq %}
+    <section class="faq-inline" data-section="faq">
+      {{ c.heading(sw.faq_heading) }}
+      {%- for item in sw.faq %}
+      <details>
+        <summary>{{ item.q }}</summary>
+        <p>{{ item.a }}</p>
+      </details>
+      {%- endfor %}
+    </section>
+    {%- endif %}
+  </div>
+  <aside class="svc-side">
+    {{ c.request_form() }}
+  </aside>
+</div>
+{{ c.reviews(f.reviews[:3], w.home.reviews_heading) }}
+{%- if related %}
+<section class="related" data-section="related">
+  <div class="wrap">
+    <h2>Related services</h2>
+    <ul class="related-list">
+      {%- for s in related %}
+      <li><a href="{{ s.url }}">{{ s.name }}</a></li>
+      {%- endfor %}
+    </ul>
+  </div>
+</section>
+{%- endif %}
+{{ c.area(w.home.area_heading, "", with_hours=false) }}
+{{ c.cta_band() }}
+{% endblock %}

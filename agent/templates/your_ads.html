@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+{% if site %}<link rel="icon" href="data:,">{% else %}<link rel="icon" href="/icon.svg?v=2" type="image/svg+xml">{% endif %}
+<title>Admiry — Your ads</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/settings.css">
+<link rel="stylesheet" href="/static/your_ads.css">
+<script src="/static/site.js" defer></script>
+</head>
+{% from "_macros.html" import csrf_field with context %}
+{#- "Your ads" (spec 2026-10-06-admiry-your-ads-page-design.md §2): this month's line, where the ads show, one card
+    per platform (status, the account, the numbers, Pause / Resume, the ads, the budget, the words), the plan's later
+    lines, the disclosure. Every form is a native <details>; Save posts to /ads/review. Context: agent/your_ads.py. -#}
+<body class="settings ads">
+{% include "_site_header.html" %}
+<div class="settings-wrap">
+  <div class="settings-side">
+    {% if business %}<p class="eyebrow">{{ business.name }}</p>{% endif %}
+    <h1>Your ads</h1>
+    {% if business and businesses|length > 1 %}
+    <details class="switcher">
+      <summary><span class="sr">Business: </span>{{ business.switch_label }}</summary>
+      <div class="switcher-menu">
+        {% for x in businesses %}<a href="/ads?b={{ x.id }}"{% if x.id == business.id %} aria-current="page"{% endif %}>{{ x.switch_label }}</a>
+        {% endfor %}
+      </div>
+    </details>
+    {% endif %}
+  </div>
+
+  <main class="settings-main" id="main">
+    {% if notice %}<p class="banner banner-alert" role="alert">{{ notice|sentence }}</p>{% endif %}
+    {% if approved_version %}<p class="banner" role="status">Version {{ approved_version }} approved.</p>{% endif %}
+
+    {% if not business %}
+    <section class="card"><h2>No business yet</h2><p>Start with Admiry on <a href="/">the home page</a>.</p></section>
+    {% elif not approved %}
+    <section class="card">
+      <h2>Not launched yet</h2>
+      {% if in_review %}
+      <p class="banner" role="status">{{ in_review }}</p>
+      {% else %}
+      <p>Your ads are not launched yet.</p>
+      <p>{% if latest_plan %}Your plan: <a href="/plan/{{ latest_plan.id }}">see it and approve it there</a>, or continue on <a href="/">the home page</a>.{% else %}Build your plan on <a href="/">the home page</a>.{% endif %}</p>
+      {% endif %}
+    </section>
+    {% else %}
+    {% set b = business %}
+    <section id="month" class="card">
+      <p class="month">{% if month %}This month so far: <strong>{{ month.spent }}</strong> of {{ month.cap }} · {{ month.visits }} visits from your ads · {{ month.leads }} lead{{ "" if month.leads == 1 else "s" }} · {{ month.calls }} call{{ "" if month.calls == 1 else "s" }}{% else %}Nothing spent yet this month.{% endif %}</p>
+      {% if newer_draft %}<p class="note">{{ newer_words }} <a href="/plan/{{ newer_draft.id }}">See version {{ newer_draft.version }}</a>.</p>{% endif %}
+    </section>
+
+    {#- spec 2026-10-11 §5.1: what Admiry removed from the approved version's ads after Google refused it -#}
+    {% if changes %}
+    <section id="changes" class="card">
+      <h2>Changes Admiry made</h2>
+      <p>{{ changes_intro }}</p>
+      <ul class="rows">{% for c in changes %}<li class="row"><p class="row-text">{{ c }}</p></li>{% endfor %}</ul>
+    </section>
+    {% endif %}
+
+    <section id="area" class="card">
+      <h2>Where your ads show</h2>
+      <p>{{ area.sentence|capfirst }}{% if area.address %} — {{ area.address }}{% endif %}.</p>
+      {% set form = open_form if open_form and open_form.kind == "area" else none %}
+      <details class="edit"{% if form %} open{% endif %}>
+        <summary>Change</summary>
+        <form class="stack" method="post" action="/ads/review">{{ csrf_field() }}
+          <input type="hidden" name="business_id" value="{{ b.id }}"><input type="hidden" name="base" value="{{ approved.id }}"><input type="hidden" name="kind" value="area">
+          <label class="field"><span>How far around the business, in miles</span>
+            <input name="radius" inputmode="decimal" required value="{{ form.radius if form else (area.radius if area.radius else '') }}"></label>
+          <p class="help">Between 1 and 100 miles. The centre stays where it is.</p>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+      </details>
+    </section>
+
+    {% for p in platforms %}
+    <section id="{{ p.channel }}" class="card platform">
+      <div class="card-head"><div class="card-title"><h2>{{ p.label }}</h2><p class="area">{{ p.state_text }}</p></div></div>
+      <p>{{ p.sentence|sentence }}</p>
+      {% if p.account %}
+      <div class="row account">
+        <div class="row-text">
+          <p class="row-meta">{{ p.account }}{% if p.account_public %} · account {{ p.account_public }}{% endif %}</p>
+          {% if p.lock %}<p class="note">{{ p.lock }}</p>{% endif %}
+          {% if p.note %}<p class="warn">{{ p.note|sentence }}</p>{% endif %}
+        </div>
+        {% if p.action %}<a class="btn" href="{{ p.action.url }}">{{ p.action.label }}<span class="sr"> for {{ p.label }}</span></a>{% endif %}
+      </div>
+      {% endif %}
+      {% if p.numbers %}<p class="numbers">{{ p.numbers }}</p>{% endif %}
+      {% for i in p.issues %}<p class="warn">{{ i }}</p>{% endfor %}
+      {% if p.toggle %}
+      <form method="post" action="/connect/ads/{{ p.toggle }}">{{ csrf_field() }}
+        <input type="hidden" name="business_id" value="{{ b.id }}"><input type="hidden" name="channel" value="{{ p.channel }}"><button class="btn" type="submit">{% if p.toggle == "resume" %}Resume my ads{% else %}Pause my ads{% endif %}<span class="sr"> on {{ p.label }}</span></button></form>
+      {% endif %}
+      {% if p.ads %}
+      <h3>The ads</h3>
+      <p class="row-meta">Version {{ p.running.version }}{% if p.running.live and not p.running.note %} · running{% endif %}</p>
+      {% if p.running.note %}<p class="note">{{ p.running.note }}</p>{% endif %}
+      {% if p.ads.copy_of %}<p>{{ p.label }} uses {{ p.ads.copy_of }}'s words.</p>{% endif %}
+      <div class="ad-words"><p class="headlines">{% for h in p.ads.headlines %}{{ h }}<br>{% endfor %}</p><p class="muted">{% for d in p.ads.descriptions %}{{ d }}<br>{% endfor %}</p></div>
+      {% if p.ads.themes %}<p class="row-meta">Shows for: {{ p.ads.themes|join(" · ") }}</p>{% endif %}
+      {% if p.ads.landing %}<p class="row-meta">Sends visitors to: {{ p.ads.landing }}</p>{% endif %}
+      {% set form = open_form if open_form and open_form.kind == "words" and open_form.channel == p.channel else none %}
+      <details class="edit"{% if form %} open{% endif %}>
+        <summary>{% if p.ads.copy_of %}Give {{ p.label }} its own words{% else %}Change the words{% endif %}</summary>
+        <form class="stack" method="post" action="/ads/review">{{ csrf_field() }}
+          <input type="hidden" name="business_id" value="{{ b.id }}"><input type="hidden" name="base" value="{{ approved.id }}"><input type="hidden" name="kind" value="words"><input type="hidden" name="channel" value="{{ p.channel }}">
+          <label class="field"><span>Headlines, one per line</span>
+            <textarea name="headlines" rows="{{ [p.ads.headlines|length + 2, 5]|max }}" maxlength="2000">{{ form.headlines if form else p.ads.headlines_text }}</textarea></label>
+          <p class="help">{{ p.limits.headline_note }}.</p>
+          <label class="field"><span>Descriptions, one per line</span>
+            <textarea name="descriptions" rows="{{ [p.ads.descriptions|length + 2, 4]|max }}" maxlength="2000">{{ form.descriptions if form else p.ads.descriptions_text }}</textarea></label>
+          <p class="help">{{ p.limits.description_note }}.</p>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+      </details>
+      {% endif %}
+      {% if p.budget %}
+      <h3>Budget</h3>
+      <p>{{ p.budget.monthly }} a month · about {{ p.budget.day }} a day</p>
+      {% set form = open_form if open_form and open_form.kind == "budget" and open_form.channel == p.channel else none %}
+      <details class="edit"{% if form %} open{% endif %}>
+        <summary>Change</summary>
+        <form class="stack" method="post" action="/ads/review">{{ csrf_field() }}
+          <input type="hidden" name="business_id" value="{{ b.id }}"><input type="hidden" name="base" value="{{ approved.id }}"><input type="hidden" name="kind" value="budget"><input type="hidden" name="channel" value="{{ p.channel }}">
+          <label class="field"><span>A month</span>
+            <input name="amount" inputmode="numeric" required value="{{ form.amount if form else p.budget.amount }}"></label>
+          <p class="help">A whole-dollar amount. The other platforms keep theirs.</p>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </form>
+      </details>
+      {% endif %}
+    </section>
+    {% endfor %}
+
+    {% if later %}
+    <section id="later" class="card">
+      <h2>Later</h2>
+      <ul class="rows">{% for l in later %}<li class="row"><p class="row-text muted">{{ l.label }} — {{ l.why }}</p></li>
+      {% endfor %}</ul>
+    </section>
+    {% endif %}
+    <p class="note foot">{{ disclosure }}</p>
+    <p class="note foot">{{ foot }}</p>
+    {% endif %}
+  </main>
+</div>
+{% include "_help.html" %}
+</body>
+</html>

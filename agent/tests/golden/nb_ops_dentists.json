@@ -1,0 +1,103 @@
+{
+  "campaign": {
+    "adAccountId": "4001",
+    "name": "Admiry · Bright Smile Dental · biz_1",
+    "objective": "WEB_TRAFFIC",
+    "status": "OFF"
+  },
+  "ad_set": {
+    "campaignId": "4002",
+    "name": "Admiry · Bright Smile Dental · biz_1",
+    "budgetType": "DAILY",
+    "budget": 1973,
+    "startTime": 1790000000,
+    "endTime": 1821536000,
+    "bidType": "CPC",
+    "bidRate": 150,
+    "deliveryRate": "EVENLY",
+    "targeting": {
+      "gender": {
+        "positive": [
+          "all"
+        ]
+      },
+      "ageGroup": {
+        "positive": [
+          "all"
+        ]
+      },
+      "interest": {
+        "positive": [
+          "all"
+        ]
+      },
+      "location": {
+        "positive": [
+          "1813859874",
+          "1813859875"
+        ]
+      },
+      "deviceLocation": {
+        "positive": [
+          "all"
+        ]
+      },
+      "language": {
+        "positive": [
+          "en_us"
+        ]
+      },
+      "os": {
+        "positive": [
+          "all"
+        ]
+      },
+      "manufacturer": {
+        "positive": [
+          "all"
+        ]
+      },
+      "carrier": {
+        "positive": [
+          "all"
+        ]
+      },
+      "network": {
+        "positive": [
+          "all"
+        ]
+      }
+    },
+    "status": "OFF"
+  },
+  "ads": [
+    {
+      "adSetId": "4003",
+      "name": "Admiry ad 1 71f3530e",
+      "status": "OFF",
+      "creative": {
+        "type": "IMAGE",
+        "headline": "Invisalign in Palo Alto",
+        "description": "Clear aligners from a family dentist. Book online.",
+        "callToAction": "Call now",
+        "brandName": "Bright Smile Dental",
+        "assetUrl": "https://static.particlenews.com/nova/assets/4001/6f1c.jpg",
+        "clickThroughUrl": "https://brightsmile.example/invisalign?src=nb&newsbreak_cid=__CALLBACK_PARAM__"
+      }
+    },
+    {
+      "adSetId": "4003",
+      "name": "Admiry ad 2 8732642d",
+      "status": "OFF",
+      "creative": {
+        "type": "IMAGE",
+        "headline": "Clear Aligners Near You",
+        "description": "Straighter teeth without metal braces.",
+        "callToAction": "Call now",
+        "brandName": "Bright Smile Dental",
+        "assetUrl": "https://static.particlenews.com/nova/assets/4001/6f1c.jpg",
+        "clickThroughUrl": "https://brightsmile.example/invisalign?src=nb&newsbreak_cid=__CALLBACK_PARAM__"
+      }
+    }
+  ]
+}

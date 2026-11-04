@@ -1,0 +1,24 @@
+{
+  "tree": "dentists",
+  "sensitive": true,
+  "cta": "call_or_book",
+  "sections": [
+    {"id": "hero", "title": "Above the fold", "guide": "One headline: the service and the city, exactly as the ads say it. Under it the offer in one line and the phone as a tap-to-call button. One button only: Call, with Book online beside it when the practice takes online bookings. The star rating and review count here only when they are real.", "example": "Invisalign in Palo Alto — free consultation. Call (650) 555-0100."},
+    {"id": "trust", "title": "Why this practice", "guide": "Three short reasons taken from the practice's own facts: years in practice, same-week appointments, insurance taken, the dentist's name. Real reviews with the reviewer's first name and the source; never a review the practice did not receive.", "example": "Same-week appointments · Most PPO plans accepted · 14 years in Palo Alto"},
+    {"id": "service", "title": "What the visit is like", "guide": "Three or four plain sentences on the service: what happens at the first visit, how long it takes, what it costs or that the consultation is free. No promises about results.", "example": "Your first visit is a 45-minute consultation. We scan your teeth, show you the plan and give you a price before anything starts."},
+    {"id": "form", "title": "Request a call", "guide": "Name, phone, the service, a preferred time. Nothing about health, symptoms or insurance details in the form. One line under the button saying the practice calls back within business hours.", "example": "We call back within one business day."},
+    {"id": "faq", "title": "Questions people ask", "guide": "Four to six questions with one-paragraph answers: what the first visit costs, whether the plan is accepted, how long treatment takes, whether it hurts (answer honestly, no 'painless'), parking.", "example": "Do you take my insurance? We accept most PPO plans; bring your card and we check before the visit."},
+    {"id": "hours", "title": "Hours and where", "guide": "Opening hours, the address with a map link, the phone again.", "example": "Mon–Fri 8–5 · 500 University Ave, Palo Alto"},
+    {"id": "footer", "title": "Footer", "guide": "The practice's name, a Terms link, the Privacy notice link (required when the page has a form), the practice's phone or e-mail, and the required professional line for the state when there is one.", "example": "Bright Smile Dental · Terms · Privacy · (650) 555-0100"}
+  ],
+  "form_intent": "appointment",
+  "form_fields": ["name", "phone", "service", "preferred_time"],
+  "form_rules": ["Never ask a health question, a symptom or a diagnosis in the form.", "Do not ask for insurance numbers.", "Say when the practice calls back."],
+  "required_lines": [
+    {"text": "General Dentist", "when": "Texas, unless the dentist is a recognised specialist", "always": false},
+    {"text": "The fee shown is the minimum fee only", "when": "Florida, next to any advertised fee", "always": false}
+  ],
+  "banned": ["painless", "guaranteed", "guarantee", "best", "#1", "no. 1", "pain-free", "cure", "cures"],
+  "negatives": ["jobs", "school", "salary", "free", "diy"],
+  "faq": ["What does the first visit cost?", "Do you take my insurance?", "How long does treatment take?", "Does it hurt?", "Is there parking?"]
+}

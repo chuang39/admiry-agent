@@ -1,0 +1,25 @@
+{# The web person's e-mail (A3p-5 batch 2, plan Q7, spec W11; site_install.send_steps): one fixed message from what
+   Admiry holds -- the business's name, the site, the steps and the code the homepage's card shows (steps_view, ruling
+   R2-i) -- and never a word of the caller's. -#}
+{{ owner }} asked Admiry to send you the steps to add Admiry's code to {{ business }}'s website, {{ site }}.
+The code lets Google count calls and forms from the site for the business's ads.
+
+{{ install.how }}
+{% if install.requirement -%}
+{{ install.requirement }}
+{% endif -%}
+{% if install.steps | length == 1 -%}
+{{ install.steps[0] }}
+{% else -%}
+{% for step in install.steps -%}
+{{ loop.index }}. {{ step }}
+{% endfor -%}
+{% endif -%}
+{% if install.help_url -%}
+Help: {{ install.help_url }}
+{% endif %}
+```
+{{ install.snippet }}
+```
+
+{{ checked }} A reply to this e-mail goes to {{ owner }}.

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — plan {{ n }} of {{ total }}</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+<link rel="stylesheet" href="/static/eval.css">
+</head>
+{#- The founder's grading page (K5): one frozen plan exactly as the judge reads it (agent/eval/view.py), then the plan
+    rubric's six dimensions, 1 to 5 with a note each. Never the judge's grades or checks, never which plans are flawed
+    copies. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main eval-plan" id="main">
+<p class="eval-nav"><a href="/ops/eval">All plans</a>{% if prev %} · <a href="/ops/eval/plan/{{ prev }}">Previous</a>{% endif %}{% if next %} · <a href="/ops/eval/plan/{{ next }}">Next</a>{% endif %}</p>
+<h1>Plan {{ n }} of {{ total }}: {{ v.business.name }}</h1>
+
+<section class="panel">
+  <h2>The business</h2>
+  <table>
+    <tr><th>Trade</th><td>{{ v.business.trade }}</td></tr>
+    <tr><th>Area</th><td>{{ v.business.area }}{% if v.business.address %} ({{ v.business.address }}){% endif %}</td></tr>
+    <tr><th>Hours</th><td>{{ v.business.hours or "—" }}</td></tr>
+    <tr><th>Phone</th><td>{{ v.business.phone or "—" }}</td></tr>
+    <tr><th>Website</th><td>{{ v.business.website or "—" }}</td></tr>
+    <tr><th>Why customers pick it</th><td>{{ v.business.usp | join("; ") or "—" }}</td></tr>
+    <tr><th>Prices it states</th><td>{{ v.business.pricing | join("; ") or "—" }}</td></tr>
+    <tr><th>What a customer is worth</th><td>{% if v.business.customer_value is not none %}${{ "{:,.0f}".format(v.business.customer_value) }}{% else %}—{% endif %}</td></tr>
+    <tr><th>Reviews</th><td>{{ v.business.reviews or "—" }}</td></tr>
+    <tr><th>Rules for its ads</th><td>{{ v.business.compliance | join(", ") or "none" }}</td></tr>
+    <tr><th>Budget the owner gave</th><td>{% if v.business.budget_said %}${{ "{:,.0f}".format(v.business.budget_said) }} a month{% else %}none{% endif %}</td></tr>
+    <tr><th>Customers wanted</th><td>{% if v.business.customers_wanted %}{{ v.business.customers_wanted }} a month{% else %}—{% endif %}</td></tr>
+    <tr><th>Services it wants promoted</th><td>{{ v.business.focus | join(", ") or "—" }}</td></tr>
+  </table>
+  <h3>Services and how people search for them</h3>
+  <ul>{% for s in v.business.services %}<li>{{ s.name }}{% if s.price %} ({{ s.price }}){% endif %}: {{ s.phrases | join(", ") }}</li>{% endfor %}</ul>
+</section>
+
+<section class="panel">
+  <h2>The plan</h2>
+  <p>{{ v.goal }}</p>
+  <table>
+    <tr><th>Budget</th><td>${{ "{:,}".format(v.budget.monthly_usd or 0) }} a month (${{ v.budget.per_day or 0 }} a day), level {{ v.budget.level }}</td></tr>
+    <tr><th>Levels</th><td>{% for name, l in (v.budget.levels or {}).items() %}{{ name }} ${{ "{:,}".format(l.monthly_usd) }}{% if not loop.last %} · {% endif %}{% endfor %}</td></tr>
+    <tr><th>Area</th><td>{{ v.setup.area }}</td></tr>
+    <tr><th>Counts as a result</th><td>{{ (v.setup.counts_as_result or []) | join(", ") }}</td></tr>
+    <tr><th>Page the ads open</th><td>{{ v.setup.landing_page or "—" }}</td></tr>
+  </table>
+  <h3>Where it runs</h3>
+  <ul>{% for c in v.channels %}<li>{{ c.label }}: ${{ "{:,}".format(c.monthly_usd) }} a month. {{ c.why }}</li>{% endfor %}</ul>
+</section>
+
+{% for a in v.ads %}
+<section class="panel">
+  <h2>{{ a.channel }}: ad text and searches</h2>
+  <h3>Headlines</h3><ul>{% for h in a.headlines %}<li>{{ h }}</li>{% endfor %}</ul>
+  <h3>Descriptions</h3><ul>{% for d in a.descriptions %}<li>{{ d }}</li>{% endfor %}</ul>
+  {% if a.lint %}<ul class="eval-dropped">{% for note in a.lint %}<li>{{ note }}</li>{% endfor %}</ul>{% endif %}
+  <h3>Page it opens</h3><p>{{ a.landing_service or "—" }}</p>
+  <h3>Searches it shows on</h3><ul>{% for t in a.themes %}<li>{{ t }}</li>{% endfor %}</ul>
+  <h3>Searches left out</h3><ul>{% for t in a.negatives %}<li>{{ t }}</li>{% else %}<li>none</li>{% endfor %}</ul>
+</section>
+{% endfor %}
+
+<section class="panel">
+  <h2>Estimate</h2>
+  {% set cols = v.economics.columns or {} %}
+  <table>
+    <tr><th></th><th>This plan</th><th>Recommended level</th></tr>
+    {% for field, label in (("spend", "Spend"), ("leads", "Leads"), ("bookings", "Bookings"), ("customers", "Customers"), ("revenue", "Revenue")) %}
+    <tr><th>{{ label }}</th>{% for col in ("planning", "recommended") %}{% set x = (cols.get(col) or {}).get(field) %}<td>{% if x is none %}—{% elif x is sequence %}{{ x[0] }}–{{ x[1] }}{% else %}{{ x }}{% endif %}</td>{% endfor %}</tr>
+    {% endfor %}
+  </table>
+  <ul>{% for a in v.economics.assumptions or [] %}<li>{{ a.name }}: {{ a.value }}{% if a.basis %} ({{ a.basis }}){% endif %}</li>{% endfor %}</ul>
+  <p class="fine">{{ v.economics.footnote }}</p>
+</section>
+
+<section class="panel">
+  <h2>Why this plan</h2>
+  <p>{{ v.rationale.why_primary }}</p>
+  <p>{{ v.rationale.why_not_later }}</p>
+  {% if v.rationale.example_searches %}<p class="muted">Example searches: {{ v.rationale.example_searches | join(", ") }}</p>{% endif %}
+</section>
+
+<form id="grades" class="panel" method="post" action="/ops/eval/plan/{{ key }}">
+  <h2>Your grades</h2>
+  <p class="fine">{{ anchors | join(" · ") }}</p>
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  {% for d in dimensions %}
+  <fieldset class="dim">
+    <legend>{{ d.label }}</legend>
+    <p class="muted">{{ d.definition }}</p>
+    <div class="scale">{% for g in range(1, 6) %}<label><input type="radio" name="grade_{{ d.id }}" value="{{ g }}"{% if (saved.get(d.id) or {}).get("grade") == g %} checked{% endif %}> {{ g }}</label>{% endfor %}</div>
+    <textarea name="note_{{ d.id }}" rows="2" maxlength="1000" aria-label="Why: {{ d.label }}">{{ (saved.get(d.id) or {}).get("note") or "" }}</textarea>
+  </fieldset>
+  {% endfor %}
+  <button class="btn btn-dark" type="submit">Save and go to the next plan</button>
+  <span id="save-status" class="muted" role="status"></span>
+</form>
+</main>
+<script src="/static/eval.js"></script>
+</body>
+</html>

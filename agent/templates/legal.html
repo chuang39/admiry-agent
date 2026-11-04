@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — {{ title }}</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+{#- A legal text (/legal/<document>, agent/legal/*.md): its own headings, as prose in a card. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main" id="main">
+<p class="muted">Version {{ version }}</p>
+<article class="card prose">
+{{ body }}
+</article>
+<p class="muted"><a href="/connect">Back to Admiry</a></p>
+</main>
+{% include "_help.html" %}
+</body>
+</html>

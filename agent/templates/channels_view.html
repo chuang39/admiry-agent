@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admiry channels</title>
+<style>
+  /* The channels card an assistant renders in the chat (MCP Apps; spec 2026-09-29-admiry-channels-design §7.2; plan
+     M0 Task 6): the channels card's rows, drawn the way the homepage's card and its mock
+     (docs/superpowers/mocks/channels-card.html) draw them. The plan view's palette (plan_view.html), so the two cards
+     in the chat match, light and dark, plus the homepage's status colours for the dots (--ok, --warn, --error,
+     --faint); nothing fetched: the host's default CSP allows inline script and style only.
+     The owner acts in the conversation (pause, resume) or in Settings. */
+  :root {
+    --bg: #FFFFFF; --fg: #1C1F2A; --soft: #3D4356; --muted: #5B6172; --faint: #C9CDDC; --line: #E4E6EE;
+    --accent: #4B4BDD; --ok: #1F7A4D; --warn: #8A5A00; --error: #A12C2C;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #171923; --fg: #F3F4F8; --soft: #C9CDDC; --muted: #9CA2B8; --faint: #4A4F63; --line: #2C3040;
+    --accent: #8A8AF0; --ok: #4FBF86; --warn: #E0A64A; --error: #F07A7A;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--sans); }
+  body { padding: 18px 20px 14px; }
+  p { margin: 0; }
+  .top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .wordmark { font: 500 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; }
+  .meta { color: var(--muted); font-size: 12px; }
+  .k { font: 11px/1.4 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .rows { margin: 0; padding: 0; list-style: none; }
+  .row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .row:first-child { border-top: 0; padding-top: 4px; }
+  .dot { flex: none; width: 10px; height: 10px; margin-top: 7px; border-radius: 999px; background: var(--faint); }
+  .dot.on { background: var(--ok); }
+  .dot.wait { background: transparent; border: 2px solid var(--warn); }
+  .dot.bad { background: var(--error); }
+  .dot.busy { background: var(--accent); }
+  .text { flex: 1; min-width: 0; }
+  .name { font-weight: 600; }
+  .state { color: var(--soft); font-size: 14px; overflow-wrap: anywhere; }
+  .line { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .total { margin: 4px 0 0; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .foot { margin: 14px 0 0; color: var(--muted); font-size: 11.5px; }
+  .waiting { color: var(--muted); }
+  .say { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="top"><span class="wordmark">Admiry</span><span class="meta" id="meta"></span></div>
+<div id="body"><p class="waiting" id="waiting">Reading where your ads run…</p></div>
+<p class="foot">Admiry card · rendered inside your assistant</p>
+<script>
+(function () {
+  "use strict";
+  var PROTOCOL = "2026-01-26";
+  var pending = {};
+  var nextId = 1;
+  // the dot per row state (a platform's open issue turns it red), as the homepage's card has them
+  var TONES = { live: "on", limited: "wait", paused: "off", failed: "bad", waiting_account: "wait",
+    waiting_creative: "wait", operator: "on" };
+
+  function send(msg) { window.parent.postMessage(msg, "*"); }
+  function request(method, params) {
+    var id = nextId++;
+    send({ jsonrpc: "2.0", id: id, method: method, params: params });
+    return new Promise(function (resolve) { pending[id] = resolve; });
+  }
+  function notify(method, params) { send({ jsonrpc: "2.0", method: method, params: params || {} }); }
+
+  function el(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined && text !== null) node.textContent = String(text);
+    return node;
+  }
+  function money(n) {
+    var v = Number(n) || 0;
+    return "$" + v.toLocaleString("en-US", { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  }
+  function count(n, word) { return n + " " + word + (n === 1 ? "" : "s"); }
+  function tone(r) {
+    var flagged = (r.issues || []).some(function (i) { return i.since; });
+    return flagged ? "bad" : TONES[r.state] || "busy";
+  }
+  function numbers(r) {  // "$38 of $40 today · 2 calls, 1 form this week"
+    var out = [];
+    if ((r.state === "live" || r.state === "limited") && r.today_usd != null && r.day_cap_usd != null) {
+      out.push(money(r.today_usd) + " of " + money(r.day_cap_usd) + " today");
+    }
+    var week = [r.calls_7d ? count(r.calls_7d, "call") : null, r.leads_7d ? count(r.leads_7d, "form") : null]
+      .filter(Boolean);
+    if (week.length) out.push(week.join(", ") + " this week");
+    return out.join(" · ");
+  }
+  function totals(f) {  // "Month to date $842 of $1,816 · next report Monday"
+    var day = f.next_report_at
+      ? new Date(f.next_report_at + "T12:00:00").toLocaleDateString("en-US", { weekday: "long" }) : null;
+    return "Month to date " + money(f.month_usd || 0) + (f.month_cap_usd != null ? " of " + money(f.month_cap_usd) : "") +
+      (day ? " · next report " + day : "");
+  }
+
+  function applyContext(ctx) {
+    if (!ctx) return;
+    if (ctx.theme) document.documentElement.setAttribute("data-theme", ctx.theme === "dark" ? "dark" : "light");
+  }
+  var lastHeight = -1;
+  function resize() {
+    var root = document.documentElement;
+    var was = root.style.height;
+    root.style.height = "max-content";
+    var h = Math.ceil(root.getBoundingClientRect().height);
+    root.style.height = was;
+    if (h === lastHeight) return;
+    lastHeight = h;
+    notify("ui/notifications/size-changed", { height: h });
+  }
+  if (typeof ResizeObserver !== "undefined") new ResizeObserver(function () { resize(); }).observe(document.body);
+  window.addEventListener("resize", resize);
+
+  function render(result) {
+    var body = document.getElementById("body");
+    while (body.firstChild) body.removeChild(body.firstChild);
+    var sc = (result && result.structuredContent) || {};
+    var d = sc.data || sc;
+    var rows = d.channels;
+    if (!rows || !rows.length) {
+      // nothing runs yet, or a refusal: the tool's own words
+      var text = sc.say || (result && result.content && result.content[0] && result.content[0].text) || "No ads yet.";
+      body.appendChild(el("p", "say", text));
+      resize();
+      return;
+    }
+    body.appendChild(el("p", "k", "Where your ads run"));
+    var list = el("ul", "rows");
+    rows.forEach(function (r) {
+      var li = el("li", "row");
+      var dot = el("span", "dot " + tone(r));
+      dot.setAttribute("aria-hidden", "true");
+      li.appendChild(dot);
+      var text = el("div", "text");
+      text.appendChild(el("p", "name", r.label));
+      text.appendChild(el("p", "state", r.state_text));
+      var line = numbers(r);
+      if (line) text.appendChild(el("p", "line", line));
+      li.appendChild(text);
+      list.appendChild(li);
+    });
+    body.appendChild(list);
+    body.appendChild(el("p", "total", totals(d.footer || {})));
+    resize();
+  }
+
+  window.addEventListener("message", function (ev) {
+    var m = ev.data;
+    if (ev.source !== window.parent || !m || m.jsonrpc !== "2.0") return;
+    if (m.id !== undefined && m.method === undefined) {  // a response to one of our requests
+      var cb = pending[m.id];
+      if (cb) { delete pending[m.id]; cb(m); }
+      return;
+    }
+    if (m.method === "ui/notifications/tool-result") render(m.params);
+    else if (m.method === "ui/notifications/host-context-changed") applyContext(m.params);
+    else if (m.method === "ui/resource-teardown" || m.method === "ping") send({ jsonrpc: "2.0", id: m.id, result: {} });
+    else if (m.id !== undefined) send({ jsonrpc: "2.0", id: m.id, error: { code: -32601, message: "not supported" } });
+  });
+
+  request("ui/initialize", {
+    protocolVersion: PROTOCOL,
+    appInfo: { name: "Admiry channels card", version: "1" },
+    appCapabilities: {}
+  }).then(function (r) {
+    if (r && r.result) applyContext(r.result.hostContext);
+    notify("ui/notifications/initialized");
+    resize();
+  });
+})();
+</script>
+</body>
+</html>

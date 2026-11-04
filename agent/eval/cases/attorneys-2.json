@@ -1,0 +1,93 @@
+{
+  "id": "attorneys-2",
+  "vertical": "attorneys",
+  "opening": "Bayou City Injury Law, Houston. We get the biggest settlements in town, put that in the ads. We want calls from car accident victims within 25 miles. $4,000 a month.",
+  "monthly_budget_usd": 4000,
+  "knowledge": {
+    "name": "Bayou City Injury Law",
+    "category": "attorneys",
+    "category_detail": "personal injury attorney",
+    "service_area": [
+      "Houston",
+      "Pasadena",
+      "Sugar Land"
+    ],
+    "services": [
+      {
+        "name": "Car accident claims",
+        "intent_phrases": [
+          "car accident lawyer houston",
+          "auto accident attorney near me",
+          "hurt in a car wreck lawyer"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "Truck accident claims",
+        "intent_phrases": [
+          "18 wheeler accident lawyer houston",
+          "truck accident attorney"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Phone answered 24/7; office Mon-Fri 8-6",
+    "phone": "713-555-0148",
+    "website": null,
+    "pricing_hints": [
+      "contingency fee: no fee unless money is recovered"
+    ],
+    "typical_customer_value_usd": 12000,
+    "usp": [
+      "Free consultation",
+      "No fee unless we recover money for you",
+      "Biggest settlements in town"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "legal"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": 10,
+      "monthly_budget_usd": 4000,
+      "focus_services": [
+        "Car accident claims"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_attorneys_2",
+      "name": "Bayou City Injury Law",
+      "address": "1001 Fannin St, Houston, TX 77002",
+      "lat": 29.757,
+      "lng": -95.3648,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Bayou City Injury Law"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "calls"
+    },
+    "service": {
+      "choice": "svc_car_accident_claims"
+    },
+    "customer_value": {
+      "choice": "10000_plus"
+    },
+    "radius": {
+      "choice": "r25"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

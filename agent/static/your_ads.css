@@ -1,0 +1,43 @@
+/* "Your ads" (spec 2026-10-06 §2), on base.css and settings.css (the grid, the cards, the rows, the fields, the
+   banners): only the page's own rules -- the eyebrow, the month line, the platform cards' ad words and edit folds, the
+   review's amounts table. Phones (<=720px) inherit settings.css's one column and 44px targets. */
+.eyebrow {
+  margin-bottom: 4px; font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); overflow-wrap: anywhere;
+}
+.month { font-size: 15px; color: var(--soft); font-variant-numeric: tabular-nums; }
+.month strong { font: 600 22px/1.2 var(--sans); letter-spacing: -0.01em; color: var(--fg); }
+.platform .card-title .area { color: var(--soft); }
+.numbers { color: var(--muted); font-variant-numeric: tabular-nums; }
+.account { margin-top: 12px; padding: 12px 0; }
+.ad-words { padding: 12px 14px; border: 1px solid var(--line-soft); border-radius: 8px; background: var(--well); }
+.ad-words p { font-size: 15px; line-height: 1.5; }
+.ad-words .headlines { font-weight: 500; }
+/* an edit fold: the summary reads as a link, the chevron turns when open; the form inside is settings.css's .stack */
+.edit { margin-top: 8px; }
+.edit > summary {
+  display: inline-flex; align-items: center; min-height: 32px; font-size: 14px; font-weight: 500; color: var(--accent);
+  cursor: pointer; list-style: none;
+}
+.edit > summary::-webkit-details-marker { display: none; }
+.edit > summary::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-right: 1.5px solid var(--accent);
+  border-bottom: 1.5px solid var(--accent); transform: rotate(-45deg);
+}
+.edit[open] > summary::before { transform: rotate(45deg); }
+.edit .stack { margin-top: 8px; }
+/* a text area's edge holds 3:1 on the card, as settings.css's inputs do */
+.field textarea {
+  width: 100%; min-height: 96px; padding: 8px 10px; border: 1px solid #8A90A0; border-radius: 8px;
+  background: var(--card); color: var(--fg); font: 400 14px/1.5 var(--sans); resize: vertical;
+}
+/* the review's amounts: changed rows in weight, the total ruled off */
+.amounts td:last-child { color: var(--muted); }
+.amounts .changed td { font-weight: 500; }
+.amounts .total td { border-top: 2px solid var(--line); }
+.foot { margin-top: 4px; }
+
+@media (max-width: 720px) {
+  .edit > summary { min-height: 44px; }
+  .field textarea { font-size: 16px; } /* under 16px iOS Safari zooms in on focus */
+}

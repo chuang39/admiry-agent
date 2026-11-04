@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — your new key</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+{#- A key, shown once (POST /connect/keys), and the Muse prompt that uses it. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main" id="main">
+<section class="card">
+<h1>Your new key for {{ record.label }}</h1>
+<p>Copy it now: Admiry shows a key only once. It can {{ record.scopes | join(", ") }}.</p>
+<code class="key-box">{{ key }}</code>
+</section>
+<section class="card">
+<h2>Set up in Meta Muse</h2>
+<p>Paste this into Muse, then give it the key above when it asks in the secure prompt:</p>
+<pre>{{ prompt }}</pre>
+</section>
+<p class="muted">Lost it? Revoke it on <a href="/connect?b={{ business.id }}#advanced">your keys page</a> and create another.</p>
+</main>
+</body>
+</html>

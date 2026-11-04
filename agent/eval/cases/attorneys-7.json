@@ -1,0 +1,92 @@
+{
+  "id": "attorneys-7",
+  "vertical": "attorneys",
+  "opening": "Lone Star Immigration Law in Dallas: family green cards and citizenship. Consultation requests within 50 miles; $1,500 a month.",
+  "monthly_budget_usd": 1500,
+  "knowledge": {
+    "name": "Lone Star Immigration Law",
+    "category": "attorneys",
+    "category_detail": "immigration attorney",
+    "service_area": [
+      "Dallas",
+      "Irving",
+      "Garland"
+    ],
+    "services": [
+      {
+        "name": "Family immigration",
+        "intent_phrases": [
+          "family green card lawyer dallas",
+          "spouse visa attorney",
+          "immigration lawyer near me"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "Citizenship",
+        "intent_phrases": [
+          "citizenship application help dallas",
+          "naturalization lawyer"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Sat 9-6",
+    "phone": "214-555-0156",
+    "website": null,
+    "pricing_hints": [
+      "flat-fee green card applications"
+    ],
+    "typical_customer_value_usd": 4000,
+    "usp": [
+      "Consultations in English and Spanish",
+      "Flat fees"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "legal"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": 10,
+      "monthly_budget_usd": 1500,
+      "focus_services": [
+        "Family immigration"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_attorneys_7",
+      "name": "Lone Star Immigration Law",
+      "address": "1717 Main St, Dallas, TX 75201",
+      "lat": 32.7813,
+      "lng": -96.7979,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Lone Star Immigration Law"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "enquiries"
+    },
+    "service": {
+      "choice": "svc_family_immigration"
+    },
+    "customer_value": {
+      "choice": "3000_10000"
+    },
+    "radius": {
+      "choice": "r50"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Admiry connector — how to connect an assistant</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main prose" id="main">
+<h1>Admiry — connector documentation</h1>
+<p>Admiry is an AI marketing agent for local and service businesses. This page is written for the
+assistant (Meta Muse, ChatGPT, Claude) that will build a bridge to it. Everything here is also at
+<a href="{{ base }}/connect/llms.txt">/connect/llms.txt</a> (plain text) and
+<a href="{{ base }}/connect/tools.json">/connect/tools.json</a> (tool schemas).</p>
+
+<h2>Endpoint</h2>
+<div class="wide"><table>
+  <tr><th>MCP server</th><td><code>{{ mcp_url }}</code> — Model Context Protocol, streamable HTTP, stateless (every POST stands alone; JSON responses)</td></tr>
+  <tr><th>Auth</th><td>OAuth 2.1, no key. Connect with no credential: the first request answers <code>401</code> with <code>WWW-Authenticate: Bearer resource_metadata={{ base }}/.well-known/oauth-protected-resource/mcp</code>; register a client at the authorization server's registration endpoint (dynamic client registration, no secret), use PKCE S256, open the authorization URL for the owner (they sign in with Google and allow), exchange the code at the token endpoint; a refresh token comes with it. <strong>Do not ask the owner for a key.</strong> Only a client that cannot open a browser for the owner falls back to <code>Authorization: Bearer ak_…</code> (or <code>X-API-Key: ak_…</code>), a key the owner copies from <code>{{ base }}/connect</code>.</td></tr>
+  <tr><th>Rate limits</th><td>60 calls per minute and 2,000 per day per key; over the limit the error text carries <code>retry_after=&lt;seconds&gt;</code>.</td></tr>
+  <tr><th>Version</th><td><code>{{ version }}</code> — <code>get_marketing_state</code> returns it as <code>surface_version</code>. If you saved an older one, read this page and <a href="{{ skill_url }}">the guide</a> again.</td></tr>
+</table></div>
+
+<h2>Paste this into Meta Muse</h2>
+<pre>{{ prompt }}</pre>
+
+<h2>How a conversation goes</h2>
+<p>The guide: <a href="{{ skill_url }}">{{ skill_url }}</a> (the files it names are beside it, under
+<code>{{ base }}/connect/references/</code>). In short: <code>get_marketing_state</code> first, and follow its
+<code>next</code>. For a business with nothing begun that is <code>create_marketing_plan</code> →
+<code>update_marketing_plan</code> (until the plan can be shown) → <code>get_marketing_plan</code> →
+<code>launch_marketing_plan</code>; called for a business that already has a plan, <code>create_marketing_plan</code>
+starts over. Every result is <code>{data, say, next}</code>: show <code>say</code> as written, present
+<code>next</code>, send the owner's own words back.</p>
+<p>For a home-services business or a dental practice, the page the ads use can be a whole website Admiry builds:
+<code>get_site_templates</code> shows its three looks, <code>update_landing_page</code> with <code>action</code> "build_site"
+(or "write") asks its questions one at a time (the look first, then the facts it lacks) and builds it, and <code>get_landing_page</code> with <code>view</code> "site"
+shows where it stands. A photo reaches Admiry only through the upload link the answer carries.</p>
+
+<h2>If you save this as a skill</h2>
+<p>Save it under this description, so it is found whenever the owner talks about their advertising:
+<em>{{ skill_description }}</em> Record the version above with it. When <code>get_marketing_state</code> returns
+another <code>surface_version</code>, or a tool answers that it was replaced, read this page and the guide again
+before you go on.</p>
+
+<h2>Tools</h2>
+<p><span class="muted">RO</span> reads · <span class="muted">W</span> writes · <span class="muted">P</span> asks first: returns
+<code>{status: 'proposed', approval_url}</code> and runs when the owner approves
+(on their page, or by your calling again with their approval). The last column says what comes before a call.
+A tool that takes an <code>idempotency_key</code> needs a new one for each distinct call; the same call sent again with the same key (a retry after a timeout) is answered with its first answer, within a day and while that answer is still true. <code>update_landing_page</code> makes a new preview on every <code>write</code>, <code>revise</code>, <code>edit</code> or <code>preview_html</code>, and on every "build_site" that builds, whatever the key.</p>
+<div class="wide"><table>
+  <tr><th>Tool</th><th>Class · scope</th><th>What it does</th><th>Before calling</th></tr>
+  {% for t in tools %}
+  <tr><td><code>{{ t.name }}</code></td><td>{{ t.class }} · {{ t.scope }}</td><td>{{ t.description }}</td><td>{{ t.approval_text }}</td></tr>
+  {% endfor %}
+</table></div>
+
+<h2>Errors and statuses</h2>
+<div class="wide"><table>
+  {% for text, meaning in errors %}
+  <tr><td><code>{{ text }}</code></td><td>{{ meaning }}</td></tr>
+  {% endfor %}
+</table></div>
+
+<h2>Terms and privacy</h2>
+<p><a href="https://admiry.ai/terms">Terms of Service</a> and the <a href="https://admiry.ai/privacy">Privacy Policy</a> (early-access versions, pending counsel). The Google Ads Management Agreement and the Prepayment Addendum are accepted in the Admiry conversation when the owner sets up ads.</p>
+</main>
+</body>
+</html>

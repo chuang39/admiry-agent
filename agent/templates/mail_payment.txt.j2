@@ -1,0 +1,10 @@
+Admiry received your payment: {{ amount }} is now on your Admiry balance.
+{% if next_step %}
+{{ next_step }}
+{% endif %}
+You paid {{ paid }} {{ way }}, including a {{ cost }} transaction fee: what Stripe charges to process the payment. Admiry adds no fee, and the transaction fee is not refunded.
+
+Admiry spends your balance on your ads at the platform's exact cost, day by day. Your balance and every charge are on your Admiry home page.
+
+When Admiry runs Google ads for you, Google's guide to working with a partner like Admiry says what to expect and what you can ask for:
+{{ guide }}

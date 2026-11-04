@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+{% if indexable %}<link rel="canonical" href="{{ canonical }}">{% else %}<meta name="robots" content="noindex">{% endif %}
+<meta name="description" content="Describe your business and the customers you want. Admiry asks a few questions, makes a plan, estimates what it will do, and runs it.">
+<meta name="color-scheme" content="light">
+{% if site %}<link rel="icon" href="data:,">{% else %}<link rel="icon" href="/icon.svg?v=2" type="image/svg+xml">{% endif %}
+<title>Admiry — Tell Admiry what you do. It finds your customers.</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/home.css">
+<script src="/static/site.js" defer></script>
+<script src="/static/setup.js" defer></script>
+{% if support %}<link rel="stylesheet" href="/static/support.css"><script src="/static/support.js" defer></script>{% endif %}
+<script src="/static/channels.js" defer></script>
+<script src="/static/sites.js" defer></script>
+<script src="/static/home.js" defer></script>
+</head>
+<body data-signed-in="{{ '1' if signed_in else '0' }}" data-anon-turns="{{ anon_turns }}"{% if returning %} class="returning"{% endif %}>
+
+{% include "_site_header.html" %}
+
+<main id="main">
+  {#- The website's front page (website/components/marketing/hero-section.tsx, hero-composer.tsx), restyled here
+      2026-10-06: its headline, its glowing box, chips and fine print; the lead stays this page's own (P8). -#}
+  <section id="hero" class="hero" aria-labelledby="hero-title">
+    <div class="hero-bg" aria-hidden="true"><div class="hero-glow"></div><div class="hero-grid"></div><div class="hero-grid-pulse"></div></div>
+    <div class="hero-head">
+      <h1 id="hero-title"><span>Tell Admiry what you do.</span><span class="brandline">It finds your customers.</span></h1>
+      <p class="lead">Your AI marketing agent for local and service businesses.</p>
+    </div>
+    <p class="notice" data-reason="expired" hidden>Your earlier answers expired; tell me again.</p>
+    <p class="notice" data-reason="moved" hidden>Your plan continues in your assistant.</p>
+    <p class="notice" data-reason="over" hidden>Starting over. Tell me about your business.</p>
+    <div class="ask-frame">
+      <form id="ask-form" class="ask">
+        <label for="ask" class="ask-label">Start with your business</label>
+        <textarea id="ask" rows="3" maxlength="2000" enterkeyhint="send" placeholder="I run a dental practice in Austin and want more new-patient appointments…" data-examples="I run a dental practice in Austin and want more new-patient appointments…|I’m a personal trainer in Denver and want more introductory sessions…|I run a landscaping company in Phoenix and want more estimate requests…"></textarea>
+        <div class="ask-foot">
+          <span class="hint">Press Enter to send. Shift+Enter adds a new line.</span>
+          <button type="submit" class="send accent" aria-label="Send">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+          </button>
+        </div>
+      </form>
+    </div>
+    <noscript><p class="hint">This page needs JavaScript. Your assistant can still connect: <a href="/connect/docs">/connect/docs</a>.</p></noscript>
+    <div class="examples" role="group" aria-label="Start from an example">
+      <button type="button" class="chip" data-fill="I run a plumbing business in Austin and want more service bookings.">Home services</button>
+      <button type="button" class="chip" data-fill="I run a dental practice in Miami and want more new-patient appointments.">Dentists</button>
+      <button type="button" class="chip" data-fill="I run a law firm in Chicago and want more consultation bookings.">Attorneys</button>
+      <button type="button" class="chip" data-fill="I’m a personal trainer in Denver and want more introductory sessions.">Fitness</button>
+    </div>
+    <div class="fine-print">
+      <p>Your business, your location, and the customers you want.</p>
+      <p>$0 platform fee · No subscription · You approve everything before it runs</p>
+    </div>
+    <div class="divider"><span>or use the assistant you already have</span></div>
+    <div class="assist">
+      <button type="button" class="muse" data-sheet="muse">
+        <img class="logo logo-muse" src="/static/brands/muse.svg" alt="" width="32" height="32">
+        <span class="muse-words">Continue in Muse<small>Admiry becomes a connector inside the assistant you already use. One copy, no keys.</small></span>
+        <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </button>
+      <div class="assist-alt">
+        <button type="button" class="alt" data-sheet="claude" aria-label="Continue in Claude"><img class="logo logo-claude" src="/static/brands/claude.svg" alt="" width="18" height="18">Claude</button>
+        <button type="button" class="alt" data-sheet="chatgpt" aria-label="Continue in ChatGPT"><img class="logo logo-chatgpt" src="/static/brands/chatgpt.svg" alt="" width="18" height="18">ChatGPT</button>
+      </div>
+    </div>
+    <a class="more" href="{{ site }}/capabilities">See everything Admiry can do <span aria-hidden="true">→</span></a>
+  </section>
+
+  <section id="convo" class="convo" aria-label="Conversation" hidden>
+    <div id="log" class="log"></div>
+    <div id="thinking" class="thinking" hidden><span></span><span></span><span></span></div>
+  </section>
+</main>
+
+<div id="dock" class="dock" hidden>
+  <form id="composer" class="composer">
+    <label for="reply" class="sr">Reply</label>
+    <textarea id="reply" rows="1" maxlength="2000" enterkeyhint="send" placeholder="Or just tell me in your own words…"></textarea>
+    <button id="send" type="submit" class="send" aria-label="Send">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+    </button>
+  </form>
+  <button type="button" class="quiet dock-alt" data-sheet="muse">Continue in Muse instead</button>
+</div>
+
+<footer id="foot" class="foot">
+  <span>$0 platform fee</span>
+  <span>Google charges billed to your own account</span>
+  <span>No management fee during early access</span>
+  <span><a href="{{ site }}/privacy">Privacy</a> · <a href="{{ site }}/terms">Terms</a> · <a href="https://support.google.com/adspolicy/answer/9457109" rel="noopener">Working with third parties (Google)</a></span>
+</footer>
+
+<div id="live" class="sr" role="status" aria-live="polite"></div>
+
+<script type="application/json" id="prompts">{{ prompts | tojson }}</script>
+
+<template id="t-check"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></template>
+
+<template id="t-you"><section class="turn you"><p class="who">You</p><p class="msg" data-part="text"></p></section></template>
+
+<template id="t-you-chip"><section class="turn you echo"><p class="who">You</p><p class="ans" data-part="text"></p></section></template>
+
+<template id="t-admiry"><section class="turn"><p class="who">Admiry</p><div class="says" data-part="body"></div></section></template>
+
+<template id="t-question">
+  <section class="question">
+    <div class="q-head"><span class="q-index" data-part="index"></span><h2 data-part="prompt" tabindex="-1"></h2></div>
+    <div class="options" role="group" data-part="options"></div>
+    <div class="q-extra" data-part="extra">
+      <form class="other" data-part="other">
+        <label><span class="sr">Something else</span><input type="text" maxlength="500" autocomplete="off" enterkeyhint="send" data-part="other-input"></label>
+      </form>
+    </div>
+  </section>
+</template>
+
+<template id="t-reading">
+  <section class="card reading" aria-label="What Admiry read">
+    <p class="k">From your website</p>
+    <dl class="grid" data-part="facts"></dl>
+    <p class="fine" data-part="pages" hidden></p>
+  </section>
+</template>
+
+<template id="t-progress">
+  <section class="card progress" aria-label="Progress">
+    <p class="k">Building your plan</p>
+    <ul class="steps" data-part="steps"></ul>
+  </section>
+</template>
+
+<template id="t-choose">
+  <section class="choose" aria-label="Your businesses">
+    <div class="options cards" role="group" aria-label="Your businesses" data-part="options"></div>
+    <div class="actions"><button type="button" class="btn" data-part="over">Start over</button></div>
+  </section>
+</template>
+
+<template id="t-wall">
+  <section class="wall" aria-labelledby="wall-title">
+    <div class="wall-head">
+      <p class="ready"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Your plan is ready</p>
+      <h2 id="wall-title" tabindex="-1">Sign in to see it.</h2>
+      <p class="muted">We keep your answers for 24 hours.</p>
+    </div>
+    <a class="btn dark" href="/connect/google/start?next=%2F%3Fafter%3Dsignin">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18M3 12h18"/></svg>
+      Continue with Google
+    </a>
+    <div class="divider small"><span>or</span></div>
+    <button type="button" class="btn" data-sheet="muse">Continue in Muse</button>
+    <p class="fine">Nothing is published or spent until you approve it. $0 platform fee.</p>
+  </section>
+</template>
+
+<template id="t-channels">
+  <section class="card where" aria-label="Where your ads run">
+    <div class="where-head"><p class="k">Where your ads run</p><a data-part="settings" href="/ads">Your ads</a></div>
+    <ul class="where-rows" data-part="rows"></ul>
+    <p class="where-foot" data-part="footer"></p>
+    <div class="money" data-part="money"></div>
+  </section>
+</template>
+
+<template id="t-plan">
+  <div class="plan">
+    <section class="card" aria-label="Your plan">
+      <p class="k">Your plan</p>
+      <h2 class="goal" data-part="goal"></h2>
+      <hr>
+      <ul class="channels" data-part="channels"></ul>
+      <hr>
+      <dl class="grid" data-part="setup"></dl>
+    </section>
+
+    <section class="card budget" data-part="budget" tabindex="-1" aria-label="Budget">
+      <div class="budget-head"><p class="k">Daily budget</p><span class="badge" data-part="badge"></span></div>
+      <div class="amount">
+        <p><span class="big" data-part="per-day"></span><span class="unit">a day</span></p>
+        <p class="muted" data-part="monthly"></p>
+        <p class="muted split" data-part="split"></p>
+      </div>
+      <div class="slider" data-part="slider">
+        <div class="track">
+          <input type="range" min="0" step="1" aria-label="Daily budget" data-part="range">
+          <div class="ticks" aria-hidden="true" data-part="ticks"></div>
+        </div>
+        <div class="ends"><span data-part="low"></span><span data-part="high"></span></div>
+      </div>
+      <div class="segs" role="group" aria-label="Budget level" data-part="segs">
+        <button type="button" class="seg" data-level="minimum"></button>
+        <button type="button" class="seg" data-level="conservative"></button>
+        <button type="button" class="seg" data-level="recommended"></button>
+        <button type="button" class="seg" data-level="aggressive"></button>
+      </div>
+      <p class="note">Drag to any amount or pick a level; the estimates below follow. Google bills your own ad account; Admiry adds no fee.</p>
+    </section>
+
+    <section class="card" aria-label="What the budget should do in 30 days">
+      <p class="k">What the budget should do in 30 days</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col"><span class="sr">Estimate</span></th><th scope="col" data-part="col-rec">Recommended</th><th scope="col">Planning</th></tr></thead>
+          <tbody data-part="economics"></tbody>
+        </table>
+      </div>
+      <ul class="assumptions" data-part="assumptions"></ul>
+      <p class="note" data-part="footnote"></p>
+    </section>
+
+    <section class="card" aria-label="Why Google Search first">
+      <p class="k">Why Google Search first</p>
+      <p class="msg" data-part="why"></p>
+      <ul class="searches" aria-label="Example searches" data-part="searches"></ul>
+      <hr>
+      <p class="k">Why not TikTok yet</p>
+      <p class="msg soft" data-part="why-not"></p>
+    </section>
+
+    <section class="card" data-part="ad-preview" aria-label="How your ad reads">
+      <p class="k">How your ad reads</p>
+      <p class="msg" data-part="ad-headlines"></p>
+      <p class="msg soft" data-part="ad-desc"></p>
+      <figure class="ad-image" data-part="ad-image"></figure>
+      <p class="muted" data-part="ad-host"></p>
+      <p class="note" data-part="ad-status"></p>
+    </section>
+
+    <section class="card" data-part="website" aria-label="Your website">
+      <p class="k">Your website</p>
+      <div class="site-line"><span class="site-host" data-part="website-host"></span><span class="tag" data-part="website-platform" hidden></span></div>
+      <p class="msg" data-part="website-say"></p>
+      <div class="checks-head" data-part="website-verdict" hidden>
+        <p class="verdict" data-part="website-verdict-line"></p>
+        <div class="bar" aria-hidden="true" data-part="website-bar"></div>
+        <p class="legend" data-part="website-legend"></p>
+      </div>
+      <div class="check-groups" data-part="website-groups" hidden></div>
+      <div class="page-actions" role="group" aria-label="Ways to add Admiry's code" data-part="website-ways"></div>
+      <div class="checks-foot" data-part="website-unchecked" hidden>
+        <p class="note">Admiry hasn't checked this page yet.</p>
+        <button type="button" class="btn small" data-part="website-first">Check now</button>
+      </div>
+      <form class="page-change" data-part="website-send" hidden>
+        <label><span class="sr">Your web person's e-mail address</span><input type="email" maxlength="254" autocomplete="off" enterkeyhint="send" placeholder="Your web person's e-mail address" data-part="website-to"></label>
+        <button type="submit" class="btn">Send</button>
+      </form>
+      <form class="page-change" data-part="website-team" hidden>
+        <label><span class="sr">Where Admiry's team can e-mail you (optional)</span><input type="email" maxlength="254" autocomplete="email" enterkeyhint="send" placeholder="Your e-mail (optional)" data-part="website-reach"></label>
+        <button type="submit" class="btn" data-part="website-ask">Ask Admiry's team</button>
+      </form>
+      <div class="page-built" data-part="website-steps" hidden>
+        <p class="msg" data-part="website-how"></p>
+        <p class="msg soft" data-part="website-needs" hidden></p>
+        <p class="msg soft" data-part="website-one" hidden></p>
+        <ol class="howto" data-part="website-list"></ol>
+        <label><span class="sr">Admiry's code</span><textarea class="prompt" readonly rows="4" data-part="website-code"></textarea></label>
+        <div class="page-actions">
+          <button type="button" class="btn" data-part="website-copy"><span data-part="website-copy-label">Copy</span></button>
+          <button type="button" class="btn dark" data-part="website-check">Check now</button>
+        </div>
+        <p class="fine"><a data-part="website-help" target="_blank" rel="noopener" hidden>Help</a></p>
+      </div>
+      <div class="checks-foot" data-part="website-foot" hidden>
+        <p class="note" data-part="website-checked"></p>
+        <button type="button" class="btn small" data-part="website-again">Check again</button>
+      </div>
+      <p class="note" data-part="website-answer" hidden></p>
+    </section>
+
+    <section class="card" data-part="page" aria-label="Your page">
+      <p class="k">Your page</p>
+      <p class="msg" data-part="page-instead" hidden>{{ admiry_page_way }}</p>
+      <button type="button" class="btn two" data-part="page-build"><span>Build your business website</span><small>Free to build and host. Improves your visibility and turns more visitors into customers.</small></button>
+      <p class="fine" data-part="page-intro">{{ hosting_minimum }}</p>
+      <div data-part="page-body" hidden></div>
+    </section>
+
+    <section class="card launch" aria-label="Your plan">
+      <p class="k" data-part="launch-k">Your plan</p>
+      <dl class="grid" data-part="summary"></dl>
+      <hr>
+      <p class="msg checking" data-part="checking" role="status" hidden><span class="spin" aria-hidden="true"></span> Admiry is checking your plan and building the final version…</p>
+      <ol class="launch-checklist" data-part="checklist" hidden></ol>
+      <p class="msg" data-part="status" hidden></p>
+      <p class="note" data-part="changes" hidden></p>
+      <p class="msg" data-when="launch">Everything is checked. Pick how your ads run:</p>
+      <p class="msg" data-when="sign-in">Sign in first to keep this plan; then you can launch it.</p>
+      <div class="launch-buttons">
+        <button type="button" class="btn two" data-id="confirm" data-tool="launch_marketing_plan"><span data-part="label">Confirm and launch</span><small>Admiry starts your ads from here</small></button>
+        <button type="button" class="btn two" data-id="prepay" data-tool="request_payment_link"><span data-part="label">Agree and pay</span><small>Admiry runs your Google Ads; you prepay what they spend, at the platform's exact cost</small></button>
+        <button type="button" class="btn two" data-id="link_own_account" data-tool="connect_channel"><span data-part="label">Agree and launch with my Google Ads account</span><small>Link it to Admiry; Google keeps billing you directly</small></button>
+        <button type="button" class="btn two" data-id="sign_in" data-tool="request_connect_link"><span data-part="label">Sign in to keep this plan</span><small>Nothing is published or spent until you approve it</small></button>
+      </div>
+      <p class="fine" data-part="promise" hidden>Your ads go live within 1 hour to 1 business day. Admiry e-mails you if anything needs your attention; write to <a href="mailto:hello@admiry.ai">hello@admiry.ai</a> any time.</p>
+      <div class="chips">
+        <button type="button" class="ghost" data-tool="adjust"><span data-part="label">Adjust the budget</span></button>
+        <button type="button" class="ghost" data-say="Change the area to ">Change the area</button>
+        <button type="button" class="ghost" data-say="Change the offer to ">Change the offer</button>
+      </div>
+      <p class="fine"><a data-part="plan-link" href="#">See the full plan page</a></p>
+      <button type="button" class="btn small-only" data-sheet="muse">Continue in Muse</button>
+    </section>
+  </div>
+</template>
+
+<template id="t-page">
+  <div class="page-built">
+    <iframe class="page-frame" data-part="frame" title="Your page preview" loading="lazy" referrerpolicy="no-referrer"></iframe>
+    <p class="note" data-part="status" hidden></p>
+    <div class="checks-head" data-part="website-verdict" hidden>
+      <p class="verdict" data-part="website-verdict-line"></p>
+      <div class="bar" aria-hidden="true" data-part="website-bar"></div>
+      <p class="legend" data-part="website-legend"></p>
+    </div>
+    <div class="check-groups" data-part="website-groups" hidden></div>
+    <p class="note" data-part="hosting" hidden></p>
+    <div class="page-actions">
+      <button type="button" class="btn dark" data-part="publish">Publish this page</button>
+      <a class="ghost" data-part="photos" target="_blank" rel="noopener">Add photos</a>
+      <a class="ghost" data-part="download" hidden>Download your site</a>
+    </div>
+    <div class="page-muse" data-part="muse" hidden>
+      <p class="msg soft" data-part="muse-text"></p>
+      <button type="button" class="btn" data-sheet="muse">Continue in Muse</button>
+    </div>
+    <form class="page-change" data-part="change">
+      <label><span class="sr">What should I change?</span><input type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="What should I change?" data-part="change-input"></label>
+      <button type="submit" class="btn">Change</button>
+    </form>
+  </div>
+</template>
+
+<template id="t-page-managed">
+  <div class="page-built">
+    <p class="msg" data-part="managed"></p>
+    <img class="page-shot" data-part="shot" alt="Your site on a phone, as Admiry's check opened it" hidden>
+    <p class="note" data-part="status" hidden></p>
+    <p class="note" data-part="hosting" hidden></p>
+    <div class="page-actions">
+      <a class="ghost" data-part="download" hidden>Download your site</a>
+    </div>
+  </div>
+</template>
+
+{#- The industry site on the page card (A3p-6 batch 2 Q17, Q12's words; static/sites.js draws it from the site's state):
+    the looks and the facts still missing before the first build (or whenever one goes missing); then the site at three
+    sizes, its address, the photo checklist, the industry's own facts, another look and Publish, held until the photos
+    are in; and once it is live, where. The build buttons' words are the state's. The headings and the refusal line take
+    focus after the card is drawn again (tabindex -1, fix round 1). -#}
+<template id="t-site">
+  <div class="page-built site">
+    <p class="note" data-part="site-error" tabindex="-1" hidden></p>
+    <div class="page-built" data-part="pick" hidden>
+      <p class="msg" data-part="lead" tabindex="-1">Pick a look. You can change words, colours and photos after.</p>
+      <div class="looks" role="group" aria-label="Looks" data-part="looks"></div>
+      <form class="site-fields" data-part="facts" hidden>
+        <div class="site-fields" data-part="fields"></div>
+        <div class="page-actions"><button type="submit" class="btn dark" data-part="build"></button></div>
+      </form>
+      <form class="page-change" data-part="own-form">
+        <label><span>Already have a website?</span><input type="text" name="own_url" inputmode="url" autocomplete="url" maxlength="320" placeholder="yourbusiness.com" enterkeyhint="go"></label>
+        <button type="submit" class="btn" data-part="own-use">Use my website</button>
+      </form>
+    </div>
+    <div class="page-built" data-part="own" hidden>
+      <p class="msg" data-part="own-say" tabindex="-1"></p>
+      <div class="page-actions"><button type="button" class="btn" data-part="own-instead">Build an Admiry site instead</button></div>
+    </div>
+    <div class="page-built" data-part="built" hidden>
+      <p class="msg" data-part="ready" tabindex="-1" hidden>Your site is ready to look over.</p>
+      <p class="msg" data-part="expired" tabindex="-1" hidden>Your preview expired; build it again.</p>
+      <p class="msg" data-part="live" tabindex="-1" hidden>Your site is live.</p>
+      <div class="tabs" role="group" aria-label="Screen size" data-part="tabs" hidden>
+        <button type="button" class="tab" data-size="phone" aria-pressed="false">Phone</button>
+        <button type="button" class="tab" data-size="tablet" aria-pressed="false">Tablet</button>
+        <button type="button" class="tab" data-size="desktop" aria-pressed="false">Computer</button>
+      </div>
+      <img class="page-shot" data-part="shot" alt="Your site, as Admiry's check opened it" hidden>
+      <p class="msg soft" data-part="hours-shown" hidden></p>
+      <div class="page-actions">
+        <a class="btn" data-part="open" target="_blank" rel="noopener" hidden>Open your site</a>
+        <button type="button" class="btn dark" data-part="again" hidden></button>
+      </div>
+      <div class="page-built" data-part="photos" hidden>
+        <p class="msg">Photos make your site yours. Upload these, most important first:</p>
+        <ol class="checklist" data-part="checklist"></ol>
+        <p class="msg soft">No logo or photos yet? Your assistant (Muse, for example) can make your logo and help with your photos.</p>
+        <div class="page-actions">
+          <a class="btn" data-part="upload" target="_blank" rel="noopener" hidden>Add photos</a>
+          <button type="button" class="btn" data-part="wordmark" hidden>Use my business name as the logo</button>
+        </div>
+      </div>
+      <div class="page-built" data-part="extras" hidden>
+        <p class="msg soft">A few more facts make the site yours. Skip any you'd rather not give.</p>
+        <details class="site-more">
+          <summary>Add a few more facts</summary>
+          <form class="site-fields" data-part="extras-form">
+            <div class="site-fields" data-part="extras-fields"></div>
+            <div class="page-actions"><button type="submit" class="btn dark" data-part="extras-send">Add them to my site</button></div>
+          </form>
+        </details>
+        <div class="page-actions"><button type="button" class="ghost" data-part="skip">Skip</button></div>
+      </div>
+      <details class="site-more" data-part="relook" hidden>
+        <summary>Change the look</summary>
+        <div class="looks small" role="group" aria-label="Looks" data-part="relooks"></div>
+      </details>
+      <div class="page-actions"><a class="btn" data-part="newer" target="_blank" rel="noopener" hidden>Look at the new version</a></div>
+      <div class="page-actions"><button type="button" class="btn dark" data-part="publish" aria-describedby="site-gate" hidden>Publish your site</button></div>
+      <p class="note" id="site-gate" data-part="gate" hidden></p>
+      <p class="note" data-part="status" hidden></p>
+      <div class="checks-head" data-part="website-verdict" hidden>
+        <p class="verdict" data-part="website-verdict-line"></p>
+        <div class="bar" aria-hidden="true" data-part="website-bar"></div>
+        <p class="legend" data-part="website-legend"></p>
+      </div>
+      <div class="check-groups" data-part="website-groups" hidden></div>
+    </div>
+    <p class="note" data-part="hosting" hidden></p>
+    <div class="page-muse" data-part="muse" hidden>
+      <p class="msg soft" data-part="muse-text"></p>
+      <button type="button" class="btn" data-sheet="muse">Continue in Muse</button>
+    </div>
+    <div class="page-actions"><a class="ghost" data-part="download" hidden>Download your site</a></div>
+  </div>
+</template>
+
+<template id="t-sheet">
+  <dialog class="sheet" aria-labelledby="sheet-title">
+    <div class="sheet-body">
+      <div class="sheet-top">
+        <div class="tabs" role="tablist" aria-label="Assistant">
+          <button type="button" class="tab" role="tab" data-tab="muse" id="tab-muse" aria-controls="sheet-panel"><img class="logo logo-muse" src="/static/brands/muse.svg" alt="" width="18" height="18">Muse</button>
+          <button type="button" class="tab" role="tab" data-tab="claude" id="tab-claude" aria-controls="sheet-panel"><img class="logo logo-claude" src="/static/brands/claude.svg" alt="" width="16" height="16">Claude</button>
+          <button type="button" class="tab" role="tab" data-tab="chatgpt" id="tab-chatgpt" aria-controls="sheet-panel"><img class="logo logo-chatgpt" src="/static/brands/chatgpt.svg" alt="" width="16" height="16">ChatGPT</button>
+        </div>
+        <button type="button" class="close" aria-label="Close" data-part="close">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="sheet-panel" role="tabpanel" class="sheet-panel">
+        <h2 id="sheet-title" data-part="title">Continue in Muse</h2>
+        <ol class="howto" data-tab="muse">
+          <li>Copy the message below.</li>
+          <li>Open Muse and paste it (Open Muse copies it for you). Muse reads Admiry's docs and shows you a sign-in link.</li>
+          <li>Sign in with Google. Your plan is waiting there.</li>
+        </ol>
+        <ol class="howto" data-tab="claude">
+          <li>In Claude, open Settings → Connectors → Add custom connector.</li>
+          <li>Use the address in the message below, or paste the whole message into a chat.</li>
+          <li>Sign in with Google when Claude asks. Admiry takes it from there.</li>
+        </ol>
+        <ol class="howto" data-tab="chatgpt">
+          <li>In ChatGPT, turn on developer mode and add a connector with the address in the message below.</li>
+          <li>Any assistant that supports MCP with OAuth 2.1 works the same way.</li>
+          <li>Sign in with Google when it asks. Admiry takes it from there.</li>
+        </ol>
+        <label class="sr" for="sheet-prompt">Message to paste</label>
+        <textarea id="sheet-prompt" class="prompt" readonly rows="5" data-part="prompt"></textarea>
+        <div class="cli" data-part="cli"><span class="k">Claude Code</span><code data-part="cli-line"></code></div>
+        <div class="sheet-actions">
+          <button type="button" class="btn" data-part="share">Share</button>
+          <button type="button" class="btn dark" data-part="copy">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            <span data-part="copy-label">Copy</span>
+          </button>
+          <a class="btn" href="https://muse.ai" target="_blank" rel="noopener noreferrer" data-tab="muse" data-part="open">Open Muse</a>
+        </div>
+        <p class="fine" data-part="note" hidden>Couldn't create a session code right now; this prompt starts a fresh plan.</p>
+        <p class="fine" data-part="foot">You never copy a key.</p>
+      </div>
+    </div>
+  </dialog>
+</template>
+
+{% include "_help.html" %}
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+{% if site %}<link rel="icon" href="data:,">{% else %}<link rel="icon" href="/icon.svg?v=2" type="image/svg+xml">{% endif %}
+<title>Admiry — Settings</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/settings.css">
+<script src="/static/site.js" defer></script>
+</head>
+{#- Settings, layout A (spec 2026-09-29-admiry-settings-redesign §4): a section nav beside one card per section, one
+    business at a time (`business`; `businesses` feeds the switcher). Read-only for ads setup: every set-up action is
+    the link to /?setup=<id> (setup-in-conversation D69). The only .btn-primary is the Overview's next step. -#}
+{% from "_macros.html" import at, used, csrf_field with context %}
+{% macro connect_block(open) %}
+<details class="connect-more"{% if open %} open{% endif %}>
+  <summary>{% if open %}Connect an assistant{% else %}Connect another assistant{% endif %}</summary>
+  <div class="fold-body">
+    <p>Paste this into Muse:</p>
+    <pre id="muse-prompt">{{ prompt }}</pre>
+    <p><button class="btn" type="button" data-copy="#muse-prompt">Copy</button></p>
+    <p class="muted">Using ChatGPT or Claude? <a href="/connect/docs">Read the connection guide</a>.</p>
+  </div>
+</details>
+{% endmacro %}
+<body class="settings">
+{% include "_site_header.html" %}
+<div class="settings-wrap">
+  <div class="settings-side">
+    <h1>Settings</h1>
+    {% if business and businesses|length > 1 %}
+    <details class="switcher">
+      <summary><span class="sr">Business: </span>{{ business.switch_label }}</summary>
+      <div class="switcher-menu">
+        {% for x in businesses %}<a href="/connect?b={{ x.id }}"{% if x.id == business.id %} aria-current="page"{% endif %}>{{ x.switch_label }}</a>
+        {% endfor %}
+        <form method="post" action="/connect/businesses/new">{{ csrf_field() }}<button class="menu-item" type="submit">Start a new business</button></form>
+      </div>
+    </details>
+    {% elif business %}
+    <p class="biz-name">{{ business.name }}</p>
+    {% endif %}
+    <nav class="section-nav" data-sections aria-label="Settings sections">
+      {% if business %}<a href="#overview">Overview</a>
+      <a href="#billing">Billing</a>
+      <a href="#assistants">Assistants</a>
+      {% if business.reports.shown %}<a href="#reports">Reports</a>
+      {% endif %}{% if email_inbound %}<a href="#email">E-mail</a>
+      {% endif %}<a href="#advanced">Advanced</a>
+      {% endif %}<a href="#account">Account</a>
+    </nav>
+  </div>
+
+  <main class="settings-main" id="main">
+    {% if message %}<p class="banner{% if alert %} banner-alert{% endif %}" role="{{ 'alert' if alert else 'status' }}">{{ message|sentence }}</p>{% endif %}
+
+    {% if confirm %}
+    <section class="card card-confirm">
+      <p>Claim <strong>{{ confirm.name }}</strong> as {{ session.email }}?</p>
+      <div class="actions">
+        <form method="post" action="/connect/claim">{{ csrf_field() }}
+          <input type="hidden" name="claim" value="{{ confirm.token }}"><button class="btn btn-accent" type="submit">Claim this business</button></form>
+        <form method="post" action="/connect/signout">{{ csrf_field() }}<button class="btn" type="submit">Not me — sign out</button></form>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if not business %}
+    {#- the claim question stands alone: the owner is claiming a business, not starting one another way -#}
+    {% if not confirm %}
+    <section class="card">
+      <h2>No business yet</h2>
+      <p>No business is linked to this account yet. Add Admiry as a connector in your assistant and sign in with Google
+      there, or use "Start a new business" below and give your assistant a key for it.</p>
+      {{ connect_block(true) }}
+    </section>
+    {% endif %}
+    {% else %}
+    {% set b = business %}
+
+    <section id="overview" class="card">
+      <div class="card-head">
+        <div class="card-title">
+          <h2>{{ b.name }}</h2>
+          {% if b.area %}<p class="area">{{ b.area }}</p>{% endif %}
+        </div>
+        {% if b.claim_state == "draft" %}<span class="badge badge-warning">Not claimed</span>
+        {% elif b.claim_state == "claimed" %}<span class="badge badge-neutral">Claimed</span>
+        {% else %}<span class="badge badge-success">Verified</span>{% endif %}
+      </div>
+      {#- the business's own Google Maps listing (plan 2026-10-03-agent-listing-confirm): what is linked, "Not my
+          business"; else the places waiting for the owner's pick; else a search #}
+      <div class="listing-line">
+        {% if b.google_listing %}
+        <p>On Google Maps: {% if b.google_listing.maps_url %}<a href="{{ b.google_listing.maps_url }}" target="_blank" rel="noopener">{{ b.google_listing.name }}</a>{% else %}{{ b.google_listing.name }}{% endif %}{% if b.google_listing.address %}, {{ b.google_listing.address }}{% endif %}</p>
+        <form method="post" action="/connect/listing/unlink" data-confirm="Unlink {{ b.google_listing.name }}? Admiry will not use it, or offer it again.">{{ csrf_field() }}
+          <input type="hidden" name="business_id" value="{{ b.id }}"><button class="btn btn-danger-quiet" type="submit">Not my business</button></form>
+        {% elif b.listing_offer %}
+        <p>Is one of these your business on Google Maps?</p>
+        <ul class="listing-offer">
+          {% for c in b.listing_offer %}
+          <li><form method="post" action="/connect/listing/choose">{{ csrf_field() }}<input type="hidden" name="business_id" value="{{ b.id }}"><input type="hidden" name="choice" value="{{ c.id }}"><button class="btn" type="submit">{{ c.label }}</button></form></li>
+          {% endfor %}
+          <li><form method="post" action="/connect/listing/choose">{{ csrf_field() }}<input type="hidden" name="business_id" value="{{ b.id }}"><input type="hidden" name="choice" value="none"><button class="btn" type="submit">None of these</button></form></li>
+        </ul>
+        {% else %}
+        <form class="listing-find" method="post" action="/connect/listing/find">{{ csrf_field() }}<input type="hidden" name="business_id" value="{{ b.id }}">
+          <label class="field"><span>Is the business on Google Maps? Its name and address</span>
+            <input name="words" maxlength="200" required></label>
+          <button class="btn" type="submit">Find it</button></form>
+        {% endif %}
+      </div>
+      {% if b.claim_state == "verified" %}<p class="status-line">Verified: its plans can be approved.</p>{% endif %}
+      {% if b.claim_state == "draft" %}
+      <div class="next-step next-step-quiet">
+        <p>Not claimed: the claim ran out after 14 days without verification. Ask your assistant for a new sign-in
+        link to claim it again.</p>
+      </div>
+      {% else %}
+      <div class="next-step">
+        {#- a paused business ran its balance down to zero or below (jobs.spend_guard; a top-up lifts it), and an
+            own-account link that is not live (an invitation waiting, declined or withdrawn) has begun: both keep D69's
+            "Set up ads" label, so the words say where things stand before the label's own case does #}
+        <p>{% if b.paused %}Your ads are paused until you add funds.
+          {%- elif b.setup_label == "Add funds" %}Admiry runs your ads from your balance.
+          {%- elif b.setup_label == "Open setup" %}Your Google Ads account is linked.
+          {%- elif b.ads_mode != "managed" and b.link %}Google Ads account {{ b.link.display }}: {{ b.link_words }}.
+            {%- if b.link.last_error %} There is a note on it under <a href="/ads?b={{ b.id }}">Your ads</a>.{% endif %}
+          {%- else %}{% if b.claim_state == "claimed" %}This business is yours. {% endif %}Nothing is spent until you set up ads and approve a plan.{% endif %}</p>
+        <a class="btn btn-primary" href="/?setup={{ b.id }}">{{ b.setup_label }}</a>
+      </div>
+      {% endif %}
+      {% if b.show_light %}
+      <p class="checkin"><span class="light{% if b.connected_at.iso %} on{% endif %}" aria-hidden="true"></span>
+        <span>{% if b.connected_at.iso %}An assistant checked in {{ at(b.connected_at) }}.{% else %}No assistant has checked in in the last 10 minutes.{% endif %}</span></p>
+      {% endif %}
+    </section>
+
+    <section id="billing" class="card">
+      <h2>Billing</h2>
+      <p><a href="/ads?b={{ b.id }}">Your ads</a> — where they run, what they bring, and what you can change.</p>
+      {% if b.claim_state == "draft" %}
+      <p class="muted">Claim the business again first; then set up its ads.</p>
+      {% else %}
+      {% if b.ads_mode == "managed" %}
+      <p class="balance">Balance: <strong>{{ b.balance }}</strong>{% if b.paused %} — your ads are paused until you add funds{% endif %}</p>
+      {% if b.payments %}
+      <h3>Last payments</h3>
+      <table class="payments">
+        <thead><tr><th scope="col">Payment</th><th scope="col" class="num">Amount</th><th scope="col">Date</th></tr></thead>
+        <tbody>
+          {% for p in b.payments %}<tr><td>{{ p.words }}</td><td class="num">{{ p.amount }}</td><td>{{ at(p.when) }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if b.payments|selectattr("has_fee")|list %}
+      <p class="note">The transaction fee is what Stripe charges to process the payment; Admiry adds no fee.</p>
+      {% endif %}
+      {% endif %}
+      {% endif %}
+      {% if b.ads_statement %}
+      <h3>Statement</h3>
+      {#- one table per channel with ads, in the payments table's look, its name above it; six columns scroll inside the
+          card on a phone (.statement); the channels' billing sentences once, after the tables -#}
+      {% for s in b.ads_statement.channels %}
+      <div class="statement">
+        <table class="payments">
+          <caption>{{ s.label }}{% if s.account_public %} · account {{ s.account_public }}{% endif %}</caption>
+          <thead><tr><th scope="col">Month</th><th scope="col" class="num">Cost</th><th scope="col" class="num">Clicks</th><th scope="col" class="num">Impressions</th><th scope="col" class="num">Calls</th><th scope="col" class="num">Conversions</th></tr></thead>
+          <tbody>
+            {% for m in s.months %}<tr><td>{{ m.month }}</td><td class="num">${{ "%.2f"|format(m.spent_usd) }}</td><td class="num">{{ m.clicks }}</td><td class="num">{{ m.impressions }}</td><td class="num">{{ m.calls }}</td><td class="num">{% if m.conversions == m.conversions|int %}{{ m.conversions|int }}{% else %}{{ "%.1f"|format(m.conversions) }}{% endif %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endfor %}
+      <p class="note">{{ b.ads_statement.no_fee_notice }}.</p>
+      {% endif %}
+      {% if b.accepted %}
+      <h3>Agreements</h3>
+      <ul class="rows">
+        {% for a in b.accepted %}
+        <li class="row">
+          <div class="row-text"><p class="row-title">{{ a.title }} {{ a.version }}</p><p class="row-meta">Accepted {{ a.date }}</p></div>
+          <a class="btn" href="{{ a.url }}">Read<span class="sr"> the {{ a.title }}</span></a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <p class="card-foot"><a class="btn" href="/?setup={{ b.id }}">{{ b.setup_label }}</a></p>
+      {% endif %}
+    </section>
+
+    <section id="assistants" class="card">
+      <h2>Connected assistants</h2>
+      {% if b.grants %}
+      <ul class="rows">
+        {% for g in b.grants %}
+        <li class="row">
+          <div class="row-text">
+            <p class="row-title">{{ g.client_name }}</p>
+            <p class="chips">{% for w in g.scope_words %}<span class="chip">{{ w }}</span>{% endfor %}</p>
+            <p class="row-meta">Connected {{ at(g.created_at) }} · {{ used(g.last_used_at) }}</p>
+          </div>
+          <form method="post" action="/connect/grants/{{ g.id }}/revoke" data-confirm="Revoke access for {{ g.which }}? It will stop working until it connects again.">
+            {{ csrf_field() }}<button class="btn btn-danger-quiet" type="submit">Revoke<span class="sr"> {{ g.which }}</span></button></form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted">Connect Admiry to the assistant you use.</p>
+      {% endif %}
+      {{ connect_block(not b.grants) }}
+    </section>
+
+    {% if b.reports.shown %}
+    <section id="reports" class="card">
+      <h2>E-mail reports</h2>
+      {% if b.reports.bounced %}
+      <p>E-mails to {{ b.reports.address }} bounced{% if b.reports.bounced_on %} on {{ b.reports.bounced_on }}{% endif %}; lead alerts and reports are paused.</p>
+      <form method="post" action="/connect/digest/resume">
+        {{ csrf_field() }}<input type="hidden" name="business_id" value="{{ b.id }}">
+        <button class="btn" type="submit">Send to this address again</button>
+      </form>
+      {% else %}
+      <form class="stack" method="post" action="/connect/digest">
+        {{ csrf_field() }}
+        <input type="hidden" name="business_id" value="{{ b.id }}">
+        <label class="check"><input type="radio" name="frequency" value="daily"{% if b.reports.frequency == "daily" %} checked{% endif %}> Daily report · every morning while your ads run</label>
+        <label class="check"><input type="radio" name="frequency" value="weekly"{% if b.reports.frequency == "weekly" %} checked{% endif %}> Weekly only · Mondays</label>
+        <label class="check"><input type="radio" name="frequency" value="off"{% if b.reports.frequency == "off" %} checked{% endif %}> Off</label>
+        <button class="btn" type="submit">Save</button>
+      </form>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    {% if email_inbound %}
+    <section id="email" class="card">
+      <h2>E-mail</h2>
+      <p class="muted">Write to Admiry at <strong>{{ email_address }}</strong> from your sign-in address{% if b.addresses %}, or from any address listed here{% endif %}. Nothing is spent or launched by e-mail.</p>
+      {% if b.addresses %}
+      <ul class="rows">
+        {% for a in b.addresses %}
+        <li class="row">
+          <div class="row-text">
+            <p class="row-title">{{ a.address }}</p>
+            <p class="chips">{% for w in a.scope_words %}<span class="chip">{{ w|capfirst }}</span>{% endfor %}</p>
+            <p class="row-meta">Added {{ at(a.created_at) }} · {{ used(a.last_used_at) }}</p>
+          </div>
+          <form method="post" action="/connect/addresses/{{ a.id }}/revoke" data-confirm="Revoke {{ a.address }}? Admiry will stop answering e-mail from it for this business.">
+            {{ csrf_field() }}<button class="btn btn-danger-quiet" type="submit">Revoke<span class="sr"> {{ a.address }}</span></button></form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <form class="stack" method="post" action="/connect/addresses">
+        {{ csrf_field() }}
+        <input type="hidden" name="business_id" value="{{ b.id }}">
+        <label class="field"><span>Add an address that may write for this business</span>
+          <input name="address" type="email" required placeholder="assistant@example.com"></label>
+        <p class="help">It can always see the plan and results.</p>
+        <label class="check"><input type="checkbox" name="manage" checked> Make changes within the monthly limit</label>
+        <label class="check"><input type="checkbox" name="leads" checked> See who the leads are</label>
+        <button class="btn" type="submit">Add address</button>
+      </form>
+    </section>
+    {% endif %}
+
+    <details id="advanced" class="card card-fold">
+      <summary><h2 class="fold-title">Keys</h2>
+        <span class="fold-sub">For assistants that can't sign in with Google{% if b.keys %} · {{ b.keys|length }} key{{ "s" if b.keys|length != 1 }}{% endif %}</span></summary>
+      <div class="fold-body">
+        {% if b.keys %}
+        <ul class="rows">
+          {% for k in b.keys %}
+          <li class="row">
+            <div class="row-text">
+              <p class="row-title">{{ k.name }}</p>
+              <p class="chips">{% for w in k.scope_words %}<span class="chip">{{ w }}</span>{% endfor %}</p>
+              <p class="row-meta">Created {{ at(k.created) }} · {{ used(k.last_used) }}</p>
+            </div>
+            <form method="post" action="/connect/keys/{{ k.id }}/revoke" data-confirm="Revoke this {{ k.name }} key? The assistant using it will stop working until it gets a new key.">
+              {{ csrf_field() }}<button class="btn btn-danger-quiet" type="submit">Revoke<span class="sr"> the {{ k.name }} key</span></button></form>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">No keys yet.</p>
+        {% endif %}
+        <form class="stack" method="post" action="/connect/keys">
+          {{ csrf_field() }}
+          <input type="hidden" name="business_id" value="{{ b.id }}">
+          <label class="field"><span>New key for</span>
+            <select name="label">{% for l, name in labels.items() %}<option value="{{ l }}">{{ name }}</option>{% endfor %}</select></label>
+          <fieldset class="checks">
+            <legend>It may</legend>
+            <p class="help">Read plans and results (always)</p>
+            <label class="check"><input type="checkbox" name="manage" checked> Change plans, pages and ads within the monthly limit</label>
+            <label class="check"><input type="checkbox" name="leads" checked> See your leads and record what became of them</label>
+            <label class="check"><input type="checkbox" name="account"> Manage keys</label>
+          </fieldset>
+          <button class="btn" type="submit">Create key</button>
+        </form>
+      </div>
+    </details>
+    {% endif %}
+
+    <section id="account" class="card">
+      <h2>Account</h2>
+      <p>Signed in as <strong>{{ session.email }}</strong></p>
+      <div class="actions">
+        <form method="post" action="/connect/businesses/new">{{ csrf_field() }}<button class="btn" type="submit">Start a new business</button></form>
+        <form method="post" action="/connect/signout">{{ csrf_field() }}<button class="btn" type="submit">Sign out</button></form>
+      </div>
+    </section>
+  </main>
+</div>
+{% include "_help.html" %}
+</body>
+</html>

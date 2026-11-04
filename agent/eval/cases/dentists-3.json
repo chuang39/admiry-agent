@@ -1,0 +1,92 @@
+{
+  "id": "dentists-3",
+  "vertical": "dentists",
+  "opening": "Desert Ridge Dental Implants in Scottsdale. We place implants and want about 6 implant consultations a month, within 10 miles. Budget $3,000 a month.",
+  "monthly_budget_usd": 3000,
+  "knowledge": {
+    "name": "Desert Ridge Dental Implants",
+    "category": "dentists",
+    "category_detail": "implant dentist",
+    "service_area": [
+      "Scottsdale",
+      "Paradise Valley",
+      "Fountain Hills"
+    ],
+    "services": [
+      {
+        "name": "Dental implants",
+        "intent_phrases": [
+          "dental implants scottsdale",
+          "tooth implant cost",
+          "implant dentist near me"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "All-on-4 implants",
+        "intent_phrases": [
+          "all on 4 dental implants scottsdale",
+          "full mouth dental implants"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Thu 7-4",
+    "phone": "480-555-0131",
+    "website": null,
+    "pricing_hints": [
+      "free implant consultation"
+    ],
+    "typical_customer_value_usd": 4000,
+    "usp": [
+      "3D scan at the first visit",
+      "Sedation available"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "healthcare"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": 6,
+      "monthly_budget_usd": 3000,
+      "focus_services": [
+        "Dental implants"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_dentists_3",
+      "name": "Desert Ridge Dental Implants",
+      "address": "8950 E Raintree Dr, Scottsdale, AZ 85260",
+      "lat": 33.6177,
+      "lng": -111.8866,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Desert Ridge Dental Implants"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "bookings"
+    },
+    "service": {
+      "choice": "svc_dental_implants"
+    },
+    "customer_value": {
+      "choice": "1000_plus"
+    },
+    "radius": {
+      "choice": "r10"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

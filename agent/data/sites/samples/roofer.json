@@ -1,0 +1,346 @@
+{
+  "family": "home_services",
+  "trade": "roofing",
+  "facts": {
+    "name": "Oakline Roofing",
+    "phone": "(704) 555-0142",
+    "city": "Charlotte",
+    "state": "NC",
+    "service_area": [
+      "Charlotte",
+      "Matthews",
+      "Mint Hill",
+      "Huntersville",
+      "Concord",
+      "Pineville",
+      "Indian Trail"
+    ],
+    "storefront": false,
+    "hours": [
+      "Monday to Friday, 7 am to 6 pm",
+      "Saturday, 8 am to 2 pm",
+      "Sunday, closed"
+    ],
+    "about": "Oakline Roofing is a family-run roofing company in Charlotte. We replace and repair roofs, and we repair storm damage.",
+    "services": [
+      {
+        "slug": "roof-replacement",
+        "name": "Roof replacement",
+        "lead": true,
+        "summary": "A full tear-off and a new roof, planned around your home and your budget.",
+        "includes": [
+          "Full tear-off and disposal",
+          "New underlayment and flashing",
+          "Ridge and attic ventilation check",
+          "Clean-up after the job"
+        ],
+        "signs": [
+          "Shingles curling or cracking",
+          "Granules in the gutters",
+          "Leaks that keep coming back"
+        ]
+      },
+      {
+        "slug": "roof-repair",
+        "name": "Roof repair",
+        "lead": true,
+        "summary": "Leaks, missing shingles and flashing fixed properly, not patched over.",
+        "includes": [
+          "Leak tracing",
+          "Shingle and flashing replacement",
+          "Sealing around vents and chimneys"
+        ],
+        "signs": [
+          "A stain on the ceiling",
+          "Shingles on the lawn",
+          "Daylight in the attic"
+        ]
+      },
+      {
+        "slug": "storm-damage",
+        "name": "Storm damage repair",
+        "lead": true,
+        "summary": "We inspect after hail and wind, document the damage and give you a written estimate for the repair.",
+        "includes": [
+          "Photo-documented inspection",
+          "A written estimate for the repair",
+          "Temporary tarping when needed"
+        ],
+        "signs": [
+          "Hail dents on vents or gutters",
+          "Lifted or missing shingles after wind",
+          "A fallen branch on the roof"
+        ]
+      },
+      {
+        "slug": "roof-inspections",
+        "name": "Roof inspections",
+        "summary": "A written report with photos of what we found, free for homeowners."
+      },
+      {
+        "slug": "gutters",
+        "name": "Gutters",
+        "summary": "Seamless gutters and guards, installed or repaired with the roof."
+      },
+      {
+        "slug": "skylights",
+        "name": "Skylights",
+        "summary": "New and replacement skylights, flashed so they stay dry."
+      }
+    ],
+    "licence": "NC License #00000",
+    "years": 15,
+    "warranty": "10-year workmanship warranty",
+    "insured": true,
+    "free_estimate": "Free roof inspections",
+    "reviews": [
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      }
+    ]
+  },
+  "words": {
+    "home": {
+      "eyebrow": "Roofing contractor in Charlotte, NC",
+      "headline": "Roof replacement and repair in Charlotte",
+      "lead": "Licensed roofers with general liability insurance. Free written estimates, and storm damage repaired right.",
+      "services_heading": "What we do",
+      "services_lead": "Every job starts with a free inspection and a written quote.",
+      "why_heading": "Why Charlotte homeowners call us",
+      "why_points": [
+        "Written quotes, no pressure. You get the price on paper before any work starts.",
+        "Storm damage documented. Photos, a written report and an estimate on paper.",
+        "A clean yard every day. Nails swept with a magnet, debris hauled away."
+      ],
+      "how_heading": "How it works",
+      "steps": [
+        {
+          "title": "Call or book online",
+          "text": "Tell us what is going on. We call you back."
+        },
+        {
+          "title": "Free inspection",
+          "text": "We check the roof and hand you a written quote."
+        },
+        {
+          "title": "New roof, clean yard",
+          "text": "We do the work, haul the debris and walk you through it."
+        }
+      ],
+      "about_heading": "A local roofer you can reach",
+      "about_text": "A local, family-run crew. The person who quotes your roof is on site the day we build it.",
+      "area_heading": "Where we work",
+      "area_text": "Charlotte and the towns around it.",
+      "faq": [
+        {
+          "q": "Is the inspection really free?",
+          "a": "Yes. We inspect the roof and give you a written quote, with no obligation."
+        },
+        {
+          "q": "What do you do after a storm?",
+          "a": "We inspect the roof, photograph the damage and give you a written estimate for the repair. If water is getting in, we tarp the roof first."
+        },
+        {
+          "q": "How long does a new roof take?",
+          "a": "It depends on the size of the roof and the weather. We give you a schedule before we start."
+        },
+        {
+          "q": "Are you licensed, and what coverage do you carry?",
+          "a": "We are licensed in North Carolina and carry general liability insurance."
+        }
+      ],
+      "cta_heading": "Need a roofer in Charlotte?",
+      "cta_text": "Call now, or ask for a free inspection and we will call you back.",
+      "reviews_heading": "What customers say on Google",
+      "work_heading": "Recent roofs",
+      "faq_heading": "Questions homeowners ask"
+    },
+    "about": {
+      "headline": "About Oakline Roofing",
+      "lead": "A family roofing company serving Charlotte and the towns around it.",
+      "story": [
+        "We started Oakline Roofing to give homeowners a roofer who explains the job, shows the damage and keeps the schedule.",
+        "Today we replace and repair roofs across the Charlotte area, and we repair storm damage for families here."
+      ],
+      "values_heading": "How we work",
+      "values": [
+        "We explain before we quote",
+        "We show photos of what we find",
+        "We say plainly what we find"
+      ],
+      "community": "We live and work in the Charlotte area, so the roofs we build are the ones we drive past every day."
+    },
+    "services": {
+      "headline": "Roofing services in Charlotte",
+      "lead": "Replacements, repairs, storm work and care for the roof you already have.",
+      "intro": "Whatever the roof needs, the answer starts with an honest look at it. Pick a service to see what we do and when it makes sense."
+    },
+    "contact": {
+      "headline": "Talk to Oakline Roofing",
+      "lead": "Tell us a little about your roof and we will call you back.",
+      "response_line": "We only use your number to call you about your roof."
+    },
+    "service_pages": [
+      {
+        "slug": "roof-replacement",
+        "lead": "A new roof, planned around your home and your budget.",
+        "what": "We remove the old roof down to the deck, repair what is damaged, and install new underlayment, flashing and shingles. We explain the plan before we start.",
+        "signs": [
+          "Shingles that curl, crack or fall off",
+          "Granules collecting in the gutters",
+          "Leaks that return after repairs"
+        ],
+        "includes": [
+          "Full tear-off and disposal",
+          "New underlayment and flashing",
+          "Ventilation check",
+          "Clean-up after the job"
+        ],
+        "faq": [
+          {
+            "q": "How do I know it is time to replace?",
+            "a": "When repairs keep coming back or the damage covers much of the roof, a new roof may make more sense than another repair. We inspect first and tell you plainly."
+          },
+          {
+            "q": "Can I stay home during the work?",
+            "a": "Yes. Ask us what to expect on the day."
+          },
+          {
+            "q": "Do you take care of the permit?",
+            "a": "Ask us what the job needs and what to expect."
+          }
+        ],
+        "signs_heading": "Signs you need it",
+        "includes_heading": "What's included",
+        "faq_heading": "Questions"
+      },
+      {
+        "slug": "roof-repair",
+        "lead": "Leaks and damage fixed at the source.",
+        "what": "We find where the water gets in, which is often not where the stain shows, and fix that. We tell you if the roof needs more than a repair.",
+        "signs": [
+          "A stain on a ceiling or wall",
+          "Shingles missing after wind",
+          "Daylight in the attic"
+        ],
+        "includes": [
+          "Leak tracing",
+          "Shingle and flashing replacement",
+          "Sealing around vents and chimneys"
+        ],
+        "faq": [
+          {
+            "q": "Can you repair just one spot?",
+            "a": "Often yes. If the rest of the roof is sound, a repair is the sensible choice, and we say so."
+          },
+          {
+            "q": "How soon can you come?",
+            "a": "Call and we will tell you when we can come."
+          },
+          {
+            "q": "Will the repair match my roof?",
+            "a": "We match your shingles as closely as the stock allows and tell you if a match will show."
+          }
+        ],
+        "signs_heading": "Signs you need it",
+        "includes_heading": "What's included",
+        "faq_heading": "Questions"
+      },
+      {
+        "slug": "storm-damage",
+        "lead": "We inspect, document and repair storm damage.",
+        "what": "After hail or wind we inspect the roof, photograph the damage and give you a written report and an estimate for the repair. If water is getting in, we tarp the roof first.",
+        "signs": [
+          "Dents on vents, gutters or flashing",
+          "Shingles lifted or missing after wind",
+          "A branch or debris on the roof"
+        ],
+        "includes": [
+          "Photo-documented inspection",
+          "A written estimate for the repair",
+          "Temporary tarping when needed"
+        ],
+        "faq": [
+          {
+            "q": "Do I have to use you for the repair?",
+            "a": "No. You choose your roofer. The report and the estimate are yours to keep."
+          },
+          {
+            "q": "Can you stop a leak right away?",
+            "a": "Yes. If water is getting in, we tarp the roof first and plan the repair from there."
+          },
+          {
+            "q": "How long after a storm should I call?",
+            "a": "As soon as it is safe. Water that gets in keeps doing damage, so call sooner rather than later."
+          }
+        ],
+        "signs_heading": "Signs you need it",
+        "includes_heading": "What's included",
+        "faq_heading": "Questions"
+      }
+    ],
+    "cta_label": "Call",
+    "book_label": "Get a free inspection"
+  },
+  "style_words": {
+    "clean": {
+      "home": {
+        "eyebrow": "",
+        "headline": "Roof replacement and repair for homes in Charlotte",
+        "lead": "A roof you won't think about for decades. Free inspections, written quotes, and a crew that cleans up every day.",
+        "services_heading": "Everything your roof needs, from one crew",
+        "services_lead": "",
+        "why_heading": "Family run, and on your roof ourselves",
+        "about_text": "[Your story in two or three sentences: who you are, how long you have done this, and why people trust you with their home.]",
+        "why_points": [
+          "Written quotes before any work starts",
+          "Storm damage inspected and repaired"
+        ],
+        "reviews_heading": "",
+        "work_heading": "Recent work around Charlotte",
+        "cta_heading": "Get a free inspection",
+        "cta_text": "Tell us a little about your roof and we will call you back."
+      }
+    },
+    "bold": {
+      "home": {
+        "eyebrow": "Charlotte roofers · licensed · general liability insured",
+        "headline": "Roof repair and replacement in Charlotte",
+        "lead": "A free inspection and a written quote. Storm damage inspected and repaired, with the estimate in writing.",
+        "services_heading": "Services",
+        "services_lead": "",
+        "reviews_heading": "From our Google reviews",
+        "how_heading": "Three steps",
+        "steps": [
+          {
+            "title": "Call or book online",
+            "text": "We call you back."
+          },
+          {
+            "title": "Free inspection",
+            "text": "Photos of what we found and a written quote."
+          },
+          {
+            "title": "Done right, cleaned up",
+            "text": "We finish the job and haul away every nail."
+          }
+        ],
+        "cta_heading": "Roof trouble?",
+        "cta_text": ""
+      },
+      "cta_label": "Call now"
+    }
+  }
+}

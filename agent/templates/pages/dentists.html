@@ -1,0 +1,5 @@
+{#- Dentists (agent/page_recipes/dentists.json): Call, with Book online beside it when the practice's own address is
+    a booking page; the form asks a time to call and the service, never anything about health (P8). -#}
+{% extends "pages/_base.html" %}
+{% block service_label %}What is the visit for?{% endblock %}
+{% block form_note %}The practice calls you back during business hours.{% endblock %}

@@ -1,0 +1,60 @@
+{#- Admiry's hosted terms of use for one business's page (agent/hosted.py:terms_html, M1 Task 4). The context is
+    hosted_privacy.html's, built by the same hosted._privacy_context: business ({name, phone, email}) and page
+    ({form_fields}). What the page offers a visitor follows from them -- a call when the business has a phone (the page
+    has a call button then), the form when the recipe has form fields -- so a page with no phone invites no call.
+    Rendered on the tenant host itself, so this stays a plain, static page -- no header, no links off the business's
+    own site beyond its privacy notice. Plain and minimal on purpose: who runs the page, what it is for, nothing
+    promised beyond the business's own word, who to ask, who hosts it. The text needs the founder's review before the
+    first client's page links to it. Who to ask is the business's phone, else the form on the page -- never an e-mail
+    address: the owner's sign-in address is never published here (final review I5; `business.email` stays unused). -#}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terms of use — {{ business.name }}</title>
+<style>
+  body{font-family:ui-sans-serif,system-ui,sans-serif;max-width:40rem;margin:3rem auto;padding:0 1rem;line-height:1.55;color:#1c1f2a}
+  h1{font-size:1.3rem}.muted{color:#5b6172}
+</style>
+</head>
+<body>
+<h1>Terms of use</h1>
+{%- set can_call = (business.phone or '') != '' %}
+{%- set can_send = (page.form_fields or [])|length > 0 %}
+<p>This page belongs to {{ business.name }}. By using it you agree to these terms.</p>
+<p>
+  The page describes {{ business.name }}'s services
+  {%- if can_call and can_send %} and invites you to call or send the form on it
+  {%- elif can_call %} and invites you to call
+  {%- elif can_send %} and invites you to send the form on it
+  {%- endif %}. What it says is general information: the price, the time and what is included are the ones
+  {{ business.name }} gives you when you speak with it.
+</p>
+<p>
+  The page is provided as it is, with no warranty of any kind beyond what {{ business.name }} itself offers you when
+  you deal with it directly.
+  {%- if can_call and can_send %} Calling or sending the form
+  {%- elif can_call %} Calling
+  {%- elif can_send %} Sending the form
+  {%- else %} Using this page
+  {%- endif %} does not by itself make an agreement for any service; any agreement is between you and
+  {{ business.name }}.
+</p>
+<p>
+  Please use the page for what it is for: do not send through the form anything that is not yours to send, and do
+  not try to disrupt the page.
+</p>
+<p>
+  What the form collects is described in the <a href="/privacy">privacy notice</a>.
+</p>
+<p>
+  Admiry, Inc. hosts this page for {{ business.name }} and is not a party to anything between you and the business.
+</p>
+<p class="muted">
+  Questions about these terms go to {{ business.name }}
+  {%- if can_call %}, {{ business.phone }}
+  {%- elif can_send %} through the form on this page
+  {%- endif %}.
+</p>
+</body>
+</html>

@@ -1,0 +1,34 @@
+Yesterday: $28.10 spent, 2 calls, 1 form. October: $412.30 of $600.
+
+Google Search: $23.10 spent (117% of its daily budget), 41 clicks, 2 calls, 1 form, 2 leads
+NewsBreak: $5 spent (51% of its daily budget), 10 clicks, 0 calls, 0 forms, 0 leads — Paused: there is no money left to run it
+Your page: 1 lead
+
+Needs you:
+- NewsBreak is paused: there is no money left to run it. Add funds to start it again.
+  See your ads: http://testserver/ads?b=biz_1
+- 2 people who contacted you are still marked new. Tell Admiry which ones booked (in Claude, ChatGPT or Muse) — that is how it learns what a booked job costs.
+- Google Search: $397.30 of its $450 for October; it pauses at $450 and restarts November 1.
+  Open Admiry: http://testserver/?report=biz_1&day=2026-10-05
+
+Admiry's take: Two calls yesterday, and the page brought one more.
+
+Admiry suggests:
+- Tell Admiry which callers booked.
+
+Your week:
+Google Search: $142 spent, 9 leads, 6 calls, 3 booked (the week before: $120, 7 leads); $15.78 per lead (early: 11 leads).
+NewsBreak: $25 spent, 1 lead, 0 calls, 0 booked (the week before: $30, 2 leads); $25 per lead (early: 3 leads).
+Leads this week: 4 new, 3 booked, 1 lost.
+You spent $412.30 in October. 14 leads, 4 booked.
+
+You get this every morning while your ads run.
+Weekly only: http://testserver/unsubscribe/v271a41.0k_0yp9QqBncDxBMVCNkZ1-pTJjvKSa7SAkxYsaE-MM?b=biz_1&f=weekly
+Stop reports for Bright Smile Dental: http://testserver/unsubscribe/v271a41.0k_0yp9QqBncDxBMVCNkZ1-pTJjvKSa7SAkxYsaE-MM?b=biz_1&f=off
+
+To ask about these numbers, open Admiry.
+Open Admiry: http://testserver/?report=biz_1&day=2026-10-05
+
+Admiry runs the ads from your prepaid balance at cost, or Google bills your own Google Ads account; Admiry charges no management fee.
+
+Admiry never asks for passwords, codes or card numbers by e-mail.

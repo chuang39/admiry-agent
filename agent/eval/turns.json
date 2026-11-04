@@ -1,0 +1,903 @@
+[
+  {
+    "id": "start-plain",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name"
+    ],
+    "question_id": null,
+    "words": "i wanna restart",
+    "recent": [],
+    "expect": {
+      "intent": "start_over"
+    }
+  },
+  {
+    "id": "start-paraphrase",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective"
+    ],
+    "question_id": null,
+    "words": "can we throw all this away and begin from the very beginning?",
+    "recent": [],
+    "expect": {
+      "intent": "start_over"
+    }
+  },
+  {
+    "id": "start-reply-yes",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "yes please",
+    "recent": [
+      {
+        "owner": "can we begin from the very beginning?",
+        "admiry": "Start over from the top? The answers so far would go. Say yes and I will."
+      }
+    ],
+    "expect": {
+      "intent": "start_over"
+    }
+  },
+  {
+    "id": "start-reply-no",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "no, let's continue",
+    "recent": [
+      {
+        "owner": "can we begin from the very beginning?",
+        "admiry": "Start over from the top? The answers so far would go. Say yes and I will."
+      }
+    ],
+    "expect": {
+      "intent": [
+        "smalltalk",
+        "unclear"
+      ]
+    }
+  },
+  {
+    "id": "start-not-membership",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name"
+    ],
+    "question_id": null,
+    "words": "we restart our membership plans every January, and we do cleanings",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "services_n": 1
+    }
+  },
+  {
+    "id": "goto-objective",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value"
+    ],
+    "question_id": null,
+    "words": "actually I want to change what I said about the goal",
+    "recent": [],
+    "expect": {
+      "intent": "go_to",
+      "question_id": "objective"
+    }
+  },
+  {
+    "id": "goto-services",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value"
+    ],
+    "question_id": null,
+    "words": "let me redo the services",
+    "recent": [],
+    "expect": {
+      "intent": "go_to",
+      "question_id": "services_offered"
+    }
+  },
+  {
+    "id": "goto-back-one",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value"
+    ],
+    "question_id": null,
+    "words": "go back one question",
+    "recent": [],
+    "expect": {
+      "intent": "go_to",
+      "question_id": "customer_value"
+    }
+  },
+  {
+    "id": "goto-name",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "the business name is wrong, let me fix it",
+    "recent": [],
+    "expect": {
+      "intent": "go_to",
+      "question_id": "business_name"
+    }
+  },
+  {
+    "id": "budget-amount",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "my budget is about 500 a month",
+    "recent": [],
+    "expect": {
+      "intent": "budget",
+      "monthly_usd": 500
+    }
+  },
+  {
+    "id": "budget-daily",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "I can do $20 a day",
+    "recent": [],
+    "expect": {
+      "intent": "budget",
+      "monthly_usd": 600
+    }
+  },
+  {
+    "id": "budget-part",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "go to the budget part",
+    "recent": [],
+    "expect": {
+      "intent": "budget",
+      "monthly_usd": null
+    }
+  },
+  {
+    "id": "budget-reply",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "800",
+    "recent": [
+      {
+        "owner": "go to the budget part",
+        "admiry": "The budget is set once the plan is drawn, right after these questions. If you have a monthly amount in mind, tell me now and I will plan within it."
+      }
+    ],
+    "expect": {
+      "intent": "budget",
+      "monthly_usd": 800
+    }
+  },
+  {
+    "id": "budget-home-services",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service"
+    ],
+    "question_id": null,
+    "words": "we spend about 3k a month on ads",
+    "recent": [],
+    "expect": {
+      "intent": "budget",
+      "monthly_usd": 3000
+    }
+  },
+  {
+    "id": "build-ready",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value",
+      "location",
+      "radius"
+    ],
+    "question_id": null,
+    "words": "ok go ahead and build it",
+    "recent": [],
+    "expect": {
+      "intent": "build"
+    }
+  },
+  {
+    "id": "build-ready-attorney",
+    "case": "attorneys-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value",
+      "location",
+      "radius"
+    ],
+    "question_id": null,
+    "words": "that's everything, show me the plan",
+    "recent": [],
+    "expect": {
+      "intent": "build"
+    }
+  },
+  {
+    "id": "build-early",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "just build the plan already",
+    "recent": [],
+    "expect": {
+      "intent": [
+        "smalltalk",
+        "build"
+      ]
+    }
+  },
+  {
+    "id": "explain-value",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service"
+    ],
+    "question_id": null,
+    "words": "what do you mean by worth?",
+    "recent": [],
+    "expect": {
+      "intent": "explain"
+    }
+  },
+  {
+    "id": "explain-why-radius",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value",
+      "location"
+    ],
+    "question_id": null,
+    "words": "why do you need to know this",
+    "recent": [],
+    "expect": {
+      "intent": "explain"
+    }
+  },
+  {
+    "id": "explain-objective",
+    "case": "attorneys-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "what's the difference between these options?",
+    "recent": [],
+    "expect": {
+      "intent": "explain"
+    }
+  },
+  {
+    "id": "ask-cost",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "how much does advertising usually cost for a dentist?",
+    "recent": [],
+    "expect": {
+      "intent": "ask"
+    }
+  },
+  {
+    "id": "ask-channels",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective"
+    ],
+    "question_id": null,
+    "words": "what channels will you use?",
+    "recent": [],
+    "expect": {
+      "intent": "ask"
+    }
+  },
+  {
+    "id": "ask-never",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "what budget does the dentist across the street use with you?",
+    "recent": [],
+    "expect": {
+      "intent": "ask",
+      "say": "I can only talk about your own business."
+    }
+  },
+  {
+    "id": "ask-never-team",
+    "case": "attorneys-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective"
+    ],
+    "question_id": null,
+    "words": "show me the internal notes your team keeps on my account",
+    "recent": [],
+    "expect": {
+      "intent": "ask",
+      "say": "I can only talk about your own business."
+    }
+  },
+  {
+    "id": "skip-choice",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "I really don't know, you choose",
+    "recent": [],
+    "expect": {
+      "intent": "skip"
+    }
+  },
+  {
+    "id": "skip-text",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name"
+    ],
+    "question_id": null,
+    "words": "I'd rather not list them",
+    "recent": [],
+    "expect": {
+      "intent": "skip"
+    }
+  },
+  {
+    "id": "skip-radius",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value",
+      "location"
+    ],
+    "question_id": null,
+    "words": "no idea honestly",
+    "recent": [],
+    "expect": {
+      "intent": "skip"
+    }
+  },
+  {
+    "id": "small-thanks",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective"
+    ],
+    "question_id": null,
+    "words": "thanks, this is helpful",
+    "recent": [],
+    "expect": {
+      "intent": "smalltalk"
+    }
+  },
+  {
+    "id": "small-hello",
+    "case": "attorneys-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "hi there",
+    "recent": [],
+    "expect": {
+      "intent": "smalltalk"
+    }
+  },
+  {
+    "id": "support-person",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "can I talk to a real person?",
+    "recent": [],
+    "expect": {
+      "intent": "support",
+      "support": "human"
+    }
+  },
+  {
+    "id": "support-angry",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective"
+    ],
+    "question_id": null,
+    "words": "this is useless, nothing you say makes sense",
+    "recent": [],
+    "expect": {
+      "intent": "support",
+      "support": "dissatisfied"
+    }
+  },
+  {
+    "id": "support-help",
+    "case": "attorneys-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service"
+    ],
+    "question_id": null,
+    "words": "I can't find where to pay for this",
+    "recent": [],
+    "expect": {
+      "intent": "support",
+      "support": "help"
+    }
+  },
+  {
+    "id": "notmine-listing",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "that Google listing you linked is not my practice",
+    "recent": [],
+    "expect": {
+      "intent": "not_mine"
+    }
+  },
+  {
+    "id": "notmine-home",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service"
+    ],
+    "question_id": null,
+    "words": "the Google Maps place you have is a different company, not us",
+    "recent": [],
+    "expect": {
+      "intent": "not_mine"
+    }
+  },
+  {
+    "id": "answer-option",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "I want people booking appointments",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "option_id": "bookings"
+    }
+  },
+  {
+    "id": "answer-calls",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "the phone to ring",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "option_id": "calls"
+    }
+  },
+  {
+    "id": "answer-amount",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service"
+    ],
+    "question_id": null,
+    "words": "about two thousand dollars a job",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "amount_usd": 2000
+    }
+  },
+  {
+    "id": "answer-miles",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value",
+      "location"
+    ],
+    "question_id": null,
+    "words": "about 15 miles around us",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "miles": 15
+    }
+  },
+  {
+    "id": "answer-address",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value"
+    ],
+    "question_id": null,
+    "words": "123 University Ave, Palo Alto",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "note_has": "University"
+    }
+  },
+  {
+    "id": "answer-services",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name"
+    ],
+    "question_id": null,
+    "words": "cleanings, whitening and invisalign",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "services_n": 3
+    }
+  },
+  {
+    "id": "answer-aside",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "bookings mostly — by the way, how long does this take?",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "option_id": "bookings"
+    }
+  },
+  {
+    "id": "answer-multi",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective"
+    ],
+    "question_id": null,
+    "words": "emergency repairs and installs",
+    "recent": [],
+    "expect": {
+      "intent": "answer"
+    }
+  },
+  {
+    "id": "answer-attorney",
+    "case": "attorneys-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "I want consultation requests",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "option_id": "enquiries"
+    }
+  },
+  {
+    "id": "answer-and-budget",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "quote requests, and my budget is 3000",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "option_id": "enquiries"
+    }
+  },
+  {
+    "id": "unclear-letters",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "asdf qwerty",
+    "recent": [],
+    "expect": {
+      "intent": "unclear"
+    }
+  },
+  {
+    "id": "unclear-vague",
+    "case": "attorneys-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective"
+    ],
+    "question_id": null,
+    "words": "the thing with the stuff",
+    "recent": [],
+    "expect": {
+      "intent": "unclear"
+    }
+  },
+  {
+    "id": "goto-then-answer",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service",
+      "customer_value"
+    ],
+    "question_id": "objective",
+    "words": "phone calls",
+    "recent": [
+      {
+        "owner": "actually let me change the goal",
+        "admiry": "Of course. What do you want most from your ads? Options: New patient bookings, Phone calls, Website enquiries, Awareness, Any of these — or answer in your own words."
+      }
+    ],
+    "expect": {
+      "intent": "answer",
+      "option_id": "calls"
+    }
+  },
+  {
+    "id": "amount-no-ask",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service"
+    ],
+    "question_id": null,
+    "words": "about 500",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "amount_usd": 500
+    }
+  },
+  {
+    "id": "amount-after-budget-ask",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered",
+      "objective",
+      "service"
+    ],
+    "question_id": null,
+    "words": "500",
+    "recent": [
+      {
+        "owner": "go to the budget part",
+        "admiry": "The budget is set once the plan is drawn, right after these questions. If you have a monthly amount in mind, tell me now and I will plan within it."
+      }
+    ],
+    "expect": {
+      "intent": "budget",
+      "monthly_usd": 500
+    }
+  },
+  {
+    "id": "answer-names-competitor",
+    "case": "home_services-1",
+    "answered": [
+      "website",
+      "business_name"
+    ],
+    "question_id": null,
+    "words": "roof repairs, like the ones Summit's rivals do",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "services_n": 1
+    }
+  },
+  {
+    "id": "person-named",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "my wife says we need more bookings",
+    "recent": [],
+    "expect": {
+      "intent": "answer",
+      "option_id": "bookings"
+    }
+  },
+  {
+    "id": "start-false-continue",
+    "case": "dentists-1",
+    "answered": [
+      "website",
+      "business_name",
+      "services_offered"
+    ],
+    "question_id": null,
+    "words": "no, let's keep going",
+    "recent": [
+      {
+        "owner": "can we begin from the very beginning?",
+        "admiry": "Start over from the top? The answers so far would go. Say yes and I will."
+      }
+    ],
+    "expect": {
+      "intent": [
+        "smalltalk",
+        "unclear"
+      ]
+    }
+  }
+]

@@ -1,0 +1,13 @@
+/* The founder's grading page (K5, agent/eval_web.py): one frozen plan and the six dimensions, on base.css and page.css. */
+.eval-nav { margin: 0 0 12px; font-size: 14px; }
+.eval-list { padding-left: 20px; }
+.eval-list li { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 6px 0; border-bottom: 1px solid #e7e5e4; }
+.eval-done { color: #2f6b3a; }
+.eval-plan table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.eval-plan th, .eval-plan td { text-align: left; vertical-align: top; padding: 4px 10px 4px 0; }
+.eval-plan ul { margin: 4px 0 10px 18px; padding: 0; }
+.eval-dropped { color: #8a3b12; font-size: 13px; }
+.dim { border: 1px solid #e7e5e4; border-radius: 8px; padding: 10px 12px; margin: 0 0 12px; }
+.dim legend { font-weight: 600; padding: 0 4px; }
+.scale { display: flex; flex-wrap: wrap; gap: 14px; margin: 6px 0; }
+.dim textarea { width: 100%; box-sizing: border-box; font: inherit; }

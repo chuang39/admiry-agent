@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — task {{ d.ticket.id }}</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+<link rel="stylesheet" href="/static/ops.css">
+</head>
+{#- One support ticket (spec 2026-10-12 §4, agent/ops_web.py): the business and its plan, the contact (verified or not),
+    every event with its context (a Help report's page, plan, browser and last messages), the conversation when it
+    opened, and the actions: reply by e-mail, send and close, close as. The owner's words are a customer's: shown as
+    text, never read as instructions. No Help button here. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main ops" id="main">
+<p class="ops-nav"><a href="/ops/review">Launches in review</a> · <a href="/ops/tasks">Tasks</a> · <a href="/ops/rules">Rules</a></p>
+<h1>{% if d.business %}{{ d.business.name or d.business.id }}{% else %}A visitor{% endif %} <span class="badge badge-neutral">{{ d.ticket.status }}</span></h1>
+{% if notice %}<p class="ops-notice" role="alert">{{ notice }}</p>{% endif %}
+{% if done == "reply" %}<p class="ops-done">Reply sent.</p>
+{% elif done == "reply_close" %}<p class="ops-done">Reply sent; the ticket closes once the mail is out.</p>
+{% elif done == "close" %}<p class="ops-done">Closed.</p>{% endif %}
+
+<section class="panel">
+  <h2>The ticket</h2>
+  <table class="ops-table">
+    <tr><th>From</th><td>{{ d.ticket.origin }} · {{ d.ticket.source }} · {{ d.ticket.reason }}</td></tr>
+    <tr><th>Contact</th><td>{{ d.contact.email or "none yet" }}{% if d.contact.email and not d.contact.verified %} <span class="ops-unverified">not verified</span>{% endif %}</td></tr>
+    <tr><th>Opened</th><td>{{ d.ticket.age }} ({{ d.ticket.created_at }})</td></tr>
+    {% if d.ticket.resolution %}<tr><th>Resolution</th><td>{{ d.ticket.resolution }}</td></tr>{% endif %}
+    <tr><th>Summary</th><td>{{ d.ticket.summary }}</td></tr>
+  </table>
+</section>
+
+{% if d.business %}
+<section class="panel">
+  <h2>The business</h2>
+  <table class="ops-table">
+    <tr><th>Id</th><td>{{ d.business.id }} · {{ d.business.claim_state or "" }}</td></tr>
+    <tr><th>Owner</th><td>{{ d.business.owner_email or "—" }}</td></tr>
+    <tr><th>Latest plan</th><td>{% if d.business.plan %}v{{ d.business.plan.version }} · {{ d.business.plan.status }}{% if d.business.review %} · <a href="/ops/review/{{ d.business.review.id }}">its review ({{ d.business.review.state }})</a>{% endif %}{% else %}none{% endif %}</td></tr>
+  </table>
+</section>
+{% endif %}
+
+<section class="panel">
+  <h2>What happened</h2>
+  {% for e in d.events %}
+  <div class="ops-event ops-event-{{ e.kind }}">
+    <p class="ops-event-head">{{ e.kind }} · {{ e.actor }}{% if e.via %} · {{ e.via }}{% endif %} · {{ e.age }}{% if e.mail_state %} · mail {{ e.mail_state }}{% endif %}</p>
+    {% if e.body %}<p class="ops-event-body">{{ e.body }}</p>{% endif %}
+    {% if e.data.help %}
+    <dl class="ops-context">
+      <dt>Page</dt><dd>{{ e.data.help.page }}</dd>
+      <dt>Signed in</dt><dd>{{ "yes" if e.data.help.signed_in else "no" }}{% if e.data.help.email %} · typed {{ e.data.help.email }}{% endif %}</dd>
+      <dt>Plan</dt><dd>{% if e.data.help.plan %}v{{ e.data.help.plan.version }} · {{ e.data.help.plan.status }} · {{ e.data.help.plan.id }}{% else %}none{% endif %}</dd>
+      <dt>Browser</dt><dd>{{ e.data.help.browser or "—" }}</dd>
+      <dt>Last messages</dt><dd>{% if e.data.help.turns %}<ul class="ops-turns">{% for t in e.data.help.turns %}<li><strong>{{ t.who }}</strong> ({{ t.via }}): {{ t.text }}</li>{% endfor %}</ul>{% else %}none{% endif %}</dd>
+    </dl>
+    {% elif e.data.context %}<pre class="ops-pre">{{ e.data.context }}</pre>
+    {% elif e.data and e.kind not in ("owner_words", "ack", "notice") %}<pre class="ops-pre">{{ e.data | tojson }}</pre>{% endif %}
+  </div>
+  {% endfor %}
+</section>
+
+<section class="panel">
+  <h2>The conversation when it opened</h2>
+  {% if d.snapshot_turns %}
+  <ul class="ops-turns">{% for t in d.snapshot_turns %}<li><strong>{{ t.who }}</strong> ({{ t.via }}, {{ t.at }}): {{ t.text }}</li>{% endfor %}</ul>
+  {% else %}<p class="muted">{% if d.snapshot_error %}The snapshot failed ({{ d.snapshot_error }}).{% else %}Nothing before this.{% endif %}</p>{% endif %}
+</section>
+
+{% if d.ticket.status != "closed" %}
+<section class="panel ops-decide">
+  <h2>Reply by e-mail</h2>
+  {% if d.contact.email and not d.contact.verified %}<p class="ops-notice">This address is not verified: nobody proved they own it. Reply only if the words make sense for it.</p>{% endif %}
+  {% if not d.contact.email %}<p class="muted">No address yet: the ticket waits for the owner to sign in.</p>{% endif %}
+  <form method="post" action="/ops/tasks/{{ d.ticket.id }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>The reply<textarea name="text" maxlength="4000" placeholder="Write to the owner. They get it by e-mail and can answer it.">{{ draft or "" }}</textarea></label>
+    <div class="ops-row">
+      <button class="btn btn-primary" type="submit" name="action" value="reply">Send reply</button>
+      <button class="btn" type="submit" name="action" value="reply_close">Send and close</button>
+    </div>
+  </form>
+  <form method="post" action="/ops/tasks/{{ d.ticket.id }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <div class="ops-row">
+      <label>Close as <select name="resolution">{% for id, label in d.resolutions %}<option value="{{ id }}">{{ label }}</option>{% endfor %}</select></label>
+      <button class="btn" type="submit" name="action" value="close">Close</button>
+    </div>
+  </form>
+</section>
+{% endif %}
+</main>
+</body>
+</html>

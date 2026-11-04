@@ -1,0 +1,34 @@
+{#- The dental home page (A3p-6 batch 1 Q3): hero, trust strip, the emergency line (when the practice gave one; in
+    Calm also a call band above the hero on a phone), services, the dentist, new patients, reviews, insurance and
+    payment, the office, questions, and the appointment request; each only with the facts it needs. No smile gallery
+    (Q24: before-and-after photos need real patients and their consent). -#}
+{% extends "sites/_layout.html" %}
+{% import "sites/_components.html" as c with context %}
+{% block main %}
+{{ c.emergency_top() }}
+{{ c.page_hero(w.home.eyebrow, hero_photo) }}
+{{ c.trust_strip() }}
+{{ c.emergency() }}
+<section class="services" data-section="services">
+  <div class="wrap">
+    {{ c.heading(w.home.services_heading) }}
+    {%- if w.home.services_lead %}
+    <p class="section-lead">{{ w.home.services_lead }}</p>
+    {%- endif %}
+    <ul class="cards">
+      {%- for s in services %}
+      {{ c.service_card(s) }}
+      {%- endfor %}
+    </ul>
+  </div>
+</section>
+{{ c.dentist() }}
+{{ c.new_patients() }}
+{{ c.reviews(f.reviews[:3], w.home.reviews_heading) }}
+{{ c.insurance() }}
+{{ c.office_strip() }}
+{{ c.faq(w.home.faq, w.home.faq_heading) }}
+<div class="wrap form-wrap">
+{{ c.request_form() }}
+</div>
+{% endblock %}

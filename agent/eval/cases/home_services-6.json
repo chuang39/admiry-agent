@@ -1,0 +1,90 @@
+{
+  "id": "home_services-6",
+  "vertical": "home_services",
+  "opening": "Prairie Kitchen & Bath, a design-build remodeler in Naperville. We want booked in-home consultations for kitchens, within 20 miles. $5,000 a month.",
+  "monthly_budget_usd": 5000,
+  "knowledge": {
+    "name": "Prairie Kitchen & Bath",
+    "category": "home_services",
+    "category_detail": "kitchen and bath remodeler",
+    "service_area": [
+      "Naperville",
+      "Aurora",
+      "Wheaton"
+    ],
+    "services": [
+      {
+        "name": "Kitchen remodeling",
+        "intent_phrases": [
+          "kitchen remodel naperville",
+          "kitchen renovation contractor",
+          "kitchen remodeling near me"
+        ],
+        "price_hint": "from $35,000"
+      },
+      {
+        "name": "Bathroom remodeling",
+        "intent_phrases": [
+          "bathroom remodel naperville",
+          "walk in shower conversion"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Sat 9-5",
+    "phone": "630-555-0145",
+    "website": null,
+    "pricing_hints": [
+      "kitchens from $35,000"
+    ],
+    "typical_customer_value_usd": 35000,
+    "usp": [
+      "One team from design to finish",
+      "3D design before you commit"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": 3,
+      "monthly_budget_usd": 5000,
+      "focus_services": [
+        "Kitchen remodeling"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_home_services_6",
+      "name": "Prairie Kitchen & Bath",
+      "address": "100 W Jefferson Ave, Naperville, IL 60540",
+      "lat": 41.7731,
+      "lng": -88.1497,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Prairie Kitchen & Bath"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "bookings"
+    },
+    "service": {
+      "choice": "svc_kitchen_remodeling"
+    },
+    "customer_value": {
+      "choice": "3000_plus"
+    },
+    "radius": {
+      "choice": "r20"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

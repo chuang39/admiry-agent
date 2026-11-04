@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — rules</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+<link rel="stylesheet" href="/static/ops.css">
+</head>
+{#- The refusal rules (spec 2026-10-12 §2.5, agent/ops_web.py): what the daily summary proposed, with its evidence; the
+    active rules; a rule written by hand; the last summaries. Admiry's team only (AGENT_ADMIN_EMAILS). Google's topics
+    are shown here and nowhere an owner reads. No Help button here. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main ops" id="main">
+<p class="ops-nav"><a href="/ops/review">Launches in review</a> · <a href="/ops/tasks">Tasks</a> · <a href="/ops/rules" aria-current="page">Rules</a></p>
+<h1>Rules</h1>
+{% if notice %}<p class="ops-notice" role="alert">{{ notice }}</p>{% endif %}
+{% if done %}<p class="ops-done">Done.</p>{% endif %}
+
+<section class="panel">
+  <h2>Waiting for a decision · {{ v.proposed | length }}</h2>
+  {% if v.proposed %}
+  <table class="ops-table">
+    <tr><th>Rule</th><th>Applies to</th><th>Why</th><th>Evidence</th><th>Decide</th></tr>
+    {% for r in v.proposed %}
+    <tr id="{{ r.id }}">
+      <td><code>{{ r.kind }}</code> {{ r.value }}{% if r.tell %} <span class="muted">({{ r.tell }})</span>{% endif %}<br><span class="muted">{{ r.proposed_by }} · asked for {{ r.level }}{% if r.topic %} · {{ r.topic }}{% endif %}</span></td>
+      <td>{{ "search phrase" if r.applies_to == "keyword" else r.applies_to }}</td>
+      <td>{{ r.why }}</td>
+      <td>{{ r.evidence.count }} lines · {{ r.evidence.businesses }} businesses{% if r.evidence.note %}<br><span class="muted">{{ r.evidence.note }}</span>{% endif %}{% if r.evidence.model_why %}<br><span class="muted">The model's note: {{ r.evidence.model_why }}</span>{% endif %}</td>
+      <td class="ops-decide">
+        <form method="post" action="/ops/rules"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="rule_id" value="{{ r.id }}"><input type="hidden" name="action" value="approve"><input type="hidden" name="level" value="warn"><button type="submit">Approve as warn</button></form>
+        <form method="post" action="/ops/rules"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="rule_id" value="{{ r.id }}"><input type="hidden" name="action" value="approve"><input type="hidden" name="level" value="block"><button type="submit">Approve as block</button></form>
+        <form method="post" action="/ops/rules"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="rule_id" value="{{ r.id }}"><input type="hidden" name="action" value="reject"><button type="submit">Reject</button></form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="muted">Nothing waits.</p>{% endif %}
+</section>
+
+<section class="panel">
+  <h2>Active · {{ v.active | length }}</h2>
+  {% if v.active %}
+  <table class="ops-table">
+    <tr><th>Rule</th><th>Applies to</th><th>Level</th><th>Why</th><th>Change</th></tr>
+    {% for r in v.active %}
+    <tr id="{{ r.id }}">
+      <td><code>{{ r.kind }}</code> {{ r.value }}{% if r.tell %} <span class="muted">({{ r.tell }})</span>{% endif %}<br><span class="muted">{{ r.proposed_by }}{% if r.topic %} · {{ r.topic }}{% endif %}</span></td>
+      <td>{{ "search phrase" if r.applies_to == "keyword" else r.applies_to }}</td>
+      <td><span class="badge badge-neutral">{{ r.level }}</span></td>
+      <td>{{ r.why }}</td>
+      <td class="ops-decide">
+        <form method="post" action="/ops/rules"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="rule_id" value="{{ r.id }}"><input type="hidden" name="action" value="level"><input type="hidden" name="level" value="{{ 'block' if r.level == 'warn' else 'warn' }}"><button type="submit">Make it {{ 'block' if r.level == 'warn' else 'warn' }}</button></form>
+        <form method="post" action="/ops/rules"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="rule_id" value="{{ r.id }}"><input type="hidden" name="action" value="retire"><button type="submit">Retire</button></form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="muted">No active rule.</p>{% endif %}
+</section>
+
+<section class="panel">
+  <h2>Add a rule</h2>
+  <form method="post" action="/ops/rules" class="ops-row">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="add">
+    <label>Kind
+      <select name="kind">{% for k in v.kinds %}<option value="{{ k }}">{{ k }}</option>{% endfor %}</select>
+    </label>
+    <label>Word or phrase, or a shape's id
+      <input name="value" list="shapes" required>
+      <datalist id="shapes">{% for s in v.shapes %}<option value="{{ s.id }}">{{ s.tell }}</option>{% endfor %}</datalist>
+    </label>
+    <label>Applies to
+      <select name="applies_to">{% for a in v.applies %}<option value="{{ a }}">{{ "search phrase" if a == "keyword" else a }}</option>{% endfor %}</select>
+    </label>
+    <label>Level
+      <select name="level">{% for l in v.levels %}<option value="{{ l }}">{{ l }}</option>{% endfor %}</select>
+    </label>
+    <label>Why, in the owner's words
+      <input name="why" required maxlength="160">
+    </label>
+    <label>Google's topic (optional)
+      <input name="topic">
+    </label>
+    <button type="submit">Add the rule</button>
+  </form>
+  <p class="muted">The shapes: {% for s in v.shapes %}<code>{{ s.id }}</code> {{ s.tell }}{% if not loop.last %}; {% endif %}{% endfor %}.</p>
+</section>
+
+<section class="panel">
+  <h2>Daily summaries</h2>
+  {% if v.summaries %}
+  <table class="ops-table">
+    <tr><th>Day</th><th>Refusals</th><th>Businesses</th><th>Lines</th><th>Hits</th><th>Misses</th><th>Live disapprovals</th><th>Model</th><th>Proposed</th></tr>
+    {% for s in v.summaries %}
+    <tr>
+      <td>{{ s.day }}</td>
+      <td>{{ s.counts.refusals }}</td>
+      <td>{{ s.counts.businesses }}</td>
+      <td>{{ s.lines | length }}</td>
+      <td>{{ s.rules.hits.values() | sum if s.rules.hits else 0 }}</td>
+      <td>{{ s.rules.misses }}</td>
+      <td>{{ s.counts.live.ads if s.counts.live else 0 }}</td>
+      <td>{{ s.model }} · {{ s.calls }} call{{ "" if s.calls == 1 else "s" }}</td>
+      <td>{% for p in s.proposals %}<a href="#{{ p }}">{{ p }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="muted">No summary yet.</p>{% endif %}
+</section>
+</main>
+</body>
+</html>

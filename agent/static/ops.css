@@ -1,0 +1,33 @@
+/* The admins' launch review pages (L1, agent/ops_web.py), on base.css and page.css. */
+.ops-nav { margin: 0 0 12px; font-size: 14px; }
+/* the queue's seven columns (R26, the browser look): together wider than a phone's card even wrapped, so the table
+   scrolls in place rather than taking the panel, and the page, sideways -- the same promise .wide (page.css) and
+   .table-wrap (home.css) make elsewhere. */
+.ops-table { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 14px; }
+.ops-table th, .ops-table td { text-align: left; vertical-align: top; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line-soft); }
+.ops-held, .ops-rejected { color: var(--error); }
+.ops-passed { color: var(--ok); }
+.ops-notice { color: var(--error); font-weight: 600; }
+.ops-done { color: var(--ok); font-weight: 600; }
+.ops-step pre { white-space: pre-wrap; font-family: var(--mono); font-size: 12px; background: var(--well); padding: 8px; }
+.ops-decide form { display: grid; gap: 8px; margin: 0 0 16px; }
+.ops-decide textarea { width: 100%; min-height: 4rem; box-sizing: border-box; font: inherit; }
+/* /ops/tasks (spec 2026-10-12 §4): the tabs, the rows, a ticket's events and the reply row. */
+.ops-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 16px; font-size: 14px; }
+.ops-tab { padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--soft); }
+.ops-tab.current { border-color: var(--accent); color: var(--accent-ink); font-weight: 500; }
+.ops-tasks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ops-task { padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.ops-task-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+.ops-task-who { font-size: 15px; font-weight: 600; }
+.ops-task-line { margin: 6px 0 0; font-size: 14px; color: var(--soft); white-space: pre-wrap; }
+.ops-unverified { margin-left: 6px; padding: 1px 7px; border-radius: 9px; background: #FBEAEA; color: var(--error); font-size: 12px; }
+.ops-event { padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
+.ops-event-head { margin: 0; font-size: 13px; color: var(--muted); }
+.ops-event-body { margin: 4px 0 0; white-space: pre-wrap; }
+.ops-context { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 8px 0 0; padding: 10px 12px; font-size: 13px; background: var(--well); border-radius: 10px; }
+.ops-context dt { color: var(--muted); }
+.ops-context dd { margin: 0; }
+.ops-turns { margin: 0; padding-left: 18px; font-size: 13px; }
+.ops-pre { white-space: pre-wrap; font-family: var(--mono); font-size: 12px; background: var(--well); padding: 8px; }
+.ops-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }

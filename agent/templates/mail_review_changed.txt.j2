@@ -1,0 +1,10 @@
+{# spec 2026-10-11 §5.1: the owner's e-mail once Admiry removed what Google refused, once per plan version, at the review's pass (roles/reviewer.py _tell_changed) #}
+Google checks every ad against its own rules before it runs, and refused {% if changes|length == 1 %}one part{% else %}{{ changes|length }} parts{% endif %} of your ads:
+
+{% for c in changes %}- {{ c.what|capfirst }}: {{ c.why }}.
+{% endfor %}
+Admiry removed {% if changes|length == 1 %}it{% else %}them{% endif %} so your ads can run. The rest of your ads stay exactly as you agreed, and there is nothing you need to do.
+
+Your plan, with what changed: {{ link }}
+
+If you would rather Admiry hold your ads instead, write to hello@admiry.ai and it will. Write any time.

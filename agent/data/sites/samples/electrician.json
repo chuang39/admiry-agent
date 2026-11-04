@@ -1,0 +1,296 @@
+{
+  "family": "home_services",
+  "trade": "electrical",
+  "facts": {
+    "name": "Brightline Electric",
+    "phone": "(704) 555-0199",
+    "city": "Charlotte",
+    "state": "NC",
+    "service_area": [
+      "Charlotte",
+      "Matthews",
+      "Mint Hill",
+      "Huntersville",
+      "Concord",
+      "Pineville",
+      "Indian Trail"
+    ],
+    "storefront": false,
+    "hours": [
+      "Monday to Friday, 8 am to 6 pm",
+      "Saturday, 9 am to 1 pm",
+      "Sunday, closed"
+    ],
+    "about": "Brightline Electric is a family-run electrical company in Charlotte. We upgrade panels, fix wiring and install lighting and chargers for homes across the area.",
+    "services": [
+      {
+        "slug": "panel-upgrades",
+        "name": "Panel upgrades",
+        "lead": true,
+        "summary": "Old or full panels replaced so the home has the power it needs.",
+        "includes": [
+          "A load check of the home",
+          "Permit and inspection",
+          "Labeled breakers"
+        ],
+        "signs": [
+          "Breakers that trip often",
+          "A fuse box",
+          "No room for new circuits"
+        ]
+      },
+      {
+        "slug": "wiring-repair",
+        "name": "Wiring repair",
+        "lead": true,
+        "summary": "Faulty wiring traced and repaired safely, to code.",
+        "includes": [
+          "Circuit testing",
+          "Repair or replacement of damaged wiring",
+          "A safety check when we finish"
+        ],
+        "signs": [
+          "Flickering lights",
+          "Warm outlets or switches",
+          "A burning smell"
+        ]
+      },
+      {
+        "slug": "lighting",
+        "name": "Lighting installation",
+        "lead": true,
+        "summary": "Indoor and outdoor lights, recessed lights and fixtures put in right.",
+        "includes": [
+          "Layout help",
+          "Fixture and dimmer install",
+          "Clean-up after the job"
+        ],
+        "signs": [
+          "Dark rooms",
+          "Old fixtures",
+          "Outdoor areas with no light"
+        ]
+      },
+      {
+        "slug": "ev-chargers",
+        "name": "EV charger installation",
+        "summary": "Home chargers for electric cars, with the circuit they need."
+      },
+      {
+        "slug": "ceiling-fans",
+        "name": "Ceiling fans",
+        "summary": "Ceiling fans installed or replaced, balanced and quiet."
+      },
+      {
+        "slug": "outlets",
+        "name": "Outlets and switches",
+        "summary": "Outlets and switches repaired, added or upgraded."
+      }
+    ],
+    "licence": "NC License #00000",
+    "years": 10,
+    "warranty": "1-year workmanship warranty",
+    "insured": true,
+    "free_estimate": "Free estimates",
+    "reviews": [
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      }
+    ]
+  },
+  "words": {
+    "home": {
+      "eyebrow": "family-run electrician in charlotte",
+      "headline": "Panel upgrades in Charlotte",
+      "lead": "Panel upgrades, wiring repair and lighting for Charlotte homes.",
+      "services_heading": "Our electrical services",
+      "services_lead": "Panel, wiring and lighting help for homes in and around Charlotte.",
+      "why_heading": "Why choose Brightline Electric",
+      "why_points": [
+        "Family-run company with 10 years in business.",
+        "Free estimates for home electrical work.",
+        "1-year workmanship warranty.",
+        "Licensed and general liability insured for home electrical work."
+      ],
+      "how_heading": "How it works",
+      "steps": [
+        {
+          "title": "Get in touch",
+          "text": "Call or send the form and tell us what is happening at your home."
+        },
+        {
+          "title": "Plan the job",
+          "text": "We visit, check the issue and give a free estimate for the work."
+        },
+        {
+          "title": "We complete the work",
+          "text": "We do the work to code, test it and clean up when done."
+        }
+      ],
+      "about_heading": "Meet Brightline Electric",
+      "about_text": "Brightline Electric is a family-run electrical company in Charlotte with 10 years in business. We upgrade panels, fix wiring and install lighting and chargers for homes across the area.",
+      "area_heading": "Where we work",
+      "area_text": "We serve Charlotte and nearby towns including Matthews, Mint Hill, Huntersville, Concord, Pineville and Indian Trail.",
+      "faq": [
+        {
+          "q": "Do you offer free estimates?",
+          "a": "Free estimates are offered. The business answers questions about cost on the phone."
+        },
+        {
+          "q": "What is included with a panel upgrade?",
+          "a": "Our panel work includes a load check of the home, permit and inspection, and labeled breakers."
+        },
+        {
+          "q": "How do I know if my wiring needs repair?",
+          "a": "Signs include flickering lights, warm outlets or switches, or a burning smell. Call to talk through what you see."
+        },
+        {
+          "q": "Do you install indoor and outdoor lighting?",
+          "a": "Yes, we install indoor and outdoor lights, recessed lights and fixtures, with layout help and clean-up after the job."
+        },
+        {
+          "q": "Do you warranty your work?",
+          "a": "Our work carries a 1-year workmanship warranty. The business answers detail questions on the phone."
+        }
+      ],
+      "cta_heading": "Need panel, wiring or lighting help",
+      "reviews_heading": "",
+      "work_heading": "",
+      "faq_heading": "",
+      "new_patients_heading": "",
+      "insurance_heading": "",
+      "office_heading": "",
+      "cta_text": "Reach out for a free estimate and talk through your project."
+    },
+    "about": {
+      "headline": "A family-run electric team in Charlotte",
+      "lead": "We handle panels, wiring, lights and chargers for local homes.",
+      "story": [
+        "Brightline Electric is a family-run electrical company in Charlotte. We work in homes across the area on panels, wiring, lighting and chargers.",
+        "We have 10 years in business. Our work includes free estimates and a 1-year workmanship warranty."
+      ],
+      "values_heading": "How we work",
+      "values": [
+        "Show up on time and leave the space clean.",
+        "Explain the work in plain words.",
+        "Follow code and permit rules."
+      ],
+      "community": "Serving homeowners in Charlotte, Matthews, Mint Hill, Huntersville, Concord, Pineville and Indian Trail."
+    },
+    "services": {
+      "headline": "Electrical services in Charlotte",
+      "lead": "Panels, wiring, lighting and more for homes around Charlotte.",
+      "intro": "Brightline Electric is a family-run company serving Charlotte and nearby towns. We work on panels, wiring, lighting, chargers, fans, outlets and switches for homes."
+    },
+    "contact": {
+      "headline": "Contact Brightline Electric",
+      "lead": "Tell us about your panel, wiring or lighting job in Charlotte.",
+      "response_line": "We reply during open hours to set up your free estimate."
+    },
+    "service_pages": [
+      {
+        "slug": "panel-upgrades",
+        "lead": "Old or full panels replaced for Charlotte homes.",
+        "what": "A panel upgrade replaces an old or full panel so the home has the power it needs. Work includes permit and inspection, and breakers are labeled when done.",
+        "signs": [
+          "Breakers that trip often",
+          "A fuse box",
+          "No room for new circuits"
+        ],
+        "includes": [
+          "A load check of the home",
+          "Permit and inspection",
+          "Labeled breakers"
+        ],
+        "faq": [
+          {
+            "q": "What happens during a panel upgrade?",
+            "a": "Old or full panels are replaced so the home has the power it needs. We start with a load check of the home."
+          },
+          {
+            "q": "Do I need a panel upgrade?",
+            "a": "Signs include breakers that trip often, a fuse box, or no room for new circuits."
+          }
+        ],
+        "signs_heading": "Signs you may need it",
+        "includes_heading": "What it includes",
+        "faq_heading": ""
+      },
+      {
+        "slug": "wiring-repair",
+        "lead": "Faulty wiring traced and repaired for Charlotte homes.",
+        "what": "Faulty wiring is traced and repaired safely, to code. We test circuits, fix damaged wiring and run a safety check when we finish.",
+        "signs": [
+          "Flickering lights",
+          "Warm outlets or switches",
+          "A burning smell"
+        ],
+        "includes": [
+          "Circuit testing",
+          "Repair or replacement of damaged wiring",
+          "A safety check when we finish"
+        ],
+        "faq": [
+          {
+            "q": "How do you repair wiring?",
+            "a": "We test circuits, then repair or replace damaged wiring. We do a safety check when we finish."
+          },
+          {
+            "q": "How long does a wiring repair take?",
+            "a": "The business answers questions about timing on the phone after hearing about your home."
+          }
+        ],
+        "signs_heading": "Signs you may need it",
+        "includes_heading": "What it includes",
+        "faq_heading": ""
+      },
+      {
+        "slug": "lighting",
+        "lead": "Indoor and outdoor lighting installed for Charlotte homes.",
+        "what": "Indoor and outdoor lights, recessed lights and fixtures put in right. We help with layout, install fixtures and dimmers, and clean up after the job.",
+        "signs": [
+          "Dark rooms",
+          "Old fixtures",
+          "Outdoor areas with no light"
+        ],
+        "includes": [
+          "Layout help",
+          "Fixture and dimmer install",
+          "Clean-up after the job"
+        ],
+        "faq": [
+          {
+            "q": "What kinds of lights do you install?",
+            "a": "We install indoor and outdoor lights, recessed lights and fixtures. We offer layout help and clean up after the job."
+          },
+          {
+            "q": "Is new lighting right for my home?",
+            "a": "Signs include dark rooms, old fixtures, or outdoor areas with no light."
+          },
+          {
+            "q": "Can you install dimmers with new fixtures?",
+            "a": "Yes, fixture and dimmer install is part of the work."
+          }
+        ],
+        "signs_heading": "Signs you may need it",
+        "includes_heading": "What it includes",
+        "faq_heading": ""
+      }
+    ],
+    "cta_label": "Call Brightline Electric",
+    "book_label": "Book a visit"
+  },
+  "style_words": {}
+}

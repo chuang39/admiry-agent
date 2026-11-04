@@ -1,0 +1,42 @@
+{#- The about page (blueprint §4.3): who we are with both calls, the trust facts, the story, the team (the owner's
+    photo only, T11), how we work, the community and the towns, the reviews, the final call. -#}
+{% extends "sites/_layout.html" %}
+{% import "sites/_components.html" as c with context %}
+{% block main %}
+{{ c.page_hero(none, about_photo) }}
+{{ c.trust_strip() }}
+{%- if w.about.story or f.about %}
+<section class="story" data-section="story">
+  <div class="wrap story-in">
+    <div class="prose">
+      {%- for paragraph in w.about.story %}
+      <p>{{ paragraph }}</p>
+      {%- else %}
+      <p>{{ f.about }}</p>
+      {%- endfor %}
+      {%- if f.warranty %}
+      <p class="callout">{{ f.warranty }}</p>
+      {%- endif %}
+    </div>
+    {%- if team_photo %}
+    <div class="story-media">{{ c.photo(team_photo, card_sizes) }}</div>
+    {%- endif %}
+  </div>
+</section>
+{%- endif %}
+{%- if w.about.values %}
+<section class="values" data-section="values">
+  <div class="wrap">
+    {{ c.heading(w.about.values_heading) }}
+    <ul class="checks checks--grid">
+      {%- for v in w.about.values %}
+      <li>{{ v }}</li>
+      {%- endfor %}
+    </ul>
+  </div>
+</section>
+{%- endif %}
+{{ c.area(w.home.area_heading, w.about.community, with_hours=false) }}
+{{ c.reviews(f.reviews, w.home.reviews_heading) }}
+{{ c.cta_band() }}
+{% endblock %}

@@ -1,0 +1,92 @@
+{
+  "id": "attorneys-6",
+  "vertical": "attorneys",
+  "opening": "Peachtree DUI Defense in Atlanta. People call right after an arrest; we want those calls within 25 miles. $2,500 a month.",
+  "monthly_budget_usd": 2500,
+  "knowledge": {
+    "name": "Peachtree DUI Defense",
+    "category": "attorneys",
+    "category_detail": "DUI defense attorney",
+    "service_area": [
+      "Atlanta",
+      "Decatur",
+      "Marietta"
+    ],
+    "services": [
+      {
+        "name": "DUI defense",
+        "intent_phrases": [
+          "dui lawyer atlanta",
+          "dui attorney near me",
+          "arrested for dui georgia"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "Traffic tickets",
+        "intent_phrases": [
+          "speeding ticket lawyer atlanta",
+          "super speeder ticket attorney"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Phone answered 24/7",
+    "phone": "404-555-0182",
+    "website": null,
+    "pricing_hints": [
+      "payment plans"
+    ],
+    "typical_customer_value_usd": 3500,
+    "usp": [
+      "Free case review",
+      "Former prosecutor"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "legal"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": 8,
+      "monthly_budget_usd": 2500,
+      "focus_services": [
+        "DUI defense"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_attorneys_6",
+      "name": "Peachtree DUI Defense",
+      "address": "191 Peachtree St NE, Atlanta, GA 30303",
+      "lat": 33.759,
+      "lng": -84.3866,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Peachtree DUI Defense"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "calls"
+    },
+    "service": {
+      "choice": "svc_dui_defense"
+    },
+    "customer_value": {
+      "choice": "3000_10000"
+    },
+    "radius": {
+      "choice": "r25"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

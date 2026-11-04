@@ -1,0 +1,28 @@
+{#- The website's header, shared by the home and Settings (spec 2026-09-29-admiry-settings-redesign §3). Context:
+    signed_in, initial, email, csrf (the web session's), site (the website-link prefix, web.website_prefix).
+    Your ads (`/ads`, spec 2026-10-06) replaced the Campaigns placeholder. -#}
+<header class="top">
+  {% include "_brand.html" %}
+  <nav class="nav" aria-label="Main">
+    <a href="{{ site }}/capabilities">Capabilities</a>
+    <a class="programmatic" href="{{ site }}/programmatic">Programmatic</a>
+    {% if signed_in %}
+    <a href="/ads">Your ads</a>
+    <a class="soon" href="#" aria-disabled="true">Insights</a>
+    <details class="account-menu">
+      <summary aria-label="Your account">{{ initial }}</summary>
+      <div class="menu">
+        <p class="menu-email">{{ email }}</p>
+        <a class="menu-item" href="/ads">Your ads</a>
+        <a class="menu-item" href="/connect">Settings</a>
+        <form method="post" action="/connect/signout">
+          <input type="hidden" name="csrf" value="{{ csrf }}">
+          <button class="menu-item" type="submit">Sign out</button>
+        </form>
+      </div>
+    </details>
+    {% else %}
+    <a class="signin" href="/connect/google/start?next=%2F">Sign in</a>
+    {% endif %}
+  </nav>
+</header>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+{% if site %}<link rel="icon" href="data:,">{% else %}<link rel="icon" href="/icon.svg?v=2" type="image/svg+xml">{% endif %}
+<title>Admiry — Review the change</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/settings.css">
+<link rel="stylesheet" href="/static/your_ads.css">
+<script src="/static/site.js" defer></script>
+</head>
+{% from "_macros.html" import csrf_field with context %}
+{#- The review step of a "Your ads" edit (spec 2026-10-06 §3.2): what the owner approves, exactly -- every platform's
+    amount, the lines that will run and the ones dropped, what each platform does next. Nothing is stored yet; Approve
+    posts the same inputs to /ads/approve. Context: agent/your_ads.py (_review_context). -#}
+<body class="settings ads">
+{% include "_site_header.html" %}
+<div class="settings-wrap">
+  <div class="settings-side"><h1>Review the change</h1><p class="biz-name">{{ headline }}</p></div>
+  <main class="settings-main" id="main">
+    <section id="review" class="card">
+      <h2>{{ headline }}</h2>
+      <h3>Amounts</h3>
+      <table class="payments amounts">
+        <thead><tr><th scope="col">Platform</th><th scope="col" class="num">Now</th><th scope="col" class="num">After</th><th scope="col">A day</th></tr></thead>
+        <tbody>
+        {% for r in rows %}<tr{% if r.changed %} class="changed"{% endif %}><td>{{ r.label }}</td><td class="num">{{ r.old }}</td><td class="num">{% if r.changed %}{{ r.new }}{% else %}unchanged{% endif %}</td><td>{% if r.day %}about {{ r.day }}{% endif %}</td></tr>
+        {% endfor %}<tr class="total"><td>Total a month</td><td class="num">{{ total.old }}</td><td class="num">{% if total.changed %}{{ total.new }}{% else %}unchanged{% endif %}</td><td></td></tr>
+        </tbody>
+      </table>
+      {% if radius %}<h3>Where your ads show</h3><p>Within {{ radius.old }} → {{ radius.new }} miles of the business.</p>{% endif %}
+      {% for w in words %}
+      <h3>{{ w.label }}: the lines that will run</h3>
+      <div class="ad-words"><p class="headlines">{% for h in w.headlines %}{{ h }}<br>{% endfor %}</p><p class="muted">{% for d in w.descriptions %}{{ d }}<br>{% endfor %}</p></div>
+      {% for n in w.notes %}<p class="warn">{{ n }}</p>{% endfor %}
+      {% endfor %}
+      <h3>What happens next</h3>
+      <ul class="rows">{% for s in next_steps %}<li class="row"><p class="row-text">{{ s.sentence }}</p></li>
+      {% endfor %}</ul>
+      <p class="note">{{ disclosure }}</p>
+      <form class="actions" method="post" action="/ads/approve">{{ csrf_field() }}
+        {% for k, v in fields.items() %}{% if v is not none %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endif %}{% endfor %}
+        <input type="hidden" name="business_id" value="{{ business.id }}">
+        <button class="btn btn-primary" type="submit">Approve and send</button>
+        <a class="btn" href="{{ back }}">Back</a>
+      </form>
+    </section>
+  </main>
+</div>
+{% include "_help.html" %}
+</body>
+</html>

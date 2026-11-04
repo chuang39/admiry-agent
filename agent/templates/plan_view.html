@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admiry plan</title>
+<style>
+  /* The plan card an assistant renders in the chat (MCP Apps, spec 2026-09-26 §5.2 probe). The homepage's
+     tokens (home.css); nothing fetched: the host's default CSP allows inline script and style only -- but for the
+     plan's picture (M1 Task 7), from the web host the resource declares (mcp_view.py). */
+  :root {
+    --bg: #FFFFFF; --fg: #1C1F2A; --soft: #3D4356; --muted: #5B6172; --line: #E4E6EE; --well: #F7F8FB;
+    --accent: #4B4BDD; --accent-ink: #2F2FB0; --accent-bg: #EEF0FB;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg: #171923; --fg: #F3F4F8; --soft: #C9CDDC; --muted: #9CA2B8; --line: #2C3040; --well: #1F2230;
+    --accent: #8A8AF0; --accent-ink: #B4B4F8; --accent-bg: #262A45;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 var(--sans); }
+  body { padding: 18px 20px 14px; }
+  [hidden] { display: none !important; }
+  .top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .wordmark { font: 500 12px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; }
+  .meta { color: var(--muted); font-size: 12px; }
+  h1 { margin: 0 0 6px; font-size: 19px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; }
+  .channel { color: var(--soft); margin: 0 0 12px; }
+  .levels { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+  .level { border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 13px; color: var(--muted); }
+  .level.on { border-color: var(--accent); background: var(--accent-bg); color: var(--accent-ink); }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  th { font-weight: 500; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+  th:first-child, td:first-child { text-align: left; }
+  td.planning { font-weight: 600; }
+  .assumptions { margin: 8px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 12.5px; }
+  .assumptions li { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; }
+  .assumptions b { font-weight: 500; color: var(--soft); }
+  .footnote { color: var(--muted); font-size: 12.5px; margin: 10px 0 0; }
+  .rows { margin: 0 0 12px; padding: 0; list-style: none; }
+  .rows li { padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .rows b { display: block; font-weight: 600; }
+  .rows span { color: var(--soft); font-size: 13.5px; }
+  .picture { margin: 0 0 12px; }
+  .picture img { display: block; width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+  .picture figcaption { color: var(--muted); font-size: 12.5px; margin: 6px 0 0; }
+  .later { margin: 12px 0 0; padding: 8px 12px; background: var(--well); border-radius: 8px; color: var(--soft); font-size: 13px; }
+  .later p { margin: 2px 0; }
+  .site { margin: 0 0 12px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--soft); font-size: 13.5px; }
+  .actions { margin: 14px 0 0; display: flex; align-items: center; gap: 14px; }
+  button { font: inherit; cursor: pointer; border: 0; border-radius: 8px; padding: 9px 14px; background: var(--accent); color: #fff; font-weight: 500; }
+  button:hover { background: var(--accent-ink); }
+  .foot { margin: 14px 0 0; color: var(--muted); font-size: 11.5px; }
+  .waiting { color: var(--muted); }
+  .say { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="top"><span class="wordmark">Admiry</span><span class="meta" id="meta"></span></div>
+<div id="body"><p class="waiting" id="waiting">Preparing your plan…</p></div>
+<p class="foot">Admiry card · rendered inside your assistant</p>
+<script>
+(function () {
+  "use strict";
+  var PROTOCOL = "2026-01-26";
+  var pending = {};
+  var nextId = 1;
+  var planUrl = null;
+
+  function send(msg) { window.parent.postMessage(msg, "*"); }
+  function request(method, params) {
+    var id = nextId++;
+    send({ jsonrpc: "2.0", id: id, method: method, params: params });
+    return new Promise(function (resolve) { pending[id] = resolve; });
+  }
+  function notify(method, params) { send({ jsonrpc: "2.0", method: method, params: params || {} }); }
+
+  function el(tag, cls, text) {
+    var node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined && text !== null) node.textContent = String(text);
+    return node;
+  }
+  function usd(n) {
+    if (n === null || n === undefined || isNaN(n)) return "";
+    return "$" + Math.round(n).toLocaleString("en-US");
+  }
+  function range(pair, money) {
+    if (!pair || pair.length < 2) return "";
+    var f = money ? usd : function (x) { return String(x); };
+    return pair[0] === pair[1] ? f(pair[0]) : f(pair[0]) + "–" + f(pair[1]);
+  }
+  function title(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
+
+  function applyContext(ctx) {
+    if (!ctx) return;
+    if (ctx.theme) document.documentElement.setAttribute("data-theme", ctx.theme === "dark" ? "dark" : "light");
+  }
+  var lastHeight = -1;
+  function resize() {
+    // measure the content, not the viewport, so the card can shrink as well as grow
+    var root = document.documentElement;
+    var was = root.style.height;
+    root.style.height = "max-content";
+    var h = Math.ceil(root.getBoundingClientRect().height);
+    root.style.height = was;
+    if (h === lastHeight) return;
+    lastHeight = h;
+    notify("ui/notifications/size-changed", { height: h });
+  }
+  if (typeof ResizeObserver !== "undefined") new ResizeObserver(function () { resize(); }).observe(document.body);
+  window.addEventListener("resize", resize);
+
+  function render(result) {
+    var body = document.getElementById("body");
+    while (body.firstChild) body.removeChild(body.firstChild);
+    var sc = (result && result.structuredContent) || {};
+    var d = sc.data || sc;
+    var cards = d.cards;
+    planUrl = d.plan_url || null;
+    if (!cards) {
+      // A tool result without cards (an error, or a plan made before the consultation existed): the words.
+      var text = sc.say || (result && result.content && result.content[0] && result.content[0].text) || "No plan to show yet.";
+      body.appendChild(el("p", "say", text));
+      resize();
+      return;
+    }
+    var meta = document.getElementById("meta");
+    meta.textContent = [d.version ? "v" + d.version : null, d.status ? title(d.status) : null].filter(Boolean).join(" · ");
+
+    body.appendChild(el("h1", null, cards.plan.goal));
+    var b = cards.budget || {};
+    body.appendChild(el("p", "channel",
+      [b.per_day ? usd(b.per_day) + " a day" : null,
+       b.monthly_usd ? "about " + usd(b.monthly_usd) + " a month" : null].filter(Boolean).join(" · ")));
+    // one row per funded channel (spec 2026-09-29 §7.2): its amount, why it is there, who runs it
+    var rows = cards.plan.channels || [];
+    if (rows.length) {
+      var list = el("ul", "rows");
+      rows.forEach(function (ch) {
+        var li = el("li");
+        li.appendChild(el("b", null, ch.label + " · " + usd(ch.monthly_usd) + " a month"));
+        li.appendChild(el("span", null, ch.why + (ch.mode_text ? " " + title(ch.mode_text) + "." : "")));
+        list.appendChild(li);
+      });
+      body.appendChild(list);
+    }
+    // the plan's "Your website" row (A3p-5 batch 2, Q5): its sentence alone; the four ways are the answer's `next`
+    var site = (cards.plan.setup || {}).website;
+    if (site && site.say) body.appendChild(el("p", "site", site.say));
+    // the picture a channel shows with the ad (M1 Task 7, plan P7): one <img> with the manifest's words for a screen
+    // reader, and the line under it -- or only the line, while the trade has no picture; only a web address is shown
+    var preview = cards.ads_preview || {};
+    if (preview.image_note) {
+      var fig = el("figure", "picture");
+      var shown = preview.image;
+      if (shown && typeof shown.url === "string" && /^https?:\/\//.test(shown.url)) {
+        var img = el("img");
+        img.src = shown.url;
+        img.alt = shown.alt || "";
+        fig.appendChild(img);
+      }
+      fig.appendChild(el("figcaption", null, preview.image_note));
+      body.appendChild(fig);
+    }
+
+    var lv = b.levels || {};
+    var names = ["minimum", "conservative", "recommended", "aggressive"];
+    if (names.some(function (k) { return lv[k]; })) {
+      var row = el("div", "levels");
+      names.forEach(function (k) {
+        if (!lv[k]) return;
+        row.appendChild(el("span", "level" + (b.level === k ? " on" : ""), title(k) + " " + usd(Math.floor(lv[k].monthly_usd / 30)) + "/day"));
+      });
+      body.appendChild(row);
+    }
+
+    var econ = cards.economics || {};
+    var cols = econ.columns || {};
+    // Recommended beside the owner's own budget; one column when the owner's budget is the recommended one
+    var both = cols.recommended && cols.planning && cols.recommended.spend !== cols.planning.spend;
+    if (cols.planning) {
+      var table = el("table");
+      var thead = el("thead"); var tr = el("tr");
+      tr.appendChild(el("th", null, "In 30 days")); if (both) tr.appendChild(el("th", null, "Recommended")); tr.appendChild(el("th", null, "Planning"));
+      thead.appendChild(tr); table.appendChild(thead);
+      var tbody = el("tbody");
+      [["Spend", "spend", true], ["Leads", "leads", false], ["Bookings", "bookings", false],
+       ["Customers", "customers", false], ["Revenue", "revenue", true]].forEach(function (r) {
+        var line = el("tr");
+        line.appendChild(el("td", null, r[0]));
+        var c = both && cols.recommended[r[1]], p = cols.planning[r[1]];
+        if (both) line.appendChild(el("td", null, Array.isArray(c) ? range(c, r[2]) : (r[2] ? usd(c) : c)));
+        line.appendChild(el("td", "planning", Array.isArray(p) ? range(p, r[2]) : (r[2] ? usd(p) : p)));
+        tbody.appendChild(line);
+      });
+      table.appendChild(tbody);
+      body.appendChild(table);
+    }
+    if (econ.assumptions && econ.assumptions.length) {
+      var ul = el("ul", "assumptions");
+      econ.assumptions.forEach(function (a) {
+        var li = el("li");
+        li.appendChild(el("b", null, title(a.name) + ": " + a.value));
+        li.appendChild(el("span", null, a.basis));
+        ul.appendChild(li);
+      });
+      body.appendChild(ul);
+    }
+    if (econ.footnote) body.appendChild(el("p", "footnote", econ.footnote));
+    if (cards.plan.later && cards.plan.later.length) {
+      var later = el("div", "later");
+      cards.plan.later.forEach(function (l) { later.appendChild(el("p", null, l.label + " — " + l.why)); });
+      body.appendChild(later);
+    }
+    if (planUrl) {
+      var actions = el("div", "actions");
+      var btn = el("button", null, "Open the full plan");
+      btn.addEventListener("click", function () { request("ui/open-link", { url: planUrl }); });
+      actions.appendChild(btn);
+      body.appendChild(actions);
+    }
+    resize();
+  }
+
+  window.addEventListener("message", function (ev) {
+    var m = ev.data;
+    if (ev.source !== window.parent || !m || m.jsonrpc !== "2.0") return;
+    if (m.id !== undefined && m.method === undefined) {  // a response to one of our requests
+      var cb = pending[m.id];
+      if (cb) { delete pending[m.id]; cb(m); }
+      return;
+    }
+    if (m.method === "ui/notifications/tool-result") render(m.params);
+    else if (m.method === "ui/notifications/host-context-changed") applyContext(m.params);
+    else if (m.method === "ui/resource-teardown" || m.method === "ping") send({ jsonrpc: "2.0", id: m.id, result: {} });
+    else if (m.id !== undefined) send({ jsonrpc: "2.0", id: m.id, error: { code: -32601, message: "not supported" } });
+  });
+
+  request("ui/initialize", {
+    protocolVersion: PROTOCOL,
+    appInfo: { name: "Admiry plan card", version: "1" },
+    appCapabilities: {}
+  }).then(function (r) {
+    if (r && r.result) applyContext(r.result.hostContext);
+    notify("ui/notifications/initialized");
+    resize();
+  });
+})();
+</script>
+</body>
+</html>

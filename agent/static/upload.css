@@ -1,0 +1,93 @@
+/* The photo upload page (agent/uploads.py, upload.html), after base.css and page.css -- the phone redesign of
+   2026-10-15: each kind of photo the site uses is a row of squares. A square is a photo that is in, with its Remove on
+   the corner, or the picker for one that is not: a dashed square that is the label of its own hidden file input
+   (base.css's .sr keeps the input reachable), so the kind is the square's own and nothing is chosen from a list.
+   Phones first: three squares across at 320-430px, every target 44px, the note of the last change sticky under the
+   header so it is seen wherever the page lands. */
+
+.upload-note { color: var(--muted); font-size: 15px; line-height: 1.5; }
+.upload-note strong { color: var(--fg); font-weight: 500; }
+
+/* what the last change made, or why it was refused */
+.status {
+  position: sticky; top: 72px; z-index: 5; display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 10px 10px 10px 14px; border-radius: 12px; background: #E7F4EC; border: 1px solid #CBE6D6;
+  box-shadow: var(--shadow);
+}
+.status p { font-weight: 500; }
+.status .btn { flex: none; min-height: 36px; }
+.status.error { background: #FBEAEA; border-color: #F0CACA; } /* the words' own colours are page.css's .done/.error */
+
+/* a kind: its label, its count and, for the logo and the key photo while missing, the tag that the site waits for it */
+.kind { display: flex; flex-direction: column; gap: 10px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+.kind-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.kind-head h2 { font-size: 17px; line-height: 1.3; }
+.kind-meta { display: flex; flex: none; flex-wrap: wrap; justify-content: flex-end; gap: 6px; padding-top: 1px; }
+.badge-need { background: #FBF1DE; color: #7A4B07; } /* 6.6:1, base.css's warning */
+.badge-done { background: #E7F4EC; color: var(--ok); } /* 4.7:1 */
+
+/* the squares: as many across as fit at 88px and up (three on a phone, six on a laptop), never page.css's li air */
+.slots {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 10px; margin: 0; padding: 0;
+  list-style: none;
+}
+.page-main .slots li { margin: 0; }
+.slot { position: relative; aspect-ratio: 1 / 1; min-width: 0; }
+.slot form { margin: 0; height: 100%; }
+.slot form.rm { position: absolute; top: 0; right: 0; height: auto; }
+.slot img {
+  display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; border: 1px solid var(--line);
+}
+/* the logo whole on the well: a wide one not cropped, a transparent one as it is */
+.kind.logo .slot img { object-fit: contain; background: var(--well); padding: 10px; }
+
+/* Remove: a round mark on the square's corner, its target 44px */
+.remove {
+  position: absolute; top: -8px; right: -8px; width: 30px; height: 30px; padding: 0; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--card); color: var(--fg); box-shadow: var(--shadow);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.remove::before { content: ""; position: absolute; inset: -7px; }
+.remove svg { width: 14px; height: 14px; }
+.remove:hover { background: var(--hover); }
+
+/* the picker */
+.pick {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; height: 100%; border: 1.5px dashed var(--edge); border-radius: 12px; background: var(--well);
+  color: var(--soft); font: 500 14px/1.2 var(--sans); cursor: pointer; text-align: center;
+}
+.pick svg { width: 26px; height: 26px; }
+.pick:hover { border-color: var(--accent); color: var(--accent-ink); }
+.slot form:has(input:focus-visible) .pick { outline: 2px solid var(--accent); outline-offset: 2px; }
+.send, .sending-words, .spin { display: none; }
+
+/* a photo chosen with no script running (the input is valid once it holds a file): the square fills blue and Upload
+   takes its middle; with upload.js the choice sends itself, and the square says so instead (.sending) */
+.slot:not(.sending) form:has(input[type=file]:valid) .pick {
+  border-style: solid; border-color: var(--accent); background: var(--accent-bg); color: var(--accent-ink);
+}
+.slot:not(.sending) form:has(input[type=file]:valid) .pick svg,
+.slot:not(.sending) form:has(input[type=file]:valid) .pick-words { display: none; }
+.slot:not(.sending) form:has(input[type=file]:valid) .send {
+  display: inline-flex; position: absolute; inset: 7px; min-height: 0; padding: 0; justify-content: center;
+  border-radius: 8px; font-size: 15px;
+}
+.slot.sending .pick {
+  border-style: solid; border-color: var(--accent); background: var(--accent-bg); color: var(--accent-ink);
+}
+.slot.sending .pick svg, .slot.sending .pick-words { display: none; }
+.slot.sending .sending-words { display: block; }
+.spin {
+  width: 22px; height: 22px; border-radius: 999px; border: 2.5px solid var(--accent-bg); border-top-color: var(--accent);
+  animation: spin 0.8s linear infinite;
+}
+.slot.sending .spin { display: block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+
+.done-row { padding-top: 6px; }
+
+@media (max-width: 720px) {
+  .status { top: 70px; }
+}

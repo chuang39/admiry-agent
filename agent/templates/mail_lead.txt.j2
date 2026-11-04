@@ -1,0 +1,29 @@
+A new lead came in on {{ name }}'s page.
+
+{% if fields.name -%}
+Name: {{ fields.name }}
+{% endif -%}
+{% if fields.phone -%}
+Phone: {{ fields.phone }}
+{% endif -%}
+{% if fields.email -%}
+E-mail: {{ fields.email }}
+{% endif -%}
+{% if fields.patient -%}
+Patient: {{ fields.patient }}
+{% endif -%}
+{% if fields.service -%}
+Service: {{ fields.service }}
+{% endif -%}
+{% if fields.preferred_time -%}
+Preferred time: {{ fields.preferred_time }}
+{% endif -%}
+{% if fields.zip -%}
+ZIP: {{ fields.zip }}
+{% endif -%}
+{% if fields.message -%}
+Message: {{ fields.message }}
+{% endif -%}
+When: {{ when }}
+
+Call them back within the hour if you can — the sooner the call, the more likely the booking.

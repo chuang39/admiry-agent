@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — your approval code</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+{#- A plan's approval code (POST /plan/{id}/code), to read out to the owner's assistant. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main narrow" id="main">
+<section class="panel">
+<h1>Approval code for plan v{{ plan.version }}</h1>
+<p>Read this code to your assistant. It launches the plan: <em>{{ proposal.summary }}</em></p>
+<p><span class="code-box">{{ code }}</span></p>
+<p class="fine">The code works once and expires with the proposal ({{ proposal.expires_at }}). Anyone who has it can
+launch this plan, so keep it to your assistant. <a href="/plan/{{ plan.id }}">Back to the plan</a></p>
+</section>
+</main>
+</body>
+</html>

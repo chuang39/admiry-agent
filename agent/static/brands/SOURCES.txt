@@ -1,0 +1,13 @@
+The assistants' marks on the home (home.html: the Muse button, the Claude and ChatGPT buttons, the sheet's tabs).
+Each file is the owner's own, byte for byte as published: no recolouring, cropping or added shapes. The marks are
+their owners' trademarks; Admiry shows them only to name the assistant a button opens, never as its own branding,
+and always smaller than Admiry's mark. Retrieved 2026-10-06.
+
+muse.svg     Meta's Muse: the site's own icon, https://muse.ai/images/favicon/app-squiggle.svg
+             (Meta's Brand Resource Center has no Muse page yet).
+claude.svg   Anthropic's Claude Spark, colour Clay: "Claude logos/3 Claude Spark/SVG/Claude Spark - Clay.svg" from
+             the press kit linked on https://www.anthropic.com/news (https://anthropic.com/press-kit).
+chatgpt.svg  OpenAI's Blossom, black: "OpenAI-logos/SVGs/OAI_OpenAI-Blossom_Black.svg" from
+             https://cdn.openai.com/brand/openai-logos.zip, under OpenAI's Marks usage terms
+             (https://openai.com/brand/): the Blossom is black or white only, keeps its built-in clear space (the file's
+             own margin; the CSS sizes the image larger rather than cropping it), and implies no endorsement.

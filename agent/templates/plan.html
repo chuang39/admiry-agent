@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — plan for {{ name }}</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+{#- The plan page (/plan/{id}), usually opened on a phone from an assistant or an e-mail: every line Admiry will do,
+    then the one place the owner approves it (page.css; the mobile audit, 2026-09-30). -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main" id="main">
+<div class="page-head">
+<h1>Plan v{{ plan.version }} for {{ name }} <span class="badge badge-neutral">{{ plan.status }}</span></h1>
+<p class="muted">Created <time datetime="{{ created.iso }}" title="{{ created.abs }}">{{ created.rel }}</time>. Read it top to bottom; every line is what Admiry will do once you approve.</p>
+</div>
+
+<section class="card">
+<ol class="lines">
+  {% for key in order %}<li>{{ plan.lines[key] }}</li>{% endfor %}
+</ol>
+{% if plan.rationale %}<p><strong>Why this split:</strong> {{ plan.rationale }}</p>{% endif %}
+</section>
+
+{% if cards %}
+<section class="card">
+<h2>{{ cards.plan.goal }}</h2>
+<p><strong>Budget:</strong> {{ usd(cards.budget.per_day) }} a day, about {{ usd(cards.budget.monthly_usd) }} a month
+{% if cards.budget.levels %}<span class="muted">({% for k in ("minimum", "conservative", "recommended", "aggressive") if cards.budget.levels[k] %}{{ k }} {{ usd(cards.budget.levels[k].monthly_usd // 30) }} a day{% if not loop.last %} · {% endif %}{% endfor %})</span>{% endif %}</p>
+<h3>Where the ads run</h3>
+<ul>{% for ch in cards.plan.channels %}<li><strong>{{ ch.label }} — {{ usd(ch.monthly_usd) }} a month</strong> ({{ usd(ch.per_day) }} a day, {{ ch.mode_text }}). {{ ch.why }}</li>{% endfor %}</ul>
+{% if cards.plan.later %}<p class="muted">Later: {% for l in cards.plan.later %}{{ l.label }} — {{ l.why }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
+{#- the picture a channel shows with the ad (M1 Task 7, plan P7): the owner approves it here with the plan -#}
+{% set preview = cards.ads_preview %}
+{% if preview.image_note %}<figure class="ad-image">{% if preview.image %}<img src="{{ preview.image.url }}" alt="{{ preview.image.alt }}" loading="lazy">{% endif %}<figcaption class="muted">{{ preview.image_note }}</figcaption></figure>{% endif %}
+{#- the plan's "Your website" row (A3p-5 batch 2, Q5): where Admiry's code stands on the page the ads use; no website of
+    the business's own, no row -#}
+{% set site = cards.plan.setup.website %}
+{% if site %}<h3>Your website</h3>
+<p>{{ site.say }}</p>{% endif %}
+<h3>What the budget should do in 30 days</h3>
+{% set c = cards.economics.columns %}
+{% set cols = [("Planning", c.planning)] if not c.recommended or c.recommended.spend == c.planning.spend else [("Recommended", c.recommended), ("Planning", c.planning)] %}
+<div class="wide"><table>
+  <tr><th></th>{% for name, col in cols %}<th>{{ name }}</th>{% endfor %}</tr>
+  <tr><td>Monthly spend</td>{% for _, col in cols %}<td>{{ usd(col.spend) }}</td>{% endfor %}</tr>
+  <tr><td>Estimated leads</td>{% for _, col in cols %}<td>{{ col.leads[0] }} to {{ col.leads[1] }}</td>{% endfor %}</tr>
+  <tr><td>Estimated bookings</td>{% for _, col in cols %}<td>{{ col.bookings[0] }} to {{ col.bookings[1] }}</td>{% endfor %}</tr>
+  <tr><td>Estimated new customers</td>{% for _, col in cols %}<td>{{ col.customers[0] }} to {{ col.customers[1] }}</td>{% endfor %}</tr>
+  <tr><td>Potential revenue</td>{% for _, col in cols %}<td>{{ usd(col.revenue[0]) }} to {{ usd(col.revenue[1]) }}</td>{% endfor %}</tr>
+</table></div>
+<ul class="muted">{% for a in cards.economics.assumptions %}<li>{{ a.name }}: {{ a.value }} — {{ a.basis }}</li>{% endfor %}</ul>
+<p class="muted">{{ cards.economics.footnote }}</p>
+<h3>Why Google Search first</h3>
+<p>{{ cards.rationale.why_primary }}</p>
+<p class="muted">{% for q in cards.rationale.example_searches %}<code>{{ q }}</code> {% endfor %}</p>
+<h3>Why not TikTok yet</h3>
+<p>{{ cards.rationale.why_not_later }}</p>
+</section>
+{% endif %}
+
+{% for ch in plan.sections.ads.channels %}
+<section class="card">
+<h2>{{ channel_names[ch.channel] }} — {{ usd(ch.monthly_usd) }}/mo</h2>
+{% if copy_of(ch) %}<p>Its ads are written from this plan when {{ channel_names[ch.channel] }} starts.</p>
+{% else %}<div class="wide"><table>
+  <tr><th>Services and searches</th><td>{{ ch.themes | join(" · ") }}</td></tr>
+  {% if ch.negatives %}<tr><th>Not for</th><td>{{ ch.negatives | join(" · ") }}</td></tr>{% endif %}
+  <tr><th>Ad text</th><td>{% for h in ch.headlines %}{{ h }}<br>{% endfor %}<span class="muted">{% for d in ch.descriptions %}{{ d }}<br>{% endfor %}</span></td></tr>
+  <tr><th>Sends visitors to</th><td>{{ ch.landing_service }}</td></tr>
+</table></div>{% endif %}
+</section>
+{% endfor %}
+
+<section class="card">
+<h2>Pages Admiry creates</h2>
+<ul>{% for p in plan.sections.presence.pages %}<li>{{ p.service }} — <code>{{ p.path }}</code> — {{ p.angle }}</li>{% endfor %}</ul>
+</section>
+
+<section class="card">
+<h2>Estimate</h2>
+{% set est = plan.sections.estimate %}
+{% if est.basis == "none" %}<p>{{ plan.lines.estimate }}</p>
+{% else %}<p>{{ plan.lines.estimate }}<br><span class="muted">Basis: {{ est.basis }} ({{ est.confidence }} confidence), rows {{ est.benchmark_rows | join(", ") }}.</span></p>{% endif %}
+</section>
+
+{% if plan.notes %}<section class="card"><h2>Notes</h2><ul>{% for n in plan.notes %}<li>{{ n }}</li>{% endfor %}</ul></section>{% endif %}
+{% if plan.execution %}<section class="card"><h2>Execution</h2><ul>{% for k, v in plan.execution.items() if k not in channel_ids %}<li>{{ k }}: {% if k == "ads" %}{{ ads_line }}{% else %}{{ v }}{% endif %}</li>{% endfor %}</ul></section>{% endif %}
+
+{#- spec 2026-10-11 §5.1: what Admiry removed from this version's ads after Google refused it, in owner words -#}
+{% if changes %}<section class="card" id="changes"><h2>Changes Admiry made</h2>
+<p>{{ changes_intro }}</p>
+<ul>{% for c in changes %}<li>{{ c }}</li>{% endfor %}</ul></section>{% endif %}
+
+<p class="muted">{{ plan.sections.disclosure.text }}</p>
+
+<section class="card" id="approve">
+<h2>Approve</h2>
+{% if viewer == "owner" %}
+  {% if plan.status == "approved" %}
+  <p>Approved. Admiry is preparing the launch: pages, tracking and the channels within your monthly limit.</p>
+  {% elif plan.status == "in_review" %}
+  <p>{{ in_review }}</p>
+  {% elif plan.status != "draft" %}
+  <p>This version is {{ plan.status }}; ask your assistant for the current plan.</p>
+  {% elif not approval.verified %}
+  <p>Before Admiry can spend money, the business must be verified.
+  {% if approval.ads_mode == "managed" %}<a href="{{ approval.setup }}">Add funds</a> to verify and unlock launching.
+  {% else %}<a href="{{ approval.setup }}">Link your Google Ads account</a> to verify and unlock launching.{% endif %}
+  Nothing is spent on ads until then.</p>
+  {% else %}
+  <p>Two ways, both yours alone: read the approval code to your assistant, or approve here.</p>
+  <div class="actions">
+    <form method="post" action="/plan/{{ plan.id }}/approve"><input type="hidden" name="csrf" value="{{ approval.csrf }}"><button class="btn btn-primary" type="submit">Approve and launch</button></form>
+    <form method="post" action="/plan/{{ plan.id }}/code"><input type="hidden" name="csrf" value="{{ approval.csrf }}"><button class="btn" type="submit">Show my approval code</button></form>
+  </div>
+  {% endif %}
+{% elif viewer == "unclaimed" %}
+  <p>Claim the business first (open the sign-in link from your assistant); then its plans can be approved here.</p>
+{% elif viewer == "other" %}
+  <p>This plan belongs to another Google account.</p>
+{% else %}
+  <p><a href="{{ sign_in }}">Sign in with Google</a> to approve this plan (only the business owner can).</p>
+{% endif %}
+</section>
+{% if rate %}
+<link rel="stylesheet" href="/static/support.css">
+<div class="rate-host" data-rate-plan="{{ rate.plan_id }}" data-surface="plan_page" data-vote='{{ rate.vote | tojson }}'></div>
+<script src="/static/support.js" defer></script>
+{% endif %}
+</main>
+{% include "_help.html" %}
+</body>
+</html>

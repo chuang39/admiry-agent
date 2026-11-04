@@ -1,0 +1,292 @@
+{
+  "family": "home_services",
+  "trade": "hvac",
+  "facts": {
+    "name": "Northpoint Heating & Air",
+    "phone": "(704) 555-0177",
+    "city": "Charlotte",
+    "state": "NC",
+    "service_area": [
+      "Charlotte",
+      "Matthews",
+      "Mint Hill",
+      "Huntersville",
+      "Concord",
+      "Pineville",
+      "Indian Trail"
+    ],
+    "storefront": false,
+    "hours": [
+      "Monday to Friday, 7 am to 7 pm",
+      "Saturday, 8 am to 4 pm",
+      "Sunday, closed"
+    ],
+    "about": "Northpoint Heating & Air is a family-run heating and cooling company in Charlotte. We repair, replace and look after air conditioners, furnaces and heat pumps for homes across the area.",
+    "services": [
+      {
+        "slug": "ac-repair",
+        "name": "AC repair",
+        "lead": true,
+        "summary": "Air conditioners that stop cooling, found and fixed on the first visit when we can.",
+        "includes": [
+          "A full system check",
+          "Refrigerant and electrical tests",
+          "A clear price before any work"
+        ],
+        "signs": [
+          "Warm air from the vents",
+          "Water around the indoor unit",
+          "The system turns on and off over and over"
+        ]
+      },
+      {
+        "slug": "heating-repair",
+        "name": "Heating repair",
+        "lead": true,
+        "summary": "Furnaces and heat pumps brought back to steady, even heat.",
+        "includes": [
+          "Burner, igniter and blower checks",
+          "Thermostat and safety tests",
+          "Clean-up after the job"
+        ],
+        "signs": [
+          "No heat or uneven heat",
+          "A burning smell",
+          "Loud bangs when it starts"
+        ]
+      },
+      {
+        "slug": "ac-installation",
+        "name": "AC and furnace installation",
+        "lead": true,
+        "summary": "A new system sized for your home, with a written estimate first.",
+        "includes": [
+          "A load check of the home",
+          "Removal of the old unit",
+          "Start-up and a walk-through"
+        ],
+        "signs": [
+          "A system over 15 years old",
+          "Repairs every season",
+          "Bills going up"
+        ]
+      },
+      {
+        "slug": "maintenance-plans",
+        "name": "Maintenance plans",
+        "summary": "Two tune-ups a year, spring for cooling and fall for heating."
+      },
+      {
+        "slug": "heat-pumps",
+        "name": "Heat pumps",
+        "summary": "Heat pump installs and repairs for heating and cooling in one system."
+      },
+      {
+        "slug": "indoor-air-quality",
+        "name": "Indoor air quality",
+        "summary": "Filters, humidifiers and duct cleaning for cleaner air at home."
+      }
+    ],
+    "licence": "NC License #00000",
+    "years": 12,
+    "warranty": "1-year labor warranty",
+    "insured": true,
+    "free_estimate": "Free estimates on new systems",
+    "reviews": [
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      }
+    ]
+  },
+  "words": {
+    "home": {
+      "eyebrow": "family-run heating and cooling company",
+      "headline": "AC repair in Charlotte",
+      "lead": "Air conditioners that stop cooling, found and fixed on the first visit when we can.",
+      "services_heading": "Heating and cooling services",
+      "services_lead": "Repair, replacement and tune-ups for home AC, furnaces and heat pumps.",
+      "why_heading": "Why choose Northpoint",
+      "why_points": [
+        "A family-run company with 12 years serving local homes",
+        "Clear price before any work begins",
+        "1-year labor warranty on our work",
+        "Free estimates on new systems"
+      ],
+      "how_heading": "How it works",
+      "steps": [
+        {
+          "title": "Describe the problem",
+          "text": "Tell us what your system is doing, including sounds, smells and warm or cool spots."
+        },
+        {
+          "title": "Get a check and a price",
+          "text": "We visit, check the system and give a clear price before any work."
+        },
+        {
+          "title": "We fix it and tidy up",
+          "text": "We repair or replace the system, then test it and clean up."
+        }
+      ],
+      "about_heading": "About Northpoint Heating and Air",
+      "about_text": "Northpoint Heating & Air is a family-run heating and cooling company in Charlotte. We repair, replace and look after air conditioners, furnaces and heat pumps for homes across the area.",
+      "area_heading": "Where we work",
+      "area_text": "We serve homes in Charlotte, Matthews, Mint Hill, Huntersville, Concord, Pineville and Indian Trail.",
+      "faq": [
+        {
+          "q": "What happens on an AC repair visit?",
+          "a": "We check the full system, test refrigerant and electrical parts, and give a clear price before any work. Many faults are fixed on the first visit when we can."
+        },
+        {
+          "q": "What do you check on a heating repair?",
+          "a": "We check burners, igniters, blowers, thermostats and safety parts, then clean up after the job. The goal is steady, even heat."
+        },
+        {
+          "q": "What is included with a new AC or furnace?",
+          "a": "We do a load check of the home, remove the old unit, then start up the new system and walk you through it. Estimates on new systems are free."
+        },
+        {
+          "q": "How do I know if I need a new system?",
+          "a": "Signs include a system over 15 years old, repairs every season, and bills going up. The business answers questions about your home on the phone."
+        },
+        {
+          "q": "Do you warranty your work?",
+          "a": "We offer a 1-year labor warranty. The business answers questions about your repair on the phone."
+        }
+      ],
+      "cta_heading": "Need repair or a new system?",
+      "reviews_heading": "",
+      "work_heading": "",
+      "faq_heading": "Common questions",
+      "new_patients_heading": "",
+      "insurance_heading": "",
+      "office_heading": "",
+      "cta_text": "Tell us what your system is doing and we will plan a visit."
+    },
+    "about": {
+      "headline": "A family-run heating and cooling company",
+      "lead": "We repair, replace and look after home heating and cooling systems.",
+      "story": [
+        "Northpoint Heating & Air is a family-run heating and cooling company in Charlotte. We repair, replace and look after air conditioners, furnaces and heat pumps for homes across the area.",
+        "We have served local homes for 12 years. We offer free estimates on new systems and back our work with a 1-year labor warranty."
+      ],
+      "values_heading": "How we work",
+      "values": [
+        "Family-run and focused on homes",
+        "Clear price before any work",
+        "Tidy work and clean-up after the job"
+      ],
+      "community": "We serve homes in Charlotte, Matthews, Mint Hill, Huntersville, Concord, Pineville and Indian Trail."
+    },
+    "services": {
+      "headline": "Heating and cooling services",
+      "lead": "Repair and replacement for home heating and cooling systems.",
+      "intro": "Northpoint Heating & Air repairs, replaces and looks after air conditioners, furnaces and heat pumps for homes. We have served the area for 12 years with free estimates on new systems."
+    },
+    "contact": {
+      "headline": "Contact Northpoint Heating and Air",
+      "lead": "Tell us about your heating or cooling problem and we will reply.",
+      "response_line": "We reply during open hours and confirm a time to visit."
+    },
+    "service_pages": [
+      {
+        "slug": "ac-repair",
+        "lead": "Air conditioners that stop cooling, found and fixed on the first visit when we can.",
+        "what": "Repair for home air conditioners that stop cooling. We check the system, find the fault and fix it on the first visit when we can, with a clear price first.",
+        "signs": [
+          "Warm air from the vents",
+          "Water around the indoor unit",
+          "The system turns on and off over and over"
+        ],
+        "includes": [
+          "A full system check",
+          "Refrigerant and electrical tests",
+          "A clear price before any work"
+        ],
+        "faq": [
+          {
+            "q": "What are signs I need AC repair?",
+            "a": "Warm air from the vents, water around the indoor unit, or a system that turns on and off over and over can mean it needs a check."
+          },
+          {
+            "q": "What happens during the visit?",
+            "a": "We do a full system check with refrigerant and electrical tests, then give a clear price before any work."
+          }
+        ],
+        "signs_heading": "Signs you need it",
+        "includes_heading": "What the visit includes",
+        "faq_heading": "Common questions"
+      },
+      {
+        "slug": "heating-repair",
+        "lead": "Furnaces and heat pumps brought back to steady, even heat.",
+        "what": "Repair for home furnaces and heat pumps that lose heat or heat unevenly. We test the parts and safety controls and work toward steady, even heat.",
+        "signs": [
+          "No heat or uneven heat",
+          "A burning smell",
+          "Loud bangs when it starts"
+        ],
+        "includes": [
+          "Burner, igniter and blower checks",
+          "Thermostat and safety tests",
+          "Clean-up after the job"
+        ],
+        "faq": [
+          {
+            "q": "What are signs I need heating repair?",
+            "a": "No heat or uneven heat, a burning smell, or loud bangs when it starts can mean it needs a check."
+          },
+          {
+            "q": "What happens during the visit?",
+            "a": "We check burners, igniters, blowers, thermostats and safety parts, then clean up after the job."
+          }
+        ],
+        "signs_heading": "Signs you need it",
+        "includes_heading": "What the visit includes",
+        "faq_heading": "Common questions"
+      },
+      {
+        "slug": "ac-installation",
+        "lead": "A new system sized for your home, with a written estimate first.",
+        "what": "Installation of a new AC and furnace sized for your home. We start with a load check and a written estimate, then remove the old unit and walk you through the new one.",
+        "signs": [
+          "A system over 15 years old",
+          "Repairs every season",
+          "Bills going up"
+        ],
+        "includes": [
+          "A load check of the home",
+          "Removal of the old unit",
+          "Start-up and a walk-through"
+        ],
+        "faq": [
+          {
+            "q": "How do I know I need a new system?",
+            "a": "A system over 15 years old, repairs every season, or bills going up can mean it is time to talk about replacement."
+          },
+          {
+            "q": "What happens on install day?",
+            "a": "We do a load check of the home, remove the old unit, then start up the new one and walk you through it."
+          }
+        ],
+        "signs_heading": "Signs you need it",
+        "includes_heading": "What the job includes",
+        "faq_heading": "Common questions"
+      }
+    ],
+    "cta_label": "Call now",
+    "book_label": "Book a visit"
+  },
+  "style_words": {}
+}

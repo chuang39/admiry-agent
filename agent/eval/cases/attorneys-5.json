@@ -1,0 +1,92 @@
+{
+  "id": "attorneys-5",
+  "vertical": "attorneys",
+  "opening": "Saguaro Estate & Probate in Tucson: wills, trusts and probate. Many clients are retirees all over the metro, up to 50 miles; we want booked consultations.",
+  "monthly_budget_usd": null,
+  "knowledge": {
+    "name": "Saguaro Estate & Probate",
+    "category": "attorneys",
+    "category_detail": "estate planning attorney",
+    "service_area": [
+      "Tucson",
+      "Oro Valley",
+      "Green Valley"
+    ],
+    "services": [
+      {
+        "name": "Wills and trusts",
+        "intent_phrases": [
+          "will lawyer tucson",
+          "living trust attorney near me",
+          "estate planning attorney tucson"
+        ],
+        "price_hint": "flat-fee wills"
+      },
+      {
+        "name": "Probate",
+        "intent_phrases": [
+          "probate attorney tucson",
+          "how long does probate take in arizona"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Fri 9-5",
+    "phone": "520-555-0161",
+    "website": null,
+    "pricing_hints": [
+      "flat-fee wills"
+    ],
+    "typical_customer_value_usd": 3000,
+    "usp": [
+      "Home and hospital visits",
+      "Flat-fee wills"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "legal"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": null,
+      "monthly_budget_usd": null,
+      "focus_services": [
+        "Wills and trusts"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_attorneys_5",
+      "name": "Saguaro Estate & Probate",
+      "address": "33 N Stone Ave, Tucson, AZ 85701",
+      "lat": 32.2229,
+      "lng": -110.9721,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Saguaro Estate & Probate"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "bookings"
+    },
+    "service": {
+      "choice": "svc_wills_and_trusts"
+    },
+    "customer_value": {
+      "choice": "3000_10000"
+    },
+    "radius": {
+      "choice": "r50"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

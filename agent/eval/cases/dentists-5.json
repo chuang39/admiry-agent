@@ -1,0 +1,90 @@
+{
+  "id": "dentists-5",
+  "vertical": "dentists",
+  "opening": "Park Slope Smile Studio, a cosmetic dentist in Brooklyn: whitening and veneers. We want more people asking to book a whitening, close by, within 3 miles. About $800 a month.",
+  "monthly_budget_usd": 800,
+  "knowledge": {
+    "name": "Park Slope Smile Studio",
+    "category": "dentists",
+    "category_detail": "cosmetic dentist",
+    "service_area": [
+      "Park Slope",
+      "Brooklyn"
+    ],
+    "services": [
+      {
+        "name": "Teeth whitening",
+        "intent_phrases": [
+          "teeth whitening brooklyn",
+          "professional teeth whitening near me"
+        ],
+        "price_hint": "from $450"
+      },
+      {
+        "name": "Porcelain veneers",
+        "intent_phrases": [
+          "porcelain veneers park slope",
+          "veneers cost"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Tue-Sat 10-8",
+    "phone": "718-555-0164",
+    "website": null,
+    "pricing_hints": [
+      "whitening from $450"
+    ],
+    "typical_customer_value_usd": 1200,
+    "usp": [
+      "Same-day whitening",
+      "Evening appointments"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "healthcare"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": null,
+      "monthly_budget_usd": 800,
+      "focus_services": [
+        "Teeth whitening"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_dentists_5",
+      "name": "Park Slope Smile Studio",
+      "address": "250 7th Ave, Brooklyn, NY 11215",
+      "lat": 40.6681,
+      "lng": -73.9806,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Park Slope Smile Studio"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "enquiries"
+    },
+    "service": {
+      "choice": "svc_teeth_whitening"
+    },
+    "customer_value": {
+      "choice": "1000_plus"
+    },
+    "radius": {
+      "choice": "r3"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

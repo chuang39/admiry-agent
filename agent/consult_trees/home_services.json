@@ -1,0 +1,90 @@
+{
+  "name": "home_services",
+  "audience": "homeowners",
+  "defaults": {"customer_value_usd": 900, "footnote_noun": "home-service businesses", "lead_to_booking": 0.6, "booking_to_customer": 0.6, "services_example": "roof repair, gutters, inspections"},
+  "corrections": [
+    {
+      "patterns": ["everyone", "all people", "anyone interested", "every person", "all customers", "all patients"],
+      "say": "One honest note first: no ad platform can hand us a list of everyone interested in your trade. What we can do is combine signals: people near you who are searching for that service right now, visitors to your website, and careful expansion from there, all inside your area."
+    }
+  ],
+  "questions": [
+    {
+      "id": "listing", "input": "single", "known_fact": null, "options_from": "listing",
+      "prompt": "Is your business one of these on Google Maps?",
+      "options": [],
+      "why": null
+    },
+    {
+      "id": "objective", "input": "single", "known_fact": "objective",
+      "prompt": "What do you want most from your ads?",
+      "options": [
+        {"id": "bookings", "label": "Booked jobs", "sublabel": "Jobs scheduled online or by phone"},
+        {"id": "calls", "label": "Phone calls", "sublabel": "People calling your office"},
+        {"id": "enquiries", "label": "Quote requests", "sublabel": "Forms and chat on your site"},
+        {"id": "awareness", "label": "Awareness", "sublabel": "More people nearby know your business"},
+        {"id": "any", "label": "Any of these"}
+      ],
+      "why": null
+    },
+    {
+      "id": "service", "input": "multi", "known_fact": "service", "options_from": "services",
+      "by_trade": {
+        "hvac": [
+          {"id": "svc_ac_repair", "label": "AC repair"}, {"id": "svc_heating_repair", "label": "Heating repair"}, {"id": "svc_hvac_replacement", "label": "HVAC replacement", "meta_fit": true, "newsbreak_fit": true},
+          {"id": "svc_maintenance", "label": "Maintenance plans"}, {"id": "svc_emergency", "label": "Emergency repairs"}, {"id": "svc_ducts", "label": "Duct cleaning"}
+        ],
+        "plumbing": [
+          {"id": "svc_leak_repair", "label": "Leak repair"}, {"id": "svc_drain_cleaning", "label": "Drain cleaning"}, {"id": "svc_water_heaters", "label": "Water heaters"},
+          {"id": "svc_repiping", "label": "Repiping", "meta_fit": true, "newsbreak_fit": true}, {"id": "svc_emergency", "label": "Emergency repairs"}, {"id": "svc_sewer_lines", "label": "Sewer lines"}
+        ],
+        "electrical": [
+          {"id": "svc_panel_upgrades", "label": "Panel upgrades", "meta_fit": true, "newsbreak_fit": true}, {"id": "svc_wiring_repair", "label": "Wiring repair"}, {"id": "svc_lighting", "label": "Lighting"},
+          {"id": "svc_ev_chargers", "label": "EV chargers", "meta_fit": true, "newsbreak_fit": true}, {"id": "svc_emergency", "label": "Emergency repairs"}, {"id": "svc_generators", "label": "Generators", "meta_fit": true, "newsbreak_fit": true}
+        ],
+        "roofing": [
+          {"id": "svc_roof_repair", "label": "Roof repair"}, {"id": "svc_roof_replacement", "label": "Roof replacement", "meta_fit": true, "newsbreak_fit": true}, {"id": "svc_storm_damage", "label": "Storm damage"},
+          {"id": "svc_roof_inspection", "label": "Roof inspections"}, {"id": "svc_gutters", "label": "Gutters"}, {"id": "svc_emergency", "label": "Emergency repairs"}
+        ]
+      },
+      "prompt": "Which service should the ads lead with?",
+      "options": [
+        {"id": "svc_emergency", "label": "Emergency repairs"}, {"id": "svc_install", "label": "Installations"},
+        {"id": "svc_maintenance", "label": "Maintenance plans"},
+        {"id": "svc_remodel", "label": "Remodels", "meta_fit": true, "newsbreak_fit": true},
+        {"id": "svc_roofing", "label": "Roofing", "meta_fit": true, "newsbreak_fit": true},
+        {"id": "svc_windows", "label": "Windows", "meta_fit": true, "newsbreak_fit": true},
+        {"id": "svc_solar", "label": "Solar panels", "meta_fit": true, "newsbreak_fit": true},
+        {"id": "svc_hvac_replacement", "label": "HVAC replacement", "meta_fit": true, "newsbreak_fit": true},
+        {"id": "svc_landscaping", "label": "Landscaping projects", "meta_fit": true, "newsbreak_fit": true}
+      ],
+      "why": "A same-day job like an emergency repair converts better with a fast quote than a general page, so I plan around booking a quote."
+    },
+    {
+      "id": "customer_value", "input": "single", "known_fact": "customer_value_usd",
+      "prompt": "Roughly, what is one new {service} job worth to you?",
+      "options": [
+        {"id": "lt_300", "label": "Under $300", "usd": 200}, {"id": "300_1000", "label": "$300 to 1,000", "usd": 600},
+        {"id": "1000_3000", "label": "$1,000 to 3,000", "usd": 1800}, {"id": "3000_plus", "label": "$3,000 and up", "usd": 4500},
+        {"id": "estimate", "label": "Not sure, estimate for me"}
+      ],
+      "why": "I use this to show on the plan what the new customers could be worth to you."
+    },
+    {
+      "id": "location", "input": "address", "known_fact": "address",
+      "prompt": "Where should the ads centre? A street address, or the city and ZIP code. If you would rather say later, just say so.",
+      "prompt_stated": "You said {stated}. Where in {stated} is your business? A street address or ZIP code keeps the ads close to you.",
+      "options": [],
+      "why": null
+    },
+    {
+      "id": "radius", "input": "radius", "known_fact": "radius_miles",
+      "prompt": "How far around {place} should the ads reach?", "place_default": "your business",
+      "options": [
+        {"id": "r5", "label": "5 miles", "miles": 5}, {"id": "r10", "label": "10 miles", "miles": 10},
+        {"id": "r20", "label": "20 miles", "miles": 20}
+      ],
+      "why": null
+    }
+  ]
+}

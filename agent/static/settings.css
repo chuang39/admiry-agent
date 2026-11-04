@@ -1,0 +1,188 @@
+/* Settings, layout A (spec 2026-09-29-admiry-settings-redesign §4): a sticky section nav beside a column of cards,
+   on base.css's tokens and components (loaded after it). Phones (<=720px): one column, the nav a scrolling row of
+   pills, 44px targets, no horizontal page scroll at 320px. Text colours hold 4.5:1 on their ground. */
+
+/* every button names its own colours: iPhone dark mode once drew system-white text on a white button
+   (test_pages); :where() keeps this at element weight so .btn-danger-quiet, .menu-item keep theirs */
+:where(.settings) button { -webkit-appearance: none; appearance: none; background: var(--card); color: var(--fg); }
+select { font: inherit; color: inherit; }
+/* a link styled as a button (an agreement's Read, the Ads card's setup link) hovers like a <button class="btn">:
+   base.css's a:hover (0,1,1) outweighs :where(.btn):hover (0,1,0); the primary keeps its own white */
+a.btn:not(.btn-primary):hover { color: var(--fg); }
+
+.settings-wrap {
+  display: grid; grid-template-columns: minmax(160px, 200px) minmax(0, 720px); gap: 40px; justify-content: center;
+  padding: 32px 48px 64px;
+}
+.settings-side { position: sticky; top: 88px; align-self: start; min-width: 0; }
+.settings-side h1 { margin-bottom: 12px; font: 600 24px/1.2 var(--sans); letter-spacing: -0.01em; }
+.biz-name { margin-bottom: 16px; font-size: 14px; color: var(--soft); overflow-wrap: anywhere; }
+.section-nav { display: flex; flex-direction: column; gap: 2px; }
+.section-nav a {
+  display: block; padding: 6px 10px; border-radius: 6px; font: 13px/1.4 var(--mono); color: var(--muted);
+}
+.section-nav a:hover { background: var(--hover); color: var(--fg); }
+.section-nav a[aria-current] { background: var(--hover); color: var(--fg); }
+
+/* the business switcher (more than one business): a native <details>, like the account menu */
+.switcher { position: relative; margin-bottom: 16px; }
+.switcher > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 36px; padding: 0 10px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--card); font-size: 14px; list-style: none;
+  cursor: pointer; overflow-wrap: anywhere;
+}
+.switcher > summary::-webkit-details-marker { display: none; }
+.switcher > summary::after, .card-fold > summary::after {
+  content: ""; flex: none; width: 7px; height: 7px; border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted); transform: translateY(-2px) rotate(45deg);
+}
+.switcher[open] > summary::after, .card-fold[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
+.switcher-menu {
+  position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 5; padding: 6px; background: var(--card);
+  border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow);
+  max-height: calc(100vh - 200px); overflow-y: auto; /* the aside is sticky: a long list scrolls inside the menu */
+}
+.switcher-menu a {
+  display: block; padding: 8px 10px; border-radius: 6px; font-size: 14px; color: var(--fg); overflow-wrap: anywhere;
+}
+.switcher-menu a:hover { background: var(--hover); color: var(--fg); }
+.switcher-menu a[aria-current] { font-weight: 600; }
+.switcher-menu form { margin: 4px 0 0; padding-top: 4px; border-top: 1px solid var(--line-soft); }
+
+/* ------------------------------------------------------------ the cards */
+
+.settings-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+/* base.css's scroll-padding-top (80px) already clears the sticky header; this adds the air (88px in all) */
+.settings-main > .card { scroll-margin-top: 8px; }
+.card > * + * { margin-top: 12px; }
+.card h2 { font: 600 18px/1.3 var(--sans); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.card h3 {
+  margin-top: 24px; font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted);
+}
+.card p { font-size: 15px; overflow-wrap: anywhere; } /* a long e-mail address wraps instead of widening the page */
+.card code { font: 13px/1.4 var(--mono); }
+.banner {
+  padding: 12px 14px; border-radius: 10px; background: var(--accent-bg); color: var(--accent-ink); font-size: 14px;
+}
+.banner-alert { background: #FBF1DE; color: #7A4B07; } /* something went wrong: the warning pair, 6.6:1 */
+.card-confirm { border-color: var(--accent); }
+.btn-accent { border-color: var(--accent); color: var(--accent); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.actions form { margin: 0; }
+
+/* overview: the name, the status badge, the one next step, the check-in light */
+.card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+#overview .card-head h2 { font-size: 22px; }
+.card-title { min-width: 0; }
+.card-title .area { margin-top: 2px; font-size: 14px; color: var(--muted); }
+.status-line { color: var(--muted); }
+.next-step {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px;
+  border-radius: 10px; background: var(--accent-bg); color: var(--accent-ink);
+}
+.next-step p { font-size: 14px; }
+.next-step .btn-primary { flex: none; }
+.next-step-quiet { background: #FBF1DE; color: #7A4B07; } /* 6.6:1, the warning badge's pair */
+/* the business's Google Maps listing (plan 2026-10-03-agent-listing-confirm): the link and "Not my business", or the
+   places to pick among (a button each, its label wrapping inside it), or the search */
+.listing-line > * + * { margin-top: 10px; }
+.listing-offer, .listing-find { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin: 0; }
+.listing-offer { padding: 0; list-style: none; }
+.listing-offer form { margin: 0; }
+.listing-offer .btn { padding-top: 6px; padding-bottom: 6px; text-align: left; }
+.checkin { display: flex; align-items: center; gap: 8px; color: var(--soft); }
+.checkin .light { flex: none; width: 8px; height: 8px; border-radius: 999px; background: var(--faint); }
+.checkin .light.on { background: var(--ok); }
+
+/* ads and billing */
+.balance { color: var(--soft); }
+.balance strong { font: 600 24px/1.2 var(--sans); letter-spacing: -0.01em; color: var(--fg); }
+.payments { width: 100%; border-collapse: collapse; font-size: 14px; }
+.payments th { padding: 0 0 6px; text-align: left; font: 500 12px/1.4 var(--sans); color: var(--muted); }
+.payments td { padding: 8px 0; border-top: 1px solid var(--line-soft); }
+.payments .num { padding-right: 16px; text-align: right; font-variant-numeric: tabular-nums; }
+.statement { overflow-x: auto; } /* the monthly statement's six columns (A3) scroll inside the card on a phone */
+.payments caption { padding: 0 0 6px; text-align: left; font-weight: 500; color: var(--soft); } /* the channel */
+.warn { padding: 10px 12px; border-radius: 8px; background: #FBF1DE; color: #7A4B07; }
+.note { color: var(--muted); }
+.card .note, .card .help, .card .row-meta { font-size: 13px; }
+
+/* rows: assistants, addresses, keys, agreements */
+.rows { margin: 0; padding: 0; list-style: none; }
+.row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 14px 0;
+  border-top: 1px solid var(--line-soft);
+}
+.row-text { min-width: 0; }
+.row-title { font-weight: 500; overflow-wrap: anywhere; }
+.row-meta { margin-top: 4px; color: var(--muted); }
+.row > form, .row > .btn { flex: none; margin: 0; }
+
+/* connect another assistant: the Muse prompt with its Copy button */
+.connect-more { padding-top: 12px; border-top: 1px solid var(--line-soft); }
+.connect-more > summary { font-size: 14px; font-weight: 500; color: var(--accent); cursor: pointer; }
+.fold-body { margin-top: 12px; }
+.fold-body > * + * { margin-top: 10px; }
+pre {
+  margin: 0; padding: 12px 14px; border: 1px solid var(--line-soft); border-radius: 8px; background: var(--well);
+  font: 13px/1.5 var(--mono); color: var(--fg); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+/* the folded Keys card: its summary reads as the card's header */
+.card-fold { padding: 0; }
+.card-fold > summary {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 18px 24px; list-style: none;
+  cursor: pointer;
+}
+.card-fold > summary::-webkit-details-marker { display: none; }
+.card-fold > summary::after { margin-left: auto; }
+.fold-title { font: 600 18px/1.3 var(--sans); letter-spacing: -0.01em; }
+.fold-sub { font-size: 13px; color: var(--muted); }
+.card-fold > .fold-body { margin-top: 0; padding: 0 24px 20px; }
+
+/* forms: labels above fields, one checkbox a line */
+.stack {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+.stack > * + * { margin-top: 0; }
+.field { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 420px; font-size: 14px; font-weight: 500; }
+/* a text field's edge holds 3:1 on the card (WCAG 1.4.11: #8A90A0 is 3.2:1); --line (1.35:1) is for dividers */
+.field input, .field select {
+  width: 100%; min-height: 36px; padding: 0 10px; border: 1px solid #8A90A0; border-radius: 8px;
+  background: var(--card); color: var(--fg); font: 400 14px/1.4 var(--sans);
+}
+.checks { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; border: 0; }
+.checks legend { margin-bottom: 6px; padding: 0; font-size: 14px; font-weight: 500; }
+.help { color: var(--muted); }
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.check input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+
+/* ------------------------------------------------------------ phones: one column, 44px targets */
+
+@media (max-width: 720px) {
+  .settings-wrap { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 20px 16px 48px; }
+  .settings-side { position: static; }
+  .section-nav {
+    /* 4px above and below: the scroller clips, and the focus ring sits 2px + 2px outside each pill */
+    flex-direction: row; gap: 6px; margin: 0 -16px; padding: 4px 16px; overflow-x: auto; scrollbar-width: none;
+  }
+  .section-nav a {
+    display: inline-flex; flex: none; align-items: center; min-height: 44px; padding: 0 14px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--card); white-space: nowrap;
+  }
+  .card { padding: 16px; }
+  .card-fold { padding: 0; }
+  .card-fold > summary { min-height: 44px; padding: 14px 16px; }
+  .card-fold > .fold-body { padding: 0 16px 16px; }
+  .row { flex-direction: column; gap: 10px; }
+  .next-step { flex-direction: column; align-items: stretch; }
+  .next-step .btn-primary { justify-content: center; }
+  .btn, .switcher > summary, .field input, .field select, .check { min-height: 44px; }
+  .field input, .field select { font-size: 16px; } /* under 16px iOS Safari zooms in on focus, then pans sideways */
+  .switcher-menu { max-height: none; }
+  .switcher-menu a { display: flex; align-items: center; min-height: 44px; }
+  /* a list-item still (flex would drop the disclosure marker, its only open/closed cue): padded to 44px */
+  .connect-more > summary { min-height: 44px; padding: 12px 0; }
+}

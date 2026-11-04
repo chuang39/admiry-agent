@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — connect {{ assistant }}</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+{#- The consent an assistant's sign-in lands on, often on the owner's phone (page.css; the mobile audit,
+    2026-09-30): the site's brand so the owner knows whose page it is, each choice a whole row, Allow the one
+    primary button. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main" id="main">
+<div class="page-head">
+<h1>Let {{ assistant }} work with Admiry?</h1>
+<p class="muted">Signed in as {{ email }}. You'll be sent back to <strong>{{ return_host }}</strong> when you're done.</p>
+</div>
+<form class="page-form" method="post" action="/oauth/consent">
+  <input type="hidden" name="txn" value="{{ txn }}">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <section class="card">
+  <fieldset class="choices">
+    <legend>On which business?</legend>
+    {% if website_draft_id %}
+    <label class="choice">
+      <input type="radio" name="business" value="website:{{ website_draft_id }}" checked> <span>Continue the plan you started on the website</span></label>
+    {% endif %}
+    {% for b in businesses %}
+    <label class="choice">
+      <input type="radio" name="business" value="{{ b.id }}"{% if loop.first and not website_draft_id %} checked{% endif %}> <span>{{ b.slug or b.name }}</span></label>
+    {% endfor %}
+    <label class="choice">
+      <input type="radio" name="business" value="new"{% if not businesses and not website_draft_id %} checked{% endif %}> <span>A new business</span></label>
+  </fieldset>
+  </section>
+  <section class="card">
+  <fieldset class="choices">
+    <legend>{{ assistant }} may:</legend>
+    {% for s in scopes %}
+    <label class="choice">
+      <input type="checkbox" name="scopes" value="{{ s.id }}"{% if s.checked %} checked{% endif %}{% if s.fixed %} disabled{% endif %}> <span>{{ s.words }}</span>
+      {% if s.fixed %}<input type="hidden" name="scopes" value="{{ s.id }}">{% endif %}
+    </label>
+    {% endfor %}
+  </fieldset>
+  </section>
+  <div class="actions">
+    <button class="btn btn-primary" type="submit" name="decision" value="allow">Allow</button>
+    <button class="btn" type="submit" name="decision" value="deny">Not now</button>
+  </div>
+</form>
+</main>
+</body>
+</html>

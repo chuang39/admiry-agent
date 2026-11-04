@@ -1,0 +1,21 @@
+{
+  "tree": "attorneys",
+  "sensitive": true,
+  "cta": "call",
+  "sections": [
+    {"id": "hero", "title": "Above the fold", "guide": "One headline: the practice area and the city, exactly as the ads say it. Under it, a free consultation in one line only when the firm truly offers one, and the phone as a tap-to-call button. Name the attorney responsible for the advertising.", "example": "Divorce Attorney in Austin — free consultation. Call (512) 555-0100."},
+    {"id": "trust", "title": "Why this firm", "guide": "Years in practice, the state bar admissions, the responsible attorney's name and the office address: several state bar rules require these on an advertising page. Real reviews with the reviewer's first name and the source; never a review the firm did not receive.", "example": "18 years in family law · Texas Bar · 100 Congress Ave, Austin"},
+    {"id": "service", "title": "What the consultation covers", "guide": "A few plain sentences on what the first consultation covers and how it is billed: free, a flat fee, or 'flat fee from $X'. No promises about the outcome of a case.", "example": "The first call is free. Most uncontested filings are a flat fee from $900."},
+    {"id": "form", "title": "Request a call", "guide": "Name, phone, the matter type, and a preferred time to call. Never ask for the facts of the case in the form; that conversation happens on the phone.", "example": "We call back within one business day."},
+    {"id": "faq", "title": "Questions people ask", "guide": "Four to six questions with one-paragraph answers: what the consultation costs, whether the firm handles cases like this one, how long a case like this typically takes, and the fee structure.", "example": "What does a consultation cost? The first call is free; we discuss the case and what it may cost from there."},
+    {"id": "hours", "title": "Hours and where", "guide": "Opening hours, the office address with a map link, the phone again.", "example": "Mon–Fri 9–5 · 100 Congress Ave, Austin"},
+    {"id": "footer", "title": "Footer", "guide": "The firm's name, a Terms link, the Privacy notice link (required when the page has a form), and the firm's phone or e-mail.", "example": "Austin Family Law · Terms · Privacy · (512) 555-0100"}
+  ],
+  "form_intent": "consult",
+  "form_fields": ["name", "phone", "service", "preferred_time"],
+  "form_rules": ["Never ask for the facts of the case in the form; that conversation happens on the phone.", "Say when the firm calls back.", "'specialist' only where the state certifies one."],
+  "required_lines": [],
+  "banned": ["guaranteed", "guarantee", "best", "#1", "win your case", "expert", "specialist"],
+  "negatives": ["jobs", "salary", "school", "free", "pro bono"],
+  "faq": ["What does a consultation cost?", "Do you handle cases like mine?", "How long does a case like this take?", "What are your fees?", "Is there parking at your office?"]
+}

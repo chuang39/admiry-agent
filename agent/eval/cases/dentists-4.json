@@ -1,0 +1,89 @@
+{
+  "id": "dentists-4",
+  "vertical": "dentists",
+  "opening": "Little Molars Pediatric Dentistry in Raleigh. We see kids from toddlers to teens, and we want parents calling us, within 5 miles.",
+  "monthly_budget_usd": null,
+  "knowledge": {
+    "name": "Little Molars Pediatric Dentistry",
+    "category": "dentists",
+    "category_detail": "pediatric dentist",
+    "service_area": [
+      "Raleigh",
+      "Cary"
+    ],
+    "services": [
+      {
+        "name": "Kids dentistry",
+        "intent_phrases": [
+          "pediatric dentist raleigh",
+          "kids dentist near me",
+          "children's dentist accepting new patients"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "First dental visit",
+        "intent_phrases": [
+          "baby first dentist visit",
+          "toddler dentist raleigh"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Fri 8-5, Sat 8-12",
+    "phone": "919-555-0118",
+    "website": null,
+    "pricing_hints": [],
+    "typical_customer_value_usd": 350,
+    "usp": [
+      "Kid-friendly office",
+      "Saturday appointments"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "healthcare"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": null,
+      "monthly_budget_usd": null,
+      "focus_services": [
+        "Kids dentistry"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_dentists_4",
+      "name": "Little Molars Pediatric Dentistry",
+      "address": "4325 Lake Boone Trail, Raleigh, NC 27607",
+      "lat": 35.8162,
+      "lng": -78.6908,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Little Molars Pediatric Dentistry"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "calls"
+    },
+    "service": {
+      "choice": "svc_kids_dentistry"
+    },
+    "customer_value": {
+      "choice": "300_1000"
+    },
+    "radius": {
+      "choice": "r5"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

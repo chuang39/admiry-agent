@@ -1,0 +1,7 @@
+{#- The takedown (A3p-3 §3.2 "Takedown"; agent/hosting_minimum.py take_down). Context: text (the spec's sentence and
+    the download link), status (the owner lines of the ads paused with it, or empty). -#}
+{{ text }}
+{% if status %}
+Admiry paused the ads that sent people to it first, so no click you pay for lands on a page that is not there:
+{{ status }}
+{% endif %}

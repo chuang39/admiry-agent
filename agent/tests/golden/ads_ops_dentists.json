@@ -1,0 +1,203 @@
+[
+  {
+    "campaignBudgetOperation": {
+      "create": {
+        "resourceName": "customers/1112223333/campaignBudgets/-1",
+        "name": "Admiry · Bright Smile Dental · biz_1 budget",
+        "amountMicros": 65780000,
+        "deliveryMethod": "STANDARD",
+        "explicitlyShared": false
+      }
+    }
+  },
+  {
+    "campaignOperation": {
+      "create": {
+        "resourceName": "customers/1112223333/campaigns/-2",
+        "name": "Admiry · Bright Smile Dental · biz_1",
+        "status": "PAUSED",
+        "advertisingChannelType": "SEARCH",
+        "campaignBudget": "customers/1112223333/campaignBudgets/-1",
+        "targetSpend": {
+          "cpcBidCeilingMicros": 12000000
+        },
+        "networkSettings": {
+          "targetGoogleSearch": true,
+          "targetSearchNetwork": false,
+          "targetContentNetwork": false,
+          "targetPartnerSearchNetwork": false
+        },
+        "geoTargetTypeSetting": {
+          "positiveGeoTargetType": "PRESENCE",
+          "negativeGeoTargetType": "PRESENCE"
+        },
+        "containsEuPoliticalAdvertising": "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/1112223333/campaigns/-2",
+        "proximity": {
+          "geoPoint": {
+            "latitudeInMicroDegrees": 37441900,
+            "longitudeInMicroDegrees": -122143000
+          },
+          "radius": 5.0,
+          "radiusUnits": "MILES"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/1112223333/campaigns/-2",
+        "language": {
+          "languageConstant": "languageConstants/1000"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/1112223333/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "jobs",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/1112223333/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "school",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/1112223333/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "salary",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/1112223333/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "free",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "campaignCriterionOperation": {
+      "create": {
+        "campaign": "customers/1112223333/campaigns/-2",
+        "negative": true,
+        "keyword": {
+          "text": "diy",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupOperation": {
+      "create": {
+        "resourceName": "customers/1112223333/adGroups/-3",
+        "name": "invisalign palo alto",
+        "campaign": "customers/1112223333/campaigns/-2",
+        "status": "ENABLED",
+        "type": "SEARCH_STANDARD"
+      }
+    }
+  },
+  {
+    "adGroupCriterionOperation": {
+      "create": {
+        "adGroup": "customers/1112223333/adGroups/-3",
+        "status": "ENABLED",
+        "keyword": {
+          "text": "invisalign palo alto",
+          "matchType": "PHRASE"
+        }
+      }
+    }
+  },
+  {
+    "adGroupAdOperation": {
+      "create": {
+        "adGroup": "customers/1112223333/adGroups/-3",
+        "status": "ENABLED",
+        "ad": {
+          "finalUrls": [
+            "https://brightsmile.example/invisalign"
+          ],
+          "responsiveSearchAd": {
+            "headlines": [
+              {
+                "text": "Invisalign in Palo Alto",
+                "pinnedField": "HEADLINE_1"
+              },
+              {
+                "text": "Same-Week Appointments"
+              },
+              {
+                "text": "Clear Aligners Near You"
+              }
+            ],
+            "descriptions": [
+              {
+                "text": "Clear aligners from a family dentist. Book online."
+              },
+              {
+                "text": "Straighter teeth without metal braces."
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  {
+    "assetOperation": {
+      "create": {
+        "resourceName": "customers/1112223333/assets/-4",
+        "callAsset": {
+          "countryCode": "US",
+          "phoneNumber": "6505550100",
+          "callConversionReportingState": "USE_RESOURCE_LEVEL_CALL_CONVERSION_ACTION",
+          "callConversionAction": "customers/1112223333/conversionActions/1"
+        }
+      }
+    }
+  },
+  {
+    "campaignAssetOperation": {
+      "create": {
+        "campaign": "customers/1112223333/campaigns/-2",
+        "asset": "customers/1112223333/assets/-4",
+        "fieldType": "CALL"
+      }
+    }
+  }
+]

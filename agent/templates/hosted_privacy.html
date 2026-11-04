@@ -1,0 +1,42 @@
+{#- Admiry's hosted privacy notice for one business's page (agent/hosted.py:privacy_html, H3). Context:
+    business ({name, phone, email}), page ({form_fields}: the vertical recipe's own fields, every one this
+    page's form can ever send). Rendered on the tenant host itself, so this stays a plain, static page --
+    no header, no links off the business's own site beyond Admiry's policy. -#}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — {{ business.name }}</title>
+<style>
+  body{font-family:ui-sans-serif,system-ui,sans-serif;max-width:40rem;margin:3rem auto;padding:0 1rem;line-height:1.55;color:#1c1f2a}
+  h1{font-size:1.3rem}.muted{color:#5b6172}
+</style>
+</head>
+<body>
+<h1>Privacy notice</h1>
+<p>This page belongs to {{ business.name }}.</p>
+<p>
+  If you use the form on this page, it sends {{ business.name }} what you type into it
+  {%- if page.form_fields %} — {{ page.form_fields|join(', ') }}{% endif %}.
+</p>
+<p>
+  The page also counts visits, taps on its phone, e-mail and booking links, and a booking you complete in its
+  booking calendar, without your name or number. To credit a request you send later to what brought you here,
+  your browser keeps, in its own storage for this site, the ad's click code, the link's tags and the site you
+  came from, for 90 days. Clearing this site's data in your browser removes them.
+</p>
+<p>
+  Admiry, Inc. hosts this page and processes what the form collects on {{ business.name }}'s behalf, to
+  deliver it to the business; see <a href="https://www.admiry.ai/privacy">Admiry's privacy policy</a>.
+</p>
+<p>
+  This page sets no cookies of Admiry's. If {{ business.name }} runs Google ads, Google's advertising
+  cookies belong to the business, not to Admiry.
+</p>
+<p class="muted">
+  Questions about your information go to {{ business.name }}
+  {%- if business.phone %}, {{ business.phone }}{% endif -%}
+  {%- if business.email %}, {{ business.email }}{% endif -%}.
+</p>
+</body>
+</html>

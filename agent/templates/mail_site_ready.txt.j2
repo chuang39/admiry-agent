@@ -1,0 +1,16 @@
+{#- The e-mail of an industry site's first build (A3p-6 batch 2 Q13, T12, T14; tools_sites.BuildCall.after). Context:
+    name (the business's), preview_url, minimum (hosting_minimum.MINIMUM), checklist (each kind: label, have, need,
+    done), upload_url, assistant_line (T14's line). The heading's words are Q12's. -#}
+{{ name }}'s site is ready to look over: {{ preview_url }}
+
+The link works for 24 hours. {{ minimum }}
+
+Photos make your site yours. Upload these, most important first:
+{% for item in checklist -%}
+{{ "[x]" if item.done else "[ ]" }} {{ item.label }}: {{ item.have }} of {{ item.need }}
+{% endfor %}
+Add them from a phone: {{ upload_url }}
+
+{{ assistant_line }}
+
+Publish it from your Admiry page or through your assistant once the logo and the photo are in.

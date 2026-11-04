@@ -1,0 +1,89 @@
+{
+  "id": "home_services-2",
+  "vertical": "home_services",
+  "opening": "Rapid Rooter Plumbing, Austin. 24/7 emergency plumbing. We want the phone to ring, within 10 miles.",
+  "monthly_budget_usd": 1500,
+  "knowledge": {
+    "name": "Rapid Rooter Plumbing",
+    "category": "home_services",
+    "category_detail": "residential plumber",
+    "service_area": [
+      "Austin",
+      "Round Rock",
+      "Pflugerville"
+    ],
+    "services": [
+      {
+        "name": "Emergency plumbing",
+        "intent_phrases": [
+          "emergency plumber austin",
+          "burst pipe repair"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "Water heater repair",
+        "intent_phrases": [
+          "water heater repair austin",
+          "no hot water plumber"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "24/7",
+    "phone": "512-555-0187",
+    "website": null,
+    "pricing_hints": [
+      "no extra charge for nights and weekends"
+    ],
+    "typical_customer_value_usd": 400,
+    "usp": [
+      "Open 24/7",
+      "Upfront pricing"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": null,
+      "monthly_budget_usd": 1500,
+      "focus_services": [
+        "Emergency plumbing"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_home_services_2",
+      "name": "Rapid Rooter Plumbing",
+      "address": "600 Congress Ave, Austin, TX 78701",
+      "lat": 30.2687,
+      "lng": -97.7426,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Rapid Rooter Plumbing"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "calls"
+    },
+    "service": {
+      "choice": "svc_emergency_plumbing"
+    },
+    "customer_value": {
+      "choice": "300_1000"
+    },
+    "radius": {
+      "choice": "r10"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

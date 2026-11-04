@@ -1,0 +1,22 @@
+/* The plan thumbs (spec 2026-09-30 support-and-feedback §6): on the homepage over base.css's tokens, and on the plain
+   /plan page, which has none -- every token carries its fallback. /plan loads this sheet too, so no rule may restyle a
+   page it is not for: each selector is the thumbs' (.rate*), or the homepage's own dock reached through them
+   (body:has(.rate-why ...)). "Talk to a person" left with the Help button (spec 2026-10-12 H4, static/help.css), and
+   with it the taller dock and its scroll padding. */
+.rate { margin-top: 12px; padding: 14px 16px; border: 1px solid var(--line, #DBDEE2); border-radius: 12px;
+  background: var(--card, #FFFFFF); }
+.rate-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rate-q { margin: 0 8px 0 0; font-size: 15px; color: var(--soft, #3D4356); }
+.rate-b { min-width: 44px; min-height: 44px; border: 1px solid var(--line, #DBDEE2); border-radius: 999px;
+  background: none; font-size: 18px; }
+.rate-b[aria-pressed="true"] { border-color: var(--accent, #345BFF); background: var(--accent-bg, #EEF2FF); }
+.rate-why { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.rate-r { font-size: 14px; color: var(--soft, #3D4356); }
+.rate-why textarea { width: 100%; padding: 10px; border: 1px solid var(--line, #DBDEE2); border-radius: 8px;
+  font: inherit; }
+.rate-note { margin: 8px 0 0; font-size: 14px; color: var(--muted, #596275); }
+/* Phones: typing in the thumbs' comment is typing in the conversation: one input above the keyboard, as home.css does
+   for an input */
+@media (max-width: 720px) {
+  body:has(.rate-why textarea:focus) .dock { display: none; }
+}

@@ -1,0 +1,23 @@
+# Admiry connector — for assistants
+
+Admiry is an AI marketing agent for local and service businesses.
+MCP: {{ mcp_url }} (Model Context Protocol, streamable HTTP, stateless, JSON responses)
+Auth: OAuth 2.1, no key. Connect with no credential: the first request answers 401 with WWW-Authenticate: Bearer resource_metadata={{ base }}/.well-known/oauth-protected-resource/mcp; register a client at the authorization server's registration endpoint (dynamic client registration, no secret), use PKCE S256, open the authorization URL for the owner (they sign in with Google and allow), exchange the code at the token endpoint; a refresh token comes with it. Do not ask the owner for a key. Only a client that cannot open a browser for the owner falls back to Authorization: Bearer ak_... (or X-API-Key: ak_...), a key the owner copies from {{ base }}/connect.
+Rate limits: 60 calls/minute and 2,000/day per key; errors carry retry_after=<seconds>.
+Read {{ base }}/connect/docs first. Tool schemas: {{ base }}/connect/tools.json
+Version: {{ version }} (get_marketing_state returns it as surface_version; if you saved an older one, read this again).
+The guide: {{ skill_url }} (the files it names are beside it, under {{ base }}/connect/references/) — get_marketing_state first, and follow its next. For a business with nothing begun that is create_marketing_plan → update_marketing_plan (until the plan can be shown) → get_marketing_plan → launch_marketing_plan; called for a business that already has a plan, create_marketing_plan starts over. Every result is {data, say, next}: show say as written, present next, send the owner's own words back.
+For a home-services business or a dental practice, the page the ads use can be a whole website Admiry builds: get_site_templates shows its three looks, update_landing_page with action "build_site" (or "write") asks its questions one at a time (the look first, then the facts it lacks) and builds it, and get_landing_page with view "site" shows where it stands. A photo reaches Admiry only through the upload link the answer carries.
+If you save this as a skill, use this description: {{ skill_description }}
+
+Paste into Meta Muse:
+{{ prompt }}
+
+Tools (RO = read, W = write, P = asks the owner first and runs when they approve (on their page, or by your calling again with their approval); each line ends with what comes before a call; a tool that takes idempotency_key needs a new one per distinct call):
+{% for t in tools -%}
+- {{ t.name }} [{{ t.class }} · {{ t.scope }}] — {{ t.summary }} ({{ t.approval_text }})
+{% endfor %}
+Errors and statuses:
+{% for text, meaning in errors -%}
+- {{ text }}: {{ meaning }}
+{% endfor %}

@@ -1,0 +1,394 @@
+{#- The industry site's components (A3p-6 batch 1 Q5): one set for every family and style. Imported `with context`,
+    so they read the site's values (base, tel, phone, the words, the facts). Every value is autoescaped. A section
+    renders only with the facts it needs, never empty (T5); a heading the model did not write leaves the section
+    without one. -#}
+
+{#- The accessible name starts with the visible words (WCAG 2.5.3) and always carries the number, which a phone's
+    header hides from sight ("Call" alone) but a screen reader still says. -#}
+{% macro call(label, cls="btn btn-primary", number=false) -%}
+{%- set seen = label ~ (" " ~ phone if number else "") -%}
+<a class="{{ cls }}" href="tel:{{ tel }}" data-admiry="call" aria-label="{{ seen if phone in seen else seen ~ " " ~ phone }}">{{ label }}{% if number %} <span class="num">{{ phone }}</span>{% endif %}</a>
+{%- endmacro %}
+
+{% macro button(href, label, cls="btn btn-secondary") -%}
+<a class="{{ cls }}" href="{{ href }}">{{ label }}</a>
+{%- endmacro %}
+
+{% macro hero_actions(on_dark=false) -%}
+<p class="actions">
+  {{ call(w.cta_label, number=true) }}
+  {{ button(quote_url, actions.header, "btn btn-secondary" ~ (" on-dark" if on_dark else "")) }}
+</p>
+{%- endmacro %}
+
+{% macro photo(p, sizes, eager=false, cls="") -%}
+{%- if p %}
+<figure class="photo {{ cls }}" data-slot="{{ p.slot }}" data-source="{{ p.source }}">
+  <img src="{{ p.src }}" srcset="{{ p.srcset }}" sizes="{{ sizes }}" width="{{ p.width }}" height="{{ p.height }}" alt="{{ p.alt }}"{% if eager %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>
+  {%- if p.label %}
+  <span class="photo-label">Replace with your photo</span>
+  {%- endif %}
+</figure>
+{%- endif %}
+{%- endmacro %}
+
+{#- The owner's logo, the header's brand (A3p-6 batch 2 Q10; only where the header is light): the business's name is
+    its alt, so the link home still has a name; it is on every page's first screen, so never lazy; it is the owner's
+    own, so never labelled "Replace with your photo". It is shown at most 200 px wide (`sizes`: a srcset in widths
+    needs one). -#}
+{% macro brand_logo() -%}
+<img class="brand-logo" src="{{ logo.src }}" srcset="{{ logo.srcset }}" width="{{ logo.width }}" height="{{ logo.height }}" alt="{{ f.name }}" sizes="200px">
+{%- endmacro %}
+
+{% macro heading(text, level=2) -%}
+{%- if text %}<h{{ level }}>{{ text }}</h{{ level }}>{% endif %}
+{%- endmacro %}
+
+{% macro page_hero(eyebrow, picture, extra="") -%}
+<section class="hero hero--{{ style.hero }}" data-section="hero">
+  <div class="wrap hero-in{% if not picture %} hero-solo{% endif %}">
+    <div class="hero-copy">
+      {%- if badge %}
+      <p class="badge">{{ badge }}</p>
+      {%- endif %}
+      {%- if eyebrow %}
+      <p class="eyebrow">{{ eyebrow }}</p>
+      {%- endif %}
+      <h1>{{ h1 }}</h1>
+      {%- if lead %}
+      <p class="lead">{{ lead }}</p>
+      {%- endif %}
+      {%- if extra %}
+      <p class="lead-more">{{ extra }}</p>
+      {%- endif %}
+      {{ hero_actions(on_dark=style.hero == "dark-split") }}
+    </div>
+    {%- if picture %}
+    <div class="hero-media">{{ photo(picture, hero_sizes, eager=true, cls="photo-hero") }}</div>
+    {%- endif %}
+  </div>
+</section>
+{%- endmacro %}
+
+{#- `urgent` is the family's emergency fact: home services' `emergency`, dental's `emergency_line`. -#}
+{% macro emergency() -%}
+{%- if urgent %}
+<section class="emergency" data-section="emergency">
+  <div class="wrap emergency-in">
+    <p>{{ urgent }}</p>
+    {{ call("Call " ~ phone, "btn btn-primary") }}
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{#- Calm: on a phone a one-line band above the hero, the call itself (hidden from 768 px, where the band under the
+    trust strip carries the line). -#}
+{% macro emergency_top() -%}
+{%- if urgent and "emergency-band-above-hero-on-phone" in style.features %}
+<div class="emergency-top" data-section="emergency-top">
+  <div class="wrap">{{ call("In pain? Call " ~ phone, "emergency-top-call") }}</div>
+</div>
+{%- endif %}
+{%- endmacro %}
+
+{% macro trust_strip() -%}
+{%- if trust %}
+<section class="trust trust--{{ style.trust }}" data-section="trust">
+  <ul class="wrap trust-list">
+    {%- for item in trust %}
+    <li><strong>{{ item.value }}</strong>{% if item.label %} <span>{{ item.label }}</span>{% endif %}</li>
+    {%- endfor %}
+  </ul>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{% macro problem_picker() -%}
+{%- if picker %}
+<section class="picker" data-section="picker">
+  <div class="wrap">
+    <h2>What's going on?</h2>
+    <ul class="picker-list">
+      {%- for item in picker %}
+      <li><a href="{{ item.url }}">{{ item.label }}</a></li>
+      {%- endfor %}
+      <li><a href="{{ base }}/contact/">Not sure</a></li>
+    </ul>
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{% macro service_card(s) -%}
+<li class="card">
+  {{ photo(s.photo, card_sizes) }}
+  <div class="card-body">
+    <h3><a class="card-link" href="{{ s.url }}">{{ s.name }}</a></h3>
+    {%- if s.summary %}
+    <p>{{ s.summary }}</p>
+    {%- endif %}
+  </div>
+</li>
+{%- endmacro %}
+
+{% macro review(r) -%}
+<li class="review">
+  <blockquote><p>{{ r.text }}</p></blockquote>
+  <p class="who">{{ r.first_name }} · {{ r.source }}{% if r.when %} · {{ r.when }}{% endif %}</p>
+</li>
+{%- endmacro %}
+
+{% macro reviews(items, title) -%}
+{%- if items %}
+<section class="reviews{% if 'reviews-on-dark' in style.features %} on-dark{% endif %}" data-section="reviews">
+  <div class="wrap">
+    {{ heading(title) }}
+    <ul class="review-list">
+      {%- for r in items %}
+      {{ review(r) }}
+      {%- endfor %}
+    </ul>
+    {%- if f.gbp_url %}
+    <p><a class="more" href="{{ f.gbp_url }}">Read our reviews on Google</a></p>
+    {%- endif %}
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{% macro faq(items, title) -%}
+{%- if items %}
+<section class="faq" data-section="faq">
+  <div class="wrap faq-in">
+    {{ heading(title) }}
+    <div class="faq-list">
+      {%- for item in items %}
+      <details>
+        <summary>{{ item.q }}</summary>
+        <p>{{ item.a }}</p>
+      </details>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{% macro steps(title, items) -%}
+{%- if items %}
+<section class="how" data-section="how">
+  <div class="wrap">
+    {{ heading(title) }}
+    <ol class="steps">
+      {%- for s in items %}
+      <li><h3>{{ s.title }}</h3><p>{{ s.text }}</p></li>
+      {%- endfor %}
+    </ol>
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{% macro hours_list(items) -%}
+<ul class="hours">
+  {%- for h in items %}
+  <li>{{ h }}</li>
+  {%- endfor %}
+</ul>
+{%- endmacro %}
+
+{% macro area(title, text="", with_hours=true) -%}
+{%- if towns or text %}
+<section class="area" data-section="area">
+  <div class="wrap area-in">
+    <div>
+      {{ heading(title) }}
+      {%- if text %}
+      <p>{{ text }}</p>
+      {%- endif %}
+      {%- if towns %}
+      <ul class="towns">
+        {%- for t in towns %}
+        <li>{{ t }}</li>
+        {%- endfor %}
+      </ul>
+      {%- endif %}
+    </div>
+    {%- if with_hours and f.hours %}
+    <div class="area-hours">
+      <h3>Hours</h3>
+      {{ hours_list(f.hours) }}
+    </div>
+    {%- endif %}
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{% macro cta_band() -%}
+<section class="cta" data-section="cta">
+  <div class="wrap cta-in">
+    <div>
+      {{ heading(w.home.cta_heading) }}
+      {%- if w.home.cta_text %}
+      <p>{{ w.home.cta_text }}</p>
+      {%- endif %}
+    </div>
+    <p class="actions">
+      {{ call(w.cta_label, number=true) }}
+      {{ button(quote_url, actions.header, "btn btn-secondary on-dark") }}
+    </p>
+  </div>
+</section>
+{%- endmacro %}
+
+{#- No select starts on an answer the visitor did not give (A3p-6 batch 1 follow-ups): each opens on an empty,
+    disabled placeholder, so a visitor who never touches one sends nothing for it -- the browser holds the form back
+    until the required ones (the patient, the service) are chosen, and an untouched preferred time means no
+    preference. One exception, the informed default: on a service page the service opens on that page's own service,
+    the placeholder still first but not selected. -#}
+{% macro choose_one(selected=true) -%}
+<option value="" disabled{% if selected %} selected{% endif %}>Choose one</option>
+{%- endmacro %}
+
+{% macro request_form() -%}
+<section class="request" id="quote" data-section="form">
+  {{ heading(w.book_label) }}
+  <form method="post" action="{{ form.action }}" data-admiry-intent="{{ form.intent }}">
+    {%- for field in form.fields %}
+    {%- if field == "name" %}
+    <label for="f-name">Your name</label>
+    <input id="f-name" name="name" type="text" inputmode="text" autocomplete="name" required>
+    {%- elif field == "phone" %}
+    <label for="f-phone">Phone</label>
+    <input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required>
+    {%- elif field == "patient" %}
+    <label for="f-patient">{{ form.patient_label }}</label>
+    <select id="f-patient" name="patient" autocomplete="off" required>
+      {{ choose_one() }}
+      {%- for choice in form.patients %}
+      <option>{{ choice }}</option>
+      {%- endfor %}
+    </select>
+    {%- elif field == "service" %}
+    <label for="f-service">{{ form.service_label }}</label>
+    <select id="f-service" name="service" autocomplete="off" required>
+      {{ choose_one(selected=not svc) }}
+      {%- for s in services %}
+      <option{% if svc and svc.slug == s.slug %} selected{% endif %}>{{ s.name }}</option>
+      {%- endfor %}
+      {%- if form.other %}
+      <option>{{ form.other }}</option>
+      {%- endif %}
+    </select>
+    {%- elif field == "zip" %}
+    <label for="f-zip">ZIP code</label>
+    <input id="f-zip" name="zip" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="10">
+    {%- elif field == "preferred_time" %}
+    <label for="f-time">{{ form.time_label }}</label>
+    <select id="f-time" name="preferred_time" autocomplete="off">
+      {{ choose_one() }}
+      {%- for choice in form.times %}
+      <option>{{ choice }}</option>
+      {%- endfor %}
+    </select>
+    {%- endif %}
+    {%- endfor %}
+    <p class="trap" aria-hidden="true">
+      <label for="f-{{ form.honeypot }}">Leave this empty</label>
+      <input id="f-{{ form.honeypot }}" name="{{ form.honeypot }}" type="text" tabindex="-1" autocomplete="off">
+    </p>
+    <button class="btn btn-primary" type="submit">{{ form.button }}</button>
+    <p class="note">{{ form.note }}</p>
+  </form>
+  <p class="small">What you send goes to {{ f.name }} only. <a href="/privacy">Privacy notice</a></p>
+</section>
+{%- endmacro %}
+
+{#- The dental home's modules (Q3): each only with its facts (T5). -#}
+
+{#- The dentist by name and credentials; a photo only when the owner gave one of their own (T11): never stock. -#}
+{% macro dentist() -%}
+{%- if f.dentist %}
+{%- set d = f.dentist %}
+<section class="dentist why" data-section="dentist">
+  <div class="wrap why-in">
+    <div class="why-copy">
+      {{ heading(w.home.about_heading) }}
+      <h3>{{ d.name }}</h3>
+      {%- if d.credentials and d.credentials not in d.name %}
+      <p class="who">{{ d.credentials }}</p>
+      {%- endif %}
+      {%- if d.school %}
+      <p>{{ d.school }}</p>
+      {%- endif %}
+      {%- if d.years %}
+      <p>{{ d.years }} years</p>
+      {%- endif %}
+      {%- if d.note %}
+      <p>{{ d.note }}</p>
+      {%- endif %}
+      {%- if w.home.about_text %}
+      <p>{{ w.home.about_text }}</p>
+      {%- endif %}
+    </div>
+    {%- if dentist_photo %}
+    <div class="why-media">{{ photo(dentist_photo, card_sizes) }}</div>
+    {%- endif %}
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{% macro new_patients() -%}
+{%- if f.new_patients %}
+<section class="new-patients" data-section="new-patients">
+  <div class="wrap">
+    {{ heading(w.home.new_patients_heading) }}
+    <p class="section-lead">{{ f.new_patients }}</p>
+    <p class="actions">{{ button(quote_url, actions.header, "btn btn-primary") }}</p>
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{% macro insurance() -%}
+{%- if f.insurance_plans or f.in_office_plan %}
+<section class="insurance" data-section="insurance">
+  <div class="wrap">
+    {{ heading(w.home.insurance_heading) }}
+    {%- if f.insurance_plans %}
+    <ul class="checks">
+      {%- for plan in f.insurance_plans %}
+      <li>{{ plan }}</li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+    {%- if f.in_office_plan or f.financing %}
+    <ul class="notes">
+      {%- for line in (f.in_office_plan, f.financing) if line %}
+      <li>{{ line }}</li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}
+
+{#- The office: the owner's photos, or in a preview the library's reception and outside, labelled. -#}
+{% macro office_strip() -%}
+{%- if office %}
+<section class="office" data-section="office">
+  <div class="wrap">
+    {{ heading(w.home.office_heading) }}
+    <div class="gallery">
+      {%- for p in office %}
+      {{ photo(p, card_sizes) }}
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+{%- endif %}
+{%- endmacro %}

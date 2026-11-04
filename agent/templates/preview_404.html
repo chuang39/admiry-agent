@@ -1,0 +1,15 @@
+{#- An expired or unknown preview token (agent/hosted.py:_preview_not_found, H3). No context: this page
+    never names a business -- an unguessable token that is simply gone is not information a caller should
+    get to probe for. The X-Robots-Tag header (hosted.headers) carries the real noindex signal; the meta
+    tag here is belt-and-braces for anything that only reads the body. -#}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Preview not found</title>
+<style>body{font-family:ui-sans-serif,system-ui,sans-serif;max-width:32rem;margin:4rem auto;padding:0 1rem;line-height:1.5;color:#1c1f2a}</style>
+</head>
+<body>
+<p>This preview link has expired or does not exist.</p>
+</body>
+</html>

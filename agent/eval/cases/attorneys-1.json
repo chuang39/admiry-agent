@@ -1,0 +1,90 @@
+{
+  "id": "attorneys-1",
+  "vertical": "attorneys",
+  "opening": "Harper Estate Law in Columbus, Ohio: wills, trusts and probate. We want more consultations within 25 miles.",
+  "monthly_budget_usd": 1200,
+  "knowledge": {
+    "name": "Harper Estate Law",
+    "category": "attorneys",
+    "category_detail": "estate planning attorney",
+    "service_area": [
+      "Columbus",
+      "Dublin",
+      "Westerville"
+    ],
+    "services": [
+      {
+        "name": "Estate planning",
+        "intent_phrases": [
+          "estate planning attorney columbus",
+          "will and trust lawyer"
+        ],
+        "price_hint": "flat fee"
+      },
+      {
+        "name": "Probate",
+        "intent_phrases": [
+          "probate lawyer columbus ohio"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Fri 9-5",
+    "phone": "614-555-0123",
+    "website": null,
+    "pricing_hints": [
+      "flat-fee estate plans"
+    ],
+    "typical_customer_value_usd": 2500,
+    "usp": [
+      "Flat-fee estate plans",
+      "Home visits for seniors"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "legal"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": 8,
+      "monthly_budget_usd": 1200,
+      "focus_services": [
+        "Estate planning"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_attorneys_1",
+      "name": "Harper Estate Law",
+      "address": "65 E State St, Columbus, OH 43215",
+      "lat": 39.9612,
+      "lng": -82.9988,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Harper Estate Law"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "enquiries"
+    },
+    "service": {
+      "choice": "svc_estate_planning"
+    },
+    "customer_value": {
+      "choice": "1000_3000"
+    },
+    "radius": {
+      "choice": "r25"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

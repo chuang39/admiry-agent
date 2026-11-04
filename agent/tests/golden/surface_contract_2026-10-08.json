@@ -1,0 +1,1707 @@
+{
+  "prompts": [
+    {
+      "arguments": [
+        "what_you_want",
+        "website"
+      ],
+      "name": "admiry-get-more-customers"
+    },
+    {
+      "arguments": [
+        "period"
+      ],
+      "name": "admiry-how-are-my-ads-doing"
+    },
+    {
+      "arguments": [
+        "service",
+        "offer"
+      ],
+      "name": "admiry-promote-a-service"
+    },
+    {
+      "arguments": [],
+      "name": "admiry-record-lead-outcomes"
+    }
+  ],
+  "resources": [
+    "admiry://business/profile",
+    "admiry://docs",
+    "admiry://knowledge",
+    "admiry://knowledge/{vertical}/{topic}",
+    "admiry://marketing/insights",
+    "admiry://marketing/performance/{period}",
+    "admiry://marketing/plan",
+    "admiry://marketing/state",
+    "skill://admiry-marketing/SKILL.md",
+    "skill://admiry-marketing/references/after-launch.md",
+    "skill://admiry-marketing/references/building-a-page.md",
+    "skill://admiry-marketing/references/first-plan.md",
+    "skill://admiry-marketing/references/leads-and-outcomes.md",
+    "skill://admiry-marketing/references/when-something-goes-wrong.md",
+    "ui://admiry/channels",
+    "ui://admiry/plan"
+  ],
+  "result_keys": {
+    "get_business_profile": [
+      "business",
+      "locations",
+      "services",
+      "offers",
+      "facts",
+      "knowledge_version"
+    ],
+    "get_campaign_performance": [
+      "period",
+      "from",
+      "to",
+      "funnel",
+      "by_channel",
+      "by_service",
+      "by_source",
+      "reported_by_owner",
+      "organic",
+      "plan_estimate",
+      "statement",
+      "days",
+      "goal"
+    ],
+    "get_campaigns": [
+      "channels",
+      "footer"
+    ],
+    "get_insights": [
+      "insight",
+      "report",
+      "recent",
+      "frequency",
+      "next_report_at"
+    ],
+    "get_leads": [
+      "leads",
+      "counts",
+      "awaiting_outcome"
+    ],
+    "get_marketing_plan": [
+      "plan_id",
+      "version",
+      "status",
+      "plan_url",
+      "cards"
+    ],
+    "get_marketing_state": [
+      "surface_version",
+      "caller",
+      "business",
+      "setup",
+      "consultation",
+      "goal",
+      "plan",
+      "channels",
+      "funnel_month",
+      "leads",
+      "money",
+      "issues",
+      "pending",
+      "opportunities"
+    ]
+  },
+  "tools": [
+    {
+      "approval": "none",
+      "card": null,
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "contact": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "happened_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "service": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "type": "string"
+          },
+          "value_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "kind",
+          "status",
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "add_lead",
+      "open_world": false,
+      "read_only": false,
+      "scope": "leads"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "question": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "question"
+        ],
+        "type": "object"
+      },
+      "name": "ask_admiry",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "assistant",
+      "card": null,
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "account_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "channel": {
+            "default": "google_search",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "connect_account",
+      "open_world": false,
+      "read_only": false,
+      "scope": "manage"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "summary",
+          "reason",
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "contact_support",
+      "open_world": false,
+      "read_only": false,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "W",
+      "destructive": false,
+      "idempotent": false,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "budget": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "handoff": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "known_facts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "locale": {
+            "default": "en-US",
+            "type": "string"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "message": {
+            "default": "",
+            "type": "string"
+          },
+          "preferred_outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "service": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      },
+      "name": "create_marketing_plan",
+      "open_world": true,
+      "read_only": false,
+      "scope": "manage"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "limit": {
+            "default": 50,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_activity_log",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "amount_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "limit": {
+            "default": 50,
+            "type": "integer"
+          },
+          "view": {
+            "default": "position",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_billing",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "include": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_business_profile",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "period": {
+            "default": "30d",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_campaign_performance",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": "ui://admiry/channels",
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_campaigns",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_connected_accounts",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "day": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_insights",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "candidate_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "view": {
+            "default": "status",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_landing_page",
+      "open_world": true,
+      "read_only": false,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "awaiting_outcome": {
+            "default": false,
+            "type": "boolean"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "lead_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "since": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_leads",
+      "open_world": false,
+      "read_only": true,
+      "scope": "leads"
+    },
+    {
+      "approval": "none",
+      "card": "ui://admiry/plan",
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "plan_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      },
+      "name": "get_marketing_plan",
+      "open_world": false,
+      "read_only": false,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_marketing_state",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "RO",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "name": "get_site_templates",
+      "open_world": false,
+      "read_only": true,
+      "scope": "read"
+    },
+    {
+      "approval": "code",
+      "card": null,
+      "class": "P",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "approval_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "plan_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "launch_marketing_plan",
+      "open_world": false,
+      "read_only": false,
+      "scope": "manage"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "channel": {
+            "default": "all",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "pause_campaign",
+      "open_world": false,
+      "read_only": false,
+      "scope": "manage"
+    },
+    {
+      "approval": "assistant",
+      "card": null,
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "channel": {
+            "default": "all",
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "resume_campaign",
+      "open_world": false,
+      "read_only": false,
+      "scope": "manage"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "patch": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "update_business_profile",
+      "open_world": true,
+      "read_only": false,
+      "scope": "manage"
+    },
+    {
+      "approval": "assistant",
+      "card": null,
+      "class": "P",
+      "destructive": true,
+      "idempotent": false,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "accent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "action": {
+            "type": "string"
+          },
+          "brief": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "facts": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "html": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "instruction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "owner_confirmed": {
+            "default": false,
+            "type": "boolean"
+          },
+          "section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "style": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "template": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "wordmark": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "action",
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "update_landing_page",
+      "open_world": true,
+      "read_only": false,
+      "scope": "manage"
+    },
+    {
+      "approval": "none",
+      "card": null,
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "idempotency_key": {
+            "type": "string"
+          },
+          "lead_id": {
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "status": {
+            "type": "string"
+          },
+          "value_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "lead_id",
+          "status",
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "update_lead",
+      "open_world": false,
+      "read_only": false,
+      "scope": "leads"
+    },
+    {
+      "approval": "none",
+      "card": "ui://admiry/plan",
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "channel_monthly_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "monthly_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "update_marketing_budget",
+      "open_world": false,
+      "read_only": false,
+      "scope": "manage"
+    },
+    {
+      "approval": "none",
+      "card": "ui://admiry/plan",
+      "class": "W",
+      "destructive": false,
+      "idempotent": true,
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "answers": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "changes": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "idempotency_key": {
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "plan_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "session_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "idempotency_key"
+        ],
+        "type": "object"
+      },
+      "name": "update_marketing_plan",
+      "open_world": false,
+      "read_only": false,
+      "scope": "manage"
+    }
+  ],
+  "values": {
+    "account_statuses": [
+      "none",
+      "pending",
+      "active",
+      "refused",
+      "inactive",
+      "needs_attention"
+    ],
+    "autopilot": [
+      "off",
+      "safe"
+    ],
+    "billing_views": [
+      "position",
+      "payments",
+      "topup_link"
+    ],
+    "channels": [
+      "google_search",
+      "newsbreak"
+    ],
+    "connect_modes": [
+      "own_account",
+      "managed"
+    ],
+    "connect_statuses": [
+      "connected",
+      "pending",
+      "needs_agreement",
+      "web_step"
+    ],
+    "contact_keys": [
+      "name",
+      "phone",
+      "email"
+    ],
+    "geo_models": [
+      "storefront",
+      "service_area"
+    ],
+    "goal_changes": [
+      "goal_type",
+      "target",
+      "monthly_limit_usd",
+      "focus_services",
+      "max_cost_per_customer_usd",
+      "channel_caps",
+      "autopilot"
+    ],
+    "goal_types": [
+      "customers",
+      "calls",
+      "bookings"
+    ],
+    "known_facts": [
+      "business_name",
+      "address",
+      "objective",
+      "service",
+      "customer_value_usd",
+      "radius_miles",
+      "monthly_budget_usd",
+      "offer",
+      "target_customers_per_month",
+      "max_cost_per_customer_usd",
+      "goal_type"
+    ],
+    "launch_statuses": [
+      "proposed",
+      "needs_verification"
+    ],
+    "lead_kinds": [
+      "form",
+      "call",
+      "other",
+      "booking"
+    ],
+    "lead_reasons": [
+      "out_of_area",
+      "wrong_service",
+      "no_answer",
+      "price",
+      "duplicate",
+      "not_a_customer",
+      "other"
+    ],
+    "lead_sources": [
+      "page",
+      "platform",
+      "owner"
+    ],
+    "lead_statuses": [
+      "new",
+      "contacted",
+      "booked",
+      "won",
+      "lost",
+      "spam"
+    ],
+    "limit_sources": [
+      "owner",
+      "system"
+    ],
+    "location_keys": [
+      "geo_model",
+      "areas",
+      "hours",
+      "phone",
+      "phone_hours"
+    ],
+    "page_actions": [
+      "write",
+      "revise",
+      "edit",
+      "use_url",
+      "preview_html",
+      "upload_site",
+      "publish",
+      "unpublish",
+      "send_install_steps",
+      "request_install_help",
+      "build_site"
+    ],
+    "page_sections": [
+      "headline",
+      "subheadline",
+      "offer_line",
+      "trust",
+      "service",
+      "faq",
+      "hours"
+    ],
+    "page_templates": [
+      "dentists",
+      "home_services",
+      "attorneys",
+      "fallback"
+    ],
+    "page_views": [
+      "status",
+      "check",
+      "kit",
+      "source",
+      "site"
+    ],
+    "patch_keys": [
+      "name",
+      "category_detail",
+      "website",
+      "pricing_hints",
+      "usp",
+      "locale",
+      "services",
+      "offers",
+      "locations",
+      "google_listing",
+      "notes"
+    ],
+    "pending_needs": [
+      "code",
+      "owner_yes"
+    ],
+    "periods": [
+      "7d",
+      "30d",
+      "month",
+      "last_month"
+    ],
+    "photo_kinds": [
+      "logo",
+      "key",
+      "place",
+      "team",
+      "work",
+      "before_after",
+      "dentist"
+    ],
+    "plan_changes": [
+      "monthly_budget_usd",
+      "level",
+      "radius_miles",
+      "offer",
+      "objective",
+      "channel",
+      "channel_monthly_usd"
+    ],
+    "plan_levels": [
+      "minimum",
+      "conservative",
+      "recommended",
+      "aggressive"
+    ],
+    "plan_objectives": [
+      "bookings",
+      "calls",
+      "enquiries",
+      "awareness",
+      "any"
+    ],
+    "plan_statuses": [
+      "draft",
+      "approved",
+      "superseded"
+    ],
+    "preferred_outcomes": [
+      "calls",
+      "forms",
+      "bookings"
+    ],
+    "profile_sections": [
+      "business",
+      "locations",
+      "services",
+      "offers",
+      "facts"
+    ],
+    "recommendation_kinds": [
+      "mark_leads",
+      "add_funds",
+      "raise_amount",
+      "change_ads",
+      "pause",
+      "check_page",
+      "see_issue",
+      "finish_setup",
+      "review_change"
+    ],
+    "scopes": [
+      "read",
+      "manage",
+      "leads"
+    ],
+    "site_facts": [
+      "name",
+      "phone",
+      "place",
+      "address",
+      "service_area",
+      "services",
+      "hours",
+      "about",
+      "email",
+      "social",
+      "licence",
+      "years",
+      "insured",
+      "warranty",
+      "free_estimate",
+      "insurance_claims",
+      "emergency",
+      "financing",
+      "languages",
+      "reviews",
+      "dentist",
+      "new_patients",
+      "insurance_plans",
+      "in_office_plan",
+      "emergency_line"
+    ],
+    "site_families": [
+      "dental",
+      "home_services"
+    ],
+    "site_styles": [
+      "calm",
+      "warm",
+      "boutique",
+      "solid",
+      "clean",
+      "bold"
+    ],
+    "support_reasons": [
+      "help",
+      "human",
+      "dissatisfied"
+    ]
+  },
+  "version": "2026-10-08",
+  "words": {
+    "connector_docs": "d3c0ea14c62054e2334242ed54aa084e59740616f93a458e5a49fcc4fe217269",
+    "descriptions": {
+      "add_lead": "ecddaea593511336c20e2b97abbd5d28bba0a85a667b91a935b8f33bee6c80dd",
+      "ask_admiry": "537a1fa70024c0a6004fc0dd6fc09e0b37d2c653cb5ebcbd51883453d64bceb8",
+      "connect_account": "d1f7671bcc85590b49237282649818af908bd8d77a870c9db975ca70fd99086d",
+      "contact_support": "fdf249d487c2db9ffc519c22c064ad05dd6eadec870047cf03bd70539b6c4f5e",
+      "create_marketing_plan": "111faf682415607c63c7106d2aca46d39aad0f8b6ec058f5e1c895813fa52b0a",
+      "get_activity_log": "a7da96d0785ff2ffe630088199c566a3dc054b3e209e435c13191451ff7fe413",
+      "get_billing": "209f266ae1fffa1ca8356b7f8728e096c4c03071c0855cc1ae69a9d045140d8c",
+      "get_business_profile": "a40e6c8e9c229fe26907d1cee25278ce727ffad733c797cd5280c76d0d4dee5c",
+      "get_campaign_performance": "330abbdc27255f49c26ee771366287a154202a185ce435c030b89d9c6cf6c5d1",
+      "get_campaigns": "7c389e8103bb0ccb6876bb617a18991d13d0e7e16c96a4324491a9e03eee6440",
+      "get_connected_accounts": "2b807808d82d0020c037a62c5e970cb930cdd01af77ae2fba9d35e034cf9f912",
+      "get_insights": "b86ba4262360aab3638661d3320d18f7cb7f38da1ac884dc9f7d2f1e85b5fedc",
+      "get_landing_page": "48dcb94735f8feb0e62307376322b7e4d3948c46afd7b7c3db81c24b77bc5f7c",
+      "get_leads": "78047cc87b0ff67323b2ddaf04f25bb235a95148fd383a6da8748c19041c6024",
+      "get_marketing_plan": "1ff9323d014eaef68dac5531deb55a4b91d7427c8d7de686f0d024c283bc0419",
+      "get_marketing_state": "a02e29d66f12e0c590427af3885bae6a78f2d87cfbdce3c0ff14a63646ee2a18",
+      "get_site_templates": "1bfc17e946553d97e009d4f6b0ff9ba5572d92d54c78e511ea9eab6a9d29a483",
+      "launch_marketing_plan": "926d62fd6097ab5c2e92e978c99a86af7ac0d28534dcef458d8aabcc3a0cbfc8",
+      "pause_campaign": "bde4c5b57b3091ae9c87297909c544601759eab16bfe8bec78f12c5aa244c827",
+      "resume_campaign": "636513706c6724cbb6829c56fd620a5c94022bed0d3f4c559210c395ebbdd131",
+      "update_business_profile": "58b4b9fe2f4692d2c3431a67c20866d89a3fcdc92e077a49ece850a6e10e17f5",
+      "update_landing_page": "e84a52d135e1cc1a314d3466ea0f07a62a0e6e9a528062aa3052ffb1847c8246",
+      "update_lead": "ae562f99c6ab4044344abec4d626344882532f4a185efbde2a511d8c47a06fd1",
+      "update_marketing_budget": "ec36a7a6f4b5f0ba72cce3f2d46be7b46eac53c5f82f13a776472553ac8df904",
+      "update_marketing_plan": "117093090483867982529e575e250a06469f9d5bccff2b57cce6e43b7421a4a2"
+    },
+    "instructions": "12c5527b99bade9d7db74f786d0281bd753393d6f8e52d7ce601d0ba228cead4",
+    "prompts": {
+      "admiry-get-more-customers": "3cb622160f64d0e8d80568c5982f183bb0a9810e9b9095a5fa8c935175c063c6",
+      "admiry-how-are-my-ads-doing": "706e43820db24e76497a4e59b14e2fb55b531b1a3a8a155301775c55ba89d9a9",
+      "admiry-promote-a-service": "6cb32ec6bf927bee67087192282dae7cc608d5eae3a49922b1f44cb439bdde85",
+      "admiry-record-lead-outcomes": "f8e664f7b8342f8198b9987e392830a9bdd6b01cbf9ab0fb696de4eafe0e7bbf"
+    },
+    "skill": {
+      "SKILL.md": "7bdb92980003129c9c19fb6919b0392933ece4b3379b4df00c3fb382e31f960a",
+      "references/after-launch.md": "56e5287249762ce3cb5b66d8b3926cb0a2943f108f376b1568601f5930d74b90",
+      "references/building-a-page.md": "190d4274d59f4aa7a67c0b92eebb2b63a19fc79589896454ebad9ee2bf9831e4",
+      "references/first-plan.md": "7763853a40eac439b6e8bd5de35f6d8b87ddea040bc7da4fe8e3e382b8407642",
+      "references/leads-and-outcomes.md": "26219ba63479b0d97be6d63fe18b5a9e0f90e3017c60d0d7335707a9321cec25",
+      "references/when-something-goes-wrong.md": "9f9901c6889385e35a31df0b57263c769b91316798e64b631f94158727af5297"
+    }
+  }
+}

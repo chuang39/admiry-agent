@@ -1,0 +1,90 @@
+{
+  "id": "home_services-5",
+  "vertical": "home_services",
+  "opening": "Greenway Landscape Co., Charlotte. Backyard designs, patios and walls. We'd like design consultation requests within 20 miles; $1,200 a month.",
+  "monthly_budget_usd": 1200,
+  "knowledge": {
+    "name": "Greenway Landscape Co.",
+    "category": "home_services",
+    "category_detail": "landscaping company",
+    "service_area": [
+      "Charlotte",
+      "Matthews",
+      "Huntersville"
+    ],
+    "services": [
+      {
+        "name": "Landscape design",
+        "intent_phrases": [
+          "landscape design charlotte",
+          "backyard landscaping company",
+          "landscaper near me"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "Patios and retaining walls",
+        "intent_phrases": [
+          "paver patio installation charlotte",
+          "retaining wall contractor"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Fri 7-6",
+    "phone": "704-555-0153",
+    "website": null,
+    "pricing_hints": [
+      "free design consultation"
+    ],
+    "typical_customer_value_usd": 6000,
+    "usp": [
+      "Free design consultation",
+      "Family-owned since 2009"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": 4,
+      "monthly_budget_usd": 1200,
+      "focus_services": [
+        "Landscape design"
+      ]
+    },
+    "listing": {
+      "place_id": "eval_home_services_5",
+      "name": "Greenway Landscape Co.",
+      "address": "1000 Central Ave, Charlotte, NC 28204",
+      "lat": 35.2196,
+      "lng": -80.8235,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Greenway Landscape Co."
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "enquiries"
+    },
+    "service": {
+      "choice": "svc_landscape_design"
+    },
+    "customer_value": {
+      "choice": "3000_plus"
+    },
+    "radius": {
+      "choice": "r20"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}

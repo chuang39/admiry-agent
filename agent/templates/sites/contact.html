@@ -1,0 +1,46 @@
+{#- The contact page (blueprint §4.5, Q14, Q19): the promise and a big call button, then "Call or text", "Hours",
+    "Where we work" (a service-area business: the towns, never the street address) or "Find us" (a storefront: the
+    address) with "Get directions", and the form. No map embed in batch 1. -#}
+{% extends "sites/_layout.html" %}
+{% import "sites/_components.html" as c with context %}
+{% block main %}
+{{ c.page_hero(none, contact_photo, w.contact.response_line) }}
+<section class="ways" data-section="ways">
+  <div class="wrap ways-in">
+    <div class="way">
+      <h2>Call or text</h2>
+      <p>{{ c.call(phone, "big-phone") }}</p>
+      {%- if f.email %}
+      <p><a href="mailto:{{ f.email }}">{{ f.email }}</a></p>
+      {%- endif %}
+    </div>
+    {%- if f.hours %}
+    <div class="way">
+      <h2>Hours</h2>
+      {{ c.hours_list(f.hours) }}
+    </div>
+    {%- endif %}
+    {%- if place or towns %}
+    <div class="way">
+      <h2>{{ where }}</h2>
+      {%- if f.storefront and f.address %}
+      <p>{{ f.address }}</p>
+      {%- else %}
+      <p>{{ ", ".join(towns) }}</p>
+      {%- endif %}
+      {%- if map_url %}
+      <p><a class="more" href="{{ map_url }}">Get directions</a></p>
+      {%- endif %}
+    </div>
+    {%- endif %}
+  </div>
+</section>
+<div class="wrap form-wrap">
+{{ c.request_form() }}
+</div>
+{%- if f.gbp_url %}
+<section class="reviews-link" data-section="reviews-link">
+  <p class="wrap"><a class="more" href="{{ f.gbp_url }}">Read our reviews on Google</a></p>
+</section>
+{%- endif %}
+{% endblock %}

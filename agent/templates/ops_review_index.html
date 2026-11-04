@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — launches in review</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+<link rel="stylesheet" href="/static/ops.css">
+</head>
+{#- The admins' launch review queue (L1, agent/ops_web.py): every first launch waiting, oldest first, and those decided
+    in the last 30 days. Admiry's team only (AGENT_ADMIN_EMAILS). -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main ops" id="main">
+<p class="ops-nav"><a href="/ops/review" aria-current="page">Launches in review</a> · <a href="/ops/tasks">Tasks</a> · <a href="/ops/rules">Rules</a></p>
+<section class="panel">
+  <h1>Launches in review</h1>
+  {% if queue.open %}
+  <table class="ops-table">
+    <tr><th>Business</th><th>Plan</th><th>A month</th><th>State</th><th>Why it waits</th><th>Yes by</th><th>Since</th></tr>
+    {% for r in queue.open %}
+    <tr>
+      <td><a href="/ops/review/{{ r.id }}">{{ r.name or r.business_id }}</a><br><span class="muted">{{ r.owner_email or "" }}</span></td>
+      <td>v{{ r.version }}</td>
+      <td>${{ "{:,.0f}".format(r.monthly_usd) }}</td>
+      <td class="ops-{{ r.state }}">{{ r.state }}</td>
+      <td>{{ r.hold_reason or "" }}</td>
+      <td>{{ r.approval or "" }}</td>
+      <td>{{ r.since }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="muted">Nothing waits.</p>
+  {% endif %}
+</section>
+<section class="panel">
+  <h2>Decided in the last 30 days</h2>
+  {% if queue.decided %}
+  <table class="ops-table">
+    <tr><th>Business</th><th>Plan</th><th>Decision</th><th>By</th><th>When</th></tr>
+    {% for r in queue.decided %}
+    <tr>
+      <td><a href="/ops/review/{{ r.id }}">{{ r.name or r.business_id }}</a></td>
+      <td>v{{ r.version }}</td>
+      <td class="ops-{{ r.state }}">{{ r.state }}</td>
+      <td>{{ r.decided_by or "" }}</td>
+      <td>{{ r.decided_at or "" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="muted">None yet.</p>
+  {% endif %}
+</section>
+</main>
+</body>
+</html>

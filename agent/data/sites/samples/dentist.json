@@ -1,0 +1,335 @@
+{
+  "family": "dental",
+  "trade": "dentist",
+  "facts": {
+    "name": "Clearwater Family Dental",
+    "phone": "(408) 555-0173",
+    "city": "San Jose",
+    "state": "CA",
+    "address": "100 Example Street, San Jose, CA",
+    "storefront": true,
+    "service_area": [
+      "San Jose",
+      "Santa Clara",
+      "Campbell",
+      "Cupertino"
+    ],
+    "hours": [
+      "Monday to Friday, 8 am to 5 pm",
+      "Saturday, 9 am to 2 pm"
+    ],
+    "about": "Clearwater Family Dental is a general dental practice in San Jose for children, adults and families.",
+    "services": [
+      {
+        "slug": "exams-and-cleanings",
+        "name": "Exams and cleanings",
+        "summary": "A thorough exam, X-rays when needed, and a gentle cleaning."
+      },
+      {
+        "slug": "invisalign",
+        "name": "Invisalign",
+        "lead": true,
+        "summary": "Clear aligners to straighten teeth without braces.",
+        "includes": [
+          "A scan of your teeth",
+          "A plan you can see before you start",
+          "Check-ins as your teeth move"
+        ],
+        "signs": [
+          "Crowded or crooked teeth",
+          "Gaps between teeth",
+          "A bite that feels off"
+        ]
+      },
+      {
+        "slug": "dental-implants",
+        "name": "Dental implants",
+        "lead": true,
+        "summary": "A way to replace a missing tooth.",
+        "includes": [
+          "A consultation and scan",
+          "A plan for each step",
+          "Follow-up care"
+        ],
+        "signs": [
+          "A missing tooth",
+          "Dentures that move or rub",
+          "A tooth that cannot be saved"
+        ]
+      },
+      {
+        "slug": "emergency-visits",
+        "name": "Emergency visits",
+        "lead": true,
+        "summary": "A visit for a broken tooth, a toothache or a lost filling.",
+        "includes": [
+          "A look at the problem first",
+          "A look first, a plan second",
+          "Clear next steps"
+        ],
+        "signs": [
+          "A broken or chipped tooth",
+          "A toothache that will not settle",
+          "A lost filling or crown"
+        ]
+      },
+      {
+        "slug": "kids-dentistry",
+        "name": "Kids' dentistry",
+        "summary": "Friendly first visits and checkups for children of every age."
+      },
+      {
+        "slug": "teeth-whitening",
+        "name": "Teeth whitening",
+        "summary": "In-office and take-home whitening, matched to your teeth."
+      }
+    ],
+    "dentist": {
+      "name": "Dr. [Your name], DDS",
+      "credentials": "DDS"
+    },
+    "new_patients": "New patients are welcome. Your first visit includes an exam, and we take the time to answer your questions.",
+    "insurance_plans": [
+      "Most PPO plans"
+    ],
+    "in_office_plan": "An in-office plan for patients without insurance",
+    "emergency_line": "Call us for a toothache or a broken tooth.",
+    "reviews": [
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      },
+      {
+        "text": "[A real review from your Google profile, quoted word for word.]",
+        "first_name": "[First name]",
+        "source": "Google"
+      }
+    ]
+  },
+  "words": {
+    "home": {
+      "eyebrow": "",
+      "headline": "Invisalign, family and cosmetic dentistry in San Jose",
+      "lead": "Cleanings, Invisalign, implants and emergency visits. Costs explained before we start.",
+      "services_heading": "Care for every smile in the family",
+      "services_lead": "",
+      "why_heading": "A practice that takes its time",
+      "why_points": [
+        "We explain each step before we start",
+        "A plan explained before treatment",
+        "Appointments for children and adults",
+        "A team that listens"
+      ],
+      "how_heading": "Your first visit",
+      "steps": [
+        {
+          "title": "Book online or call",
+          "text": "Pick a time that suits you. Bring your insurance card."
+        },
+        {
+          "title": "Exam and cleaning",
+          "text": "With time for your questions."
+        },
+        {
+          "title": "A clear plan",
+          "text": "Options and costs on paper before any treatment."
+        }
+      ],
+      "about_heading": "Meet your dentist",
+      "about_text": "[Two or three sentences in the dentist's own words: training, years in practice, and what patients can expect in the chair.]",
+      "area_heading": "Visit us in San Jose",
+      "area_text": "Our office is in San Jose, and patients come from Santa Clara, Campbell and Cupertino.",
+      "faq": [
+        {
+          "q": "Are you accepting new patients?",
+          "a": "Yes. Send the appointment form or call, and we will find a time for your first visit."
+        },
+        {
+          "q": "Do you take my insurance?",
+          "a": "We work with most PPO plans. Call with your plan's name and we will tell you what to expect."
+        },
+        {
+          "q": "What if I do not have insurance?",
+          "a": "We have an in-office plan for patients without insurance. Ask us about it when you call."
+        },
+        {
+          "q": "What should I do about a toothache?",
+          "a": "Call us as soon as it starts. Call and we will tell you what we can do."
+        }
+      ],
+      "cta_heading": "Ready to book a visit?",
+      "cta_text": "Request an appointment and the practice calls you back during business hours.",
+      "reviews_heading": "What patients say",
+      "faq_heading": "Questions patients ask",
+      "new_patients_heading": "New patients",
+      "insurance_heading": "Insurance and payment",
+      "office_heading": "Our office"
+    },
+    "about": {
+      "headline": "About Clearwater Family Dental",
+      "lead": "A general dental practice for children, adults and families in San Jose.",
+      "story": [
+        "We built this practice to explain each step of care before it happens.",
+        "Whether you come for a cleaning or for something bigger, you will know what we are doing and why."
+      ],
+      "values_heading": "How we care",
+      "values": [
+        "We explain before we treat",
+        "We give you the plan before the work",
+        "We listen first"
+      ],
+      "community": "We are proud to care for families across San Jose and the neighbouring towns."
+    },
+    "services": {
+      "headline": "Dental services in San Jose",
+      "lead": "Everyday care, clear aligners, implants and urgent visits.",
+      "intro": "Pick a service to see what happens at the visit. If you are not sure what you need, send the form and we will help you decide."
+    },
+    "contact": {
+      "headline": "Visit us",
+      "lead": "We will call you to confirm a time.",
+      "response_line": "Please don't include health details here. We'll ask at your visit."
+    },
+    "service_pages": [
+      {
+        "slug": "invisalign",
+        "lead": "Straighter teeth with clear aligners.",
+        "what": "We scan your teeth, show you the plan for how they will move, and fit you with a series of clear aligners. You come in for check-ins as you go.",
+        "signs": [
+          "Crowded or crooked teeth",
+          "Gaps between teeth",
+          "A bite that feels uneven"
+        ],
+        "includes": [
+          "A scan of your teeth",
+          "A plan you can see",
+          "Regular check-ins"
+        ],
+        "faq": [
+          {
+            "q": "Is Invisalign right for me?",
+            "a": "Many adults and teens can use aligners. An exam tells us whether they suit your teeth."
+          },
+          {
+            "q": "How long does treatment take?",
+            "a": "It depends on your teeth. We give you an estimate at your first visit."
+          },
+          {
+            "q": "Can I take them out?",
+            "a": "Yes, to eat and to brush. We show you how to wear them."
+          }
+        ],
+        "signs_heading": "When to come in",
+        "includes_heading": "What the visit includes",
+        "faq_heading": "Questions"
+      },
+      {
+        "slug": "dental-implants",
+        "lead": "A way to replace a missing tooth.",
+        "what": "An implant replaces the root of a missing tooth, and a crown goes on top. We explain each stage and its timing before we begin.",
+        "signs": [
+          "A missing tooth",
+          "Dentures that shift or rub",
+          "A tooth that cannot be saved"
+        ],
+        "includes": [
+          "A consultation and scan",
+          "A step-by-step plan",
+          "Follow-up care"
+        ],
+        "faq": [
+          {
+            "q": "Am I a candidate for an implant?",
+            "a": "It depends on your health and your jawbone. An exam and a scan tell us."
+          },
+          {
+            "q": "Does it hurt?",
+            "a": "Ask us about numbing and what to expect afterwards."
+          },
+          {
+            "q": "How long does it take?",
+            "a": "The stages take some months. We give you a timeline at your consultation."
+          }
+        ],
+        "signs_heading": "When to come in",
+        "includes_heading": "What the visit includes",
+        "faq_heading": "Questions"
+      },
+      {
+        "slug": "emergency-visits",
+        "lead": "Help for a broken tooth, a toothache or a lost filling.",
+        "what": "Call us as soon as the problem starts. We look at the problem first and then explain what comes next.",
+        "signs": [
+          "A broken or chipped tooth",
+          "A toothache that will not settle",
+          "A lost filling or crown"
+        ],
+        "includes": [
+          "A look at the problem first",
+          "A look first, a plan second",
+          "Clear next steps"
+        ],
+        "faq": [
+          {
+            "q": "Can you see me today?",
+            "a": "Call and we will tell you what we can do."
+          },
+          {
+            "q": "What should I do before I arrive?",
+            "a": "Rinse gently with warm water and keep any piece of tooth. Call us for advice."
+          },
+          {
+            "q": "What if the office is closed?",
+            "a": "Call and follow the message. For a medical emergency, call your local emergency number."
+          }
+        ],
+        "signs_heading": "When to come in",
+        "includes_heading": "What the visit includes",
+        "faq_heading": "Questions"
+      }
+    ],
+    "cta_label": "Call",
+    "book_label": "Book an appointment"
+  },
+  "style_words": {
+    "warm": {
+      "home": {
+        "eyebrow": "Family dentist in San Jose · Accepting new patients",
+        "headline": "Invisalign and family dentistry in San Jose",
+        "lead": "Dental care the whole family can look forward to. Checkups, Invisalign, implants and emergency visits.",
+        "services_heading": "What we can help with",
+        "about_heading": "The people you'll see",
+        "about_text": "[One line about the dentist, in their words]",
+        "reviews_heading": "Families on Google",
+        "insurance_heading": "Insurance? We'll handle the paperwork."
+      },
+      "contact": {
+        "lead": "Send a request and we'll call to find a time.",
+        "response_line": "No health details here, please. We'll ask at the visit."
+      },
+      "book_label": "Book a visit"
+    },
+    "boutique": {
+      "home": {
+        "eyebrow": "San Jose · Cosmetic and family dentistry",
+        "headline": "Invisalign, cosmetic and family dentistry in San Jose",
+        "lead": "Invisalign, implants and whitening, planned with you and explained in plain words, with the cost on paper first.",
+        "services_heading": "What we do, and how",
+        "about_heading": "The doctor",
+        "about_text": "[The dentist's own words: training, the kind of work they love, and how they plan a smile with each patient.]",
+        "reviews_heading": ""
+      },
+      "contact": {
+        "lead": "Tell us what you would like to change. We will call to set a time.",
+        "response_line": "Please leave health details for your visit."
+      },
+      "book_label": "Book a consultation"
+    }
+  }
+}

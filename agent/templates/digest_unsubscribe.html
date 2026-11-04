@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>Admiry — your reports</title>
+<link rel="stylesheet" href="/static/base.css">
+<link rel="stylesheet" href="/static/page.css">
+</head>
+{#- The daily digest's link (digest spec 2026-09-30 §9): opening it changes nothing; the button does. -#}
+<body class="page">
+{% include "_brand_header.html" %}
+<main class="page-main narrow" id="main">
+<section class="panel">
+  <p>{{ business }} will get {{ words }} from now on.</p>
+  <form method="post" action="{{ action }}">
+    <input type="hidden" name="f" value="{{ f }}">
+    <button class="btn btn-dark" type="submit">{{ button }}</button>
+  </form>
+  <p class="muted">You can change this any time in Settings.</p>
+</section>
+</main>
+</body>
+</html>

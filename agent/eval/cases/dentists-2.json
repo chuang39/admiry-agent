@@ -1,0 +1,86 @@
+{
+  "id": "dentists-2",
+  "vertical": "dentists",
+  "opening": "We're a family dentist in Maple Grove, Minnesota. We want more new patients calling us, within 10 miles.",
+  "monthly_budget_usd": null,
+  "knowledge": {
+    "name": "Maple Grove Family Dentistry",
+    "category": "dentists",
+    "category_detail": "family dentist",
+    "service_area": [
+      "Maple Grove",
+      "Plymouth",
+      "Osseo"
+    ],
+    "services": [
+      {
+        "name": "Emergency dentistry",
+        "intent_phrases": [
+          "emergency dentist maple grove",
+          "tooth pain dentist open today"
+        ],
+        "price_hint": null
+      },
+      {
+        "name": "Checkups",
+        "intent_phrases": [
+          "dentist near me accepting new patients"
+        ],
+        "price_hint": null
+      }
+    ],
+    "hours": "Mon-Thu 7-6, Fri 7-1",
+    "phone": "763-555-0142",
+    "website": null,
+    "pricing_hints": [],
+    "typical_customer_value_usd": 600,
+    "usp": [
+      "Same-day emergency visits",
+      "Evening hours"
+    ],
+    "reviews_summary": null,
+    "compliance_flags": [
+      "healthcare"
+    ],
+    "locale": "en-US",
+    "goal_hint": {
+      "target_customers_per_month": null,
+      "monthly_budget_usd": null,
+      "focus_services": []
+    },
+    "listing": {
+      "place_id": "eval_dentists_2",
+      "name": "Maple Grove Family Dentistry",
+      "address": "7900 Main St N, Maple Grove, MN 55369",
+      "lat": 45.0725,
+      "lng": -93.4558,
+      "confirmed": true
+    }
+  },
+  "answers": {
+    "website": {
+      "choice": "none"
+    },
+    "business_name": {
+      "other": "Maple Grove Family Dentistry"
+    },
+    "services_offered": {
+      "other": "skip"
+    },
+    "objective": {
+      "choice": "calls"
+    },
+    "service": {
+      "choice": "svc_emergency_dentistry"
+    },
+    "customer_value": {
+      "choice": "300_1000"
+    },
+    "radius": {
+      "choice": "r10"
+    }
+  },
+  "plan": null,
+  "founder_grades": null,
+  "founder_notes": null
+}
