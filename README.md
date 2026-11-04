@@ -88,7 +88,7 @@ page and the home-services knowledge. Its own docs: [`agent/README.md`](agent/RE
 
 | # | Piece | Status |
 |---|---|---|
-| 0 | Run this repo's agent on the dev box and walk the existing flow: [`scripts/deploy-dev.sh`](scripts/deploy-dev.sh), [walk notes](docs/ops/dev-walk-2026-11-04.md) | done |
+| 0 | Run this repo's agent on the dev box and walk the existing flow: [`scripts/deploy-agent.sh`](scripts/deploy-agent.sh), [walk notes](docs/ops/dev-walk-2026-11-04.md) | done |
 | N1 | **Creative studio** (`agent/creatives/`): job photos → Google image assets and ad text, each checked | planned |
 | N2 | **Public tool `suggest_ad_creatives`** and the owner's acceptance, with a creatives card in Muse and the web chat | planned |
 | N3 | **Google builder additions:** landscape and square image assets and callout assets linked to the campaign; accepted text feeds the responsive search ad | planned |
