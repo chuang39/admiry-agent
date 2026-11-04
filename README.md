@@ -11,6 +11,10 @@ image ads and ad text, checks every claim against facts the owner gave and every
 and, on the owner's OK, creates the Google Ads campaign in real time through the live Google Ads API. It is
 created **paused**, so nothing is spent until the owner chooses.
 
+<p align="center">
+  <img src="docs/img/how-it-works.svg" width="100%" alt="Talk to Muse, share your job photos, and Admiry turns them into checked ads and a paused Google Ads campaign">
+</p>
+
 ## The problem
 
 A roofer is good at roofs and has a phone full of job photos. Running Google Ads still means writing headlines
@@ -47,23 +51,6 @@ can't verify is cut before it reaches Google.
 | Owner content stays the owner's | Owner photos and facts go only to Standard-mode models (not Contributor mode, which allows training). |
 
 ## How it works
-
-```mermaid
-flowchart TD
-  O["Owner in Muse"] -->|"What ads would you run?"| T["suggest_ad_creatives"]
-  T --> R["Read photos<br/>muse-spark-1.3"]
-  R --> S["Cut out the work<br/>sam-3.1"]
-  S --> E["Extend to 1.91:1 and 1:1<br/>muse-image-1.0"]
-  E --> L["Pixel-lock<br/>owner's pixels pasted back"]
-  L --> CI["Check images<br/>muse-wonder-1.0 + SAM IoU"]
-  T --> W["Write ad text<br/>muse-spark-1.3"]
-  W --> CT["Check claims<br/>muse-wonder-1.0"]
-  CT -->|rejected| P["Repair, max 2 rounds<br/>muse-spark-1.3"]
-  P --> CT
-  CI --> C["Creatives card in Muse"]
-  CT --> C
-  C -->|"Looks good, set it up"| G["Google Ads API<br/>created live, PAUSED"]
-```
 
 | Step | Model | What it does | If it fails |
 |---|---|---|---|

@@ -1,0 +1,250 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Admiry on Muse: your job photos in, an honest Google Ads campaign out</title>
+  <desc id="desc">Three steps. 1: a roofer asks Muse for customers and shares job photos. 2: Admiry turns a roof photo into a wide and a square ad, keeping the roof's original pixels, and checks every claim in the ad text against the owner's facts, removing "Licensed and insured" because the owner never said it. 3: the campaign is built in Google Ads, paused, with nothing spent.</desc>
+  <defs>
+    <clipPath id="card"><rect width="1280" height="720" rx="28"/></clipPath>
+    <clipPath id="r10"><rect width="160" height="120" rx="10"/></clipPath>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7FC4EC"/>
+      <stop offset="1" stop-color="#CFEBF9"/>
+    </linearGradient>
+    <pattern id="shingle" width="8" height="6" patternUnits="userSpaceOnUse">
+      <rect width="8" height="6" fill="#40505E"/>
+      <path d="M0 0H8M0 3H8M2 0V3M6 3V6" stroke="#28343F" stroke-width="0.7"/>
+    </pattern>
+    <pattern id="bandShingle" width="56" height="28" patternUnits="userSpaceOnUse">
+      <path d="M0 0H56M0 14H56M0 0V14M28 14V28" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1.5"/>
+    </pattern>
+    <filter id="lift" x="-15%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#1B3448" flood-opacity="0.16"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#1F6FD6"/>
+    </marker>
+
+    <!-- the owner's job photo: a house with a new shingle roof -->
+    <symbol id="photo" viewBox="0 0 160 120">
+      <rect width="160" height="120" fill="url(#sky)"/>
+      <circle cx="134" cy="20" r="9" fill="#FFE27A"/>
+      <rect y="100" width="160" height="20" fill="#7DB86A"/>
+      <rect x="10" y="78" width="5" height="24" fill="#6B4A32"/>
+      <circle cx="12" cy="70" r="15" fill="#4E9A5A"/>
+      <rect x="104" y="30" width="11" height="24" fill="#A0573A"/>
+      <rect x="38" y="62" width="88" height="40" fill="#EADFCB"/>
+      <rect x="72" y="76" width="18" height="26" fill="#7A4E35"/>
+      <rect x="46" y="72" width="16" height="14" fill="#BFE0F2" stroke="#FFFFFF" stroke-width="2"/>
+      <rect x="100" y="72" width="16" height="14" fill="#BFE0F2" stroke="#FFFFFF" stroke-width="2"/>
+      <polygon points="28,66 82,26 136,66" fill="url(#shingle)"/>
+      <path d="M26 67L82 25L138 67" fill="none" stroke="#24303A" stroke-width="3" stroke-linejoin="round"/>
+    </symbol>
+
+    <!-- the wide ad: the photo, with sky and yard extended to 1.91:1 -->
+    <symbol id="wide" viewBox="0 0 320 168">
+      <rect width="320" height="168" fill="url(#sky)"/>
+      <rect y="140" width="320" height="28" fill="#7DB86A"/>
+      <g fill="#FFFFFF" opacity="0.85">
+        <ellipse cx="22" cy="40" rx="18" ry="7"/>
+        <ellipse cx="300" cy="28" rx="16" ry="6"/>
+      </g>
+      <rect x="18" y="112" width="5" height="30" fill="#6B4A32"/>
+      <circle cx="20" cy="104" r="16" fill="#58A263"/>
+      <rect x="294" y="110" width="5" height="32" fill="#6B4A32"/>
+      <circle cx="296" cy="100" r="19" fill="#4E9A5A"/>
+      <ellipse cx="282" cy="140" rx="12" ry="7" fill="#5FA868"/>
+      <use xlink:href="#photo" x="48" y="0" width="224" height="168"/>
+    </symbol>
+
+    <!-- the square ad: the photo, with sky and yard extended to 1:1 -->
+    <symbol id="square" viewBox="0 0 120 120">
+      <rect width="120" height="16" fill="#7FC4EC"/>
+      <rect y="104" width="120" height="16" fill="#7DB86A"/>
+      <ellipse cx="96" cy="112" rx="10" ry="5" fill="#5FA868"/>
+      <use xlink:href="#photo" x="0" y="15" width="120" height="90"/>
+    </symbol>
+
+    <g id="ok">
+      <circle r="9" fill="#1F9D55"/>
+      <path d="M-4 0.5L-1.2 3.3L4.2 -2.6" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="cut">
+      <circle r="9" fill="#D64545"/>
+      <path d="M-3.4 -3.4L3.4 3.4M3.4 -3.4L-3.4 3.4" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"/>
+    </g>
+    <g id="promise">
+      <circle r="14" fill="#FFC400"/>
+      <path d="M-6 0.5L-2 4.5L6 -4" fill="none" stroke="#23313D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <g clip-path="url(#card)" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+    <rect width="1280" height="720" fill="#E7F2F9"/>
+
+    <!-- headline -->
+    <text x="64" y="84" font-size="38" font-weight="800" fill="#23313D" letter-spacing="-0.6">Your job photos in. An honest Google Ads campaign out.</text>
+    <text x="64" y="122" font-size="19" fill="#4B5D6B">Talk to Muse. Admiry turns your real work into ads, checks every word, and builds the campaign.</text>
+
+    <!-- step labels -->
+    <g font-size="18" font-weight="700" fill="#23313D">
+      <circle cx="78" cy="176" r="14" fill="#23313D"/>
+      <text x="78" y="182" text-anchor="middle" font-size="15" fill="#FFFFFF">1</text>
+      <text x="102" y="182">Just talk</text>
+
+      <circle cx="394" cy="176" r="14" fill="#23313D"/>
+      <text x="394" y="182" text-anchor="middle" font-size="15" fill="#FFFFFF">2</text>
+      <text x="418" y="182">Your photos become ads</text>
+
+      <circle cx="974" cy="176" r="14" fill="#23313D"/>
+      <text x="974" y="182" text-anchor="middle" font-size="15" fill="#FFFFFF">3</text>
+      <text x="998" y="182">Built in Google Ads</text>
+    </g>
+
+    <!-- 1: the conversation in Muse -->
+    <g filter="url(#lift)">
+      <rect x="74" y="204" width="236" height="380" rx="32" fill="#23313D"/>
+    </g>
+    <rect x="84" y="214" width="216" height="360" rx="24" fill="#FFFFFF"/>
+    <text x="192" y="242" text-anchor="middle" font-size="14" font-weight="700" fill="#23313D">Muse</text>
+    <text x="192" y="258" text-anchor="middle" font-size="11" fill="#7A8B98">with Admiry</text>
+    <line x1="96" y1="268" x2="288" y2="268" stroke="#E6ECF0"/>
+
+    <g font-size="12.5">
+      <rect x="116" y="280" width="174" height="42" rx="14" fill="#1F6FD6"/>
+      <text x="128" y="297" fill="#FFFFFF">I'm a roofer in Austin.</text>
+      <text x="128" y="313" fill="#FFFFFF">Help me get customers.</text>
+
+      <rect x="94" y="332" width="186" height="42" rx="14" fill="#EEF3F6"/>
+      <text x="106" y="349" fill="#23313D">Your site and plan are ready.</text>
+      <text x="106" y="365" fill="#23313D">Want ads from your photos?</text>
+
+      <rect x="164" y="384" width="126" height="60" rx="14" fill="#1F6FD6"/>
+      <use xlink:href="#photo" x="174" y="394" width="32" height="24"/>
+      <use xlink:href="#photo" x="211" y="394" width="32" height="24"/>
+      <use xlink:href="#photo" x="248" y="394" width="32" height="24"/>
+      <text x="174" y="435" fill="#FFFFFF">My last three jobs</text>
+
+      <rect x="94" y="454" width="186" height="42" rx="14" fill="#EEF3F6"/>
+      <text x="106" y="471" fill="#23313D">Your ads are ready.</text>
+      <text x="106" y="487" fill="#23313D">Every claim is checked.</text>
+
+      <rect x="128" y="506" width="162" height="30" rx="14" fill="#1F6FD6"/>
+      <text x="140" y="526" fill="#FFFFFF">Looks good, set it up.</text>
+    </g>
+    <rect x="162" y="558" width="60" height="4" rx="2" fill="#C9D3DA"/>
+
+    <!-- chalk line 1 -->
+    <path d="M318 274H368" stroke="#1F6FD6" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.5 8" marker-end="url(#arrow)"/>
+
+    <!-- 2: the owner's photo becomes ads -->
+    <g transform="translate(380,214)">
+      <g filter="url(#lift)">
+        <g clip-path="url(#r10)"><use xlink:href="#photo" width="160" height="120"/></g>
+      </g>
+      <rect x="8" y="8" width="78" height="20" rx="10" fill="#FFFFFF" fill-opacity="0.92"/>
+      <text x="47" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#23313D">Your photo</text>
+    </g>
+
+    <path d="M548 274H568" stroke="#1F6FD6" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.5 8" marker-end="url(#arrow)"/>
+    <path d="M460 344V376" stroke="#1F6FD6" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.5 8" marker-end="url(#arrow)"/>
+
+    <g transform="translate(580,214)">
+      <g filter="url(#lift)"><rect width="320" height="168" rx="12" fill="#FFFFFF"/></g>
+      <svg width="320" height="168" viewBox="0 0 320 168">
+        <clipPath id="wclip"><rect width="320" height="168" rx="12"/></clipPath>
+        <g clip-path="url(#wclip)"><use xlink:href="#wide" width="320" height="168"/></g>
+      </svg>
+      <!-- where the original photo ends -->
+      <path d="M48 0V168M272 0V168" stroke="#FFFFFF" stroke-opacity="0.85" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <!-- the roof: the owner's own pixels -->
+      <polygon points="80,97 162.8,29 246,97" fill="none" stroke="#FFC400" stroke-width="3" stroke-dasharray="7 5" stroke-linejoin="round"/>
+      <rect x="8" y="9" width="122" height="22" rx="11" fill="#FFC400"/>
+      <g transform="translate(18,14)" fill="#23313D">
+        <rect x="0" y="5" width="9" height="7" rx="1.5"/>
+        <path d="M2 5.5V3.5a2.5 2.5 0 0 1 5 0V5.5" fill="none" stroke="#23313D" stroke-width="1.6"/>
+      </g>
+      <text x="33" y="24" font-size="11" font-weight="700" fill="#23313D">Original pixels</text>
+    </g>
+    <text x="580" y="402" font-size="13" font-weight="600" fill="#23313D">Wide ad: yard extended, roof untouched</text>
+
+    <g transform="translate(400,392)">
+      <g filter="url(#lift)"><rect width="120" height="120" rx="12" fill="#FFFFFF"/></g>
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <clipPath id="sclip"><rect width="120" height="120" rx="12"/></clipPath>
+        <g clip-path="url(#sclip)"><use xlink:href="#square" width="120" height="120"/></g>
+      </svg>
+      <polygon points="14,68 61.5,29 109,68" fill="none" stroke="#FFC400" stroke-width="2.5" stroke-dasharray="6 4" stroke-linejoin="round"/>
+    </g>
+    <text x="400" y="532" font-size="13" font-weight="600" fill="#23313D">Square ad</text>
+
+    <!-- the ad text, every claim checked -->
+    <g filter="url(#lift)"><rect x="556" y="418" width="344" height="164" rx="14" fill="#FFFFFF"/></g>
+    <text x="576" y="443" font-size="13" font-weight="700" fill="#23313D">Ad text, every claim checked</text>
+
+    <use xlink:href="#ok" x="586" y="466"/>
+    <text x="604" y="470" font-size="14" font-weight="600" fill="#23313D">Storm and hail roof repair</text>
+    <text x="604" y="486" font-size="11.5" fill="#6B7C89">Source: your services</text>
+
+    <use xlink:href="#ok" x="586" y="508"/>
+    <text x="604" y="512" font-size="14" font-weight="600" fill="#23313D">Free roof inspections</text>
+    <text x="604" y="528" font-size="11.5" fill="#6B7C89">Source: your offers</text>
+
+    <use xlink:href="#cut" x="586" y="550"/>
+    <text x="604" y="554" font-size="14" font-weight="600" fill="#9AA7B1">Licensed and insured</text>
+    <line x1="603" y1="549" x2="752" y2="549" stroke="#D64545" stroke-width="2"/>
+    <text x="604" y="570" font-size="11.5" font-weight="600" fill="#D64545">Removed: you never said this</text>
+
+    <!-- chalk line 2 -->
+    <path d="M908 298H952" stroke="#1F6FD6" stroke-width="4" stroke-linecap="round" stroke-dasharray="0.5 8" marker-end="url(#arrow)"/>
+
+    <!-- 3: the campaign in Google Ads, paused -->
+    <g filter="url(#lift)"><rect x="960" y="204" width="256" height="380" rx="18" fill="#FFFFFF"/></g>
+    <text x="980" y="234" font-size="12" font-weight="600" fill="#6B7C89">Google Ads campaign</text>
+    <text x="980" y="262" font-size="19" font-weight="800" fill="#23313D">Roof repair, Austin</text>
+
+    <rect x="980" y="280" width="88" height="26" rx="13" fill="#FFF4CC" stroke="#FFC400" stroke-width="1.5"/>
+    <rect x="993" y="287" width="3.5" height="12" rx="1" fill="#23313D"/>
+    <rect x="999.5" y="287" width="3.5" height="12" rx="1" fill="#23313D"/>
+    <text x="1010" y="298" font-size="13" font-weight="700" fill="#23313D">Paused</text>
+    <text x="1082" y="298" font-size="13" fill="#6B7C89">$0 spent</text>
+
+    <line x1="980" y1="324" x2="1196" y2="324" stroke="#E6ECF0"/>
+    <text x="980" y="348" font-size="12" font-weight="600" fill="#6B7C89">Image ads</text>
+    <svg x="980" y="358" width="96" height="50" viewBox="0 0 320 168">
+      <clipPath id="t1"><rect width="320" height="168" rx="24"/></clipPath>
+      <g clip-path="url(#t1)"><use xlink:href="#wide" width="320" height="168"/></g>
+    </svg>
+    <svg x="1084" y="358" width="50" height="50" viewBox="0 0 120 120">
+      <clipPath id="t2"><rect width="120" height="120" rx="14"/></clipPath>
+      <g clip-path="url(#t2)"><use xlink:href="#square" width="120" height="120"/></g>
+    </svg>
+    <svg x="1142" y="358" width="50" height="50" viewBox="0 0 120 120">
+      <clipPath id="t3"><rect width="120" height="120" rx="14"/></clipPath>
+      <g clip-path="url(#t3)"><use xlink:href="#square" width="120" height="120"/></g>
+    </svg>
+
+    <g font-size="13">
+      <text x="980" y="440" fill="#4B5D6B">Headlines</text>
+      <text x="1196" y="440" text-anchor="end" font-weight="700" fill="#23313D">15</text>
+      <text x="980" y="466" fill="#4B5D6B">Descriptions</text>
+      <text x="1196" y="466" text-anchor="end" font-weight="700" fill="#23313D">4</text>
+      <text x="980" y="492" fill="#4B5D6B">Callouts</text>
+      <text x="1196" y="492" text-anchor="end" font-weight="700" fill="#23313D">4</text>
+    </g>
+
+    <rect x="980" y="516" width="216" height="48" rx="12" fill="#F1F6F9"/>
+    <text x="1088" y="536" text-anchor="middle" font-size="12.5" fill="#23313D">Nothing spends until</text>
+    <text x="1088" y="554" text-anchor="middle" font-size="12.5" fill="#23313D">you turn it on.</text>
+
+    <!-- the roof line: three promises -->
+    <rect y="604" width="1280" height="116" fill="#23313D"/>
+    <rect y="604" width="1280" height="116" fill="url(#bandShingle)"/>
+    <rect y="604" width="1280" height="5" fill="#FFC400"/>
+    <g font-size="18" font-weight="600" fill="#FFFFFF">
+      <use xlink:href="#promise" x="96" y="660"/>
+      <text x="120" y="666">Every claim has a source</text>
+      <use xlink:href="#promise" x="470" y="660"/>
+      <text x="494" y="666">The work in every ad is yours</text>
+      <use xlink:href="#promise" x="866" y="660"/>
+      <text x="890" y="666">Nothing spends until you say go</text>
+    </g>
+  </g>
+</svg>
