@@ -1279,14 +1279,20 @@ def _create(
     conn: psycopg.Connection, settings: config.Settings, biz: str, channel: str, account: Account, plan: dict, http
 ) -> None:
     """P7/P8: the adapter's launch (everything paused, or a lost create found by name and read back), stored, then
-    turned on by the enable step -- except under `live_paused` (N4): stored, marked `demo_paused`, and left paused."""
+    turned on by the enable step -- except under `live_paused` (N4): stored, marked `demo_paused`, and left paused.
+    There a campaign found by name that the platform shows on (`seen`, turned on by hand meanwhile) is paused first,
+    with the adapter's own stop, before anything is stored (final review I3): a failed stop leaves the row unbuilt,
+    and the next attempt finds the campaign again."""
     adapter = registry.adapter(channel)
     build = adapter.build(conn, settings, biz, plan, _knowledge(conn, biz), account, http=http)
     done = adapter.launch(
         conn, settings, account, build, get(conn, biz, channel)["resources"], http=http, validate_only=False
     )
+    demo = registry.exec_mode(settings, channel) == config.LIVE_PAUSED
+    if demo and done.seen is not None and done.seen.get("status") != "PAUSED":
+        adapter.set_paused(conn, settings, account, done.ids, True, http=http)
     _store_built(conn, biz, channel, done.plan_id or plan["id"], done.ids, build)
-    if registry.exec_mode(settings, channel) == config.LIVE_PAUSED:
+    if demo:
         conn.execute(
             "UPDATE channel_campaign SET resources = resources || '{\"demo_paused\": true}'::jsonb, updated_at = now() "
             "WHERE business_id = %s AND channel = %s",
@@ -1746,7 +1752,8 @@ def _work(settings: config.Settings, row: dict, plan: dict) -> str | None:
     nothing but finish an owed pause (ruling S11). A row the approved version no longer funds is paused (`drop`, spec
     §5.3 step 4) -- unless it never ran or failed. One waiting for its account is re-checked (`recheck`); one waiting
     for an image waits for a new approval. A `launching` row whose refusal's stop the platform did not take
-    (`stop_owed`, M1 follow-up fix round 1, F2) sends that stop alone (`stop`) before anything else is tried. Running
+    (`stop_owed`, M1 follow-up fix round 1, F2) sends that stop alone (`stop`) before anything else is tried; one
+    `live_paused` built (`demo_paused`) is never enabled, whatever the switch says now (final review I3). Running
     ads whose page moved (`url_stale`, A3p-2 H9; a channel that follows the page) are moved: a URL-only `update`, or
     `refresh_url` when the approved version is one the platform refused (H26/S15: never sent again)."""
     channel, state, resources = row["channel"], row["state"], row["resources"]
@@ -1773,7 +1780,9 @@ def _work(settings: config.Settings, row: dict, plan: dict) -> str | None:
     if state == "launching":  # N4: under `live_paused` nothing is ever turned on -- an owed stop is still sent
         if resources.get("stop_owed"):
             return "stop"
-        return None if mode == config.LIVE_PAUSED else "enable"
+        # ...nor, under any mode, a row live_paused built (`demo_paused`): its money was a sandbox top-up, so a box
+        # switched to `live` later never turns that campaign on (final review I3)
+        return None if mode == config.LIVE_PAUSED or resources.get("demo_paused") else "enable"
     refused = plan["id"] == resources.get("refused_plan_id")
     if state not in ("live", "limited") or not _built(row):
         return None

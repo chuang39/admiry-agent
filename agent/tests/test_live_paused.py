@@ -118,6 +118,68 @@ def test_launching_row_never_enables(conn, gads, live_paused, monkeypatch):
     assert gads.kinds()[sent:] == ["pause"]
 
 
+def test_a_demo_row_never_enables_once_the_switch_is_live(conn, gads, live_paused, monkeypatch):
+    """Final review I3: a box switched from live_paused to `live` never turns on a campaign live_paused built (its
+    money was a sandbox top-up) -- `_work` has no enable step for a `demo_paused` row under any mode; an owed stop is
+    still sent."""
+    _queued(conn)
+    ads_run.launch(conn, config.load(), BIZ, GOOGLE)  # built, paused, demo_paused
+    monkeypatch.setenv("AGENT_EXEC_GOOGLE_SEARCH", "live")
+    settings = config.load()
+    assert registry.exec_mode_for(conn, settings, BIZ, GOOGLE) == "live"
+    monkeypatch.setattr(ads_run, "_enable", _never)
+    sent, plan = len(gads.sent), ads_run.approved(conn, BIZ)
+
+    assert ads_run._work(settings, row(conn), plan) is None
+    assert ads_run.launch(conn, settings, BIZ, GOOGLE)["ops"] == 0
+    swept = tick.run("ads-launch", url=TEST_DB_URL)
+    assert (swept["ops"], swept["states"]) == (0, {"launching": 1})
+    assert len(gads.sent) == sent and row(conn)["state"] == "launching"
+    assert [c["status"] for c in gads.campaigns.values()] == ["PAUSED"]
+
+    conn.execute(
+        "UPDATE channel_campaign SET resources = resources || %s WHERE business_id = %s",
+        (Jsonb({"stop_owed": {"sentence": "Google did not take your ads", "plan_id": plan["id"]}}), BIZ),
+    )
+    assert ads_run._work(settings, row(conn), plan) == "stop"
+    assert tick.run("ads-launch", url=TEST_DB_URL)["ops"] == 1
+    assert gads.kinds()[sent:] == ["pause"]
+
+
+def test_an_adopted_enabled_campaign_is_paused_at_once(conn, gads, live_paused, monkeypatch):
+    """Final review I3: under live_paused a create whose answer was lost is found by name and adopted (P8). One
+    Google shows ENABLED -- turned on by hand meanwhile -- is paused at once with the adapter's own stop, before the
+    row is stored as built and demo_paused."""
+    plan_id = _queued(conn)
+    settings = config.load()
+    monkeypatch.setattr(ads_run, "_enable", _never)
+    gads.lose.add("create")  # built, its answer never came back
+    ads_run.launch(conn, settings, BIZ, GOOGLE)
+    assert row(conn)["state"] == "queued" and [c["status"] for c in gads.campaigns.values()] == ["PAUSED"]
+    for c in gads.campaigns.values():
+        c["status"] = "ENABLED"  # someone turned it on in Google Ads
+    sent = len(gads.sent)
+
+    ads_run.launch(conn, settings, BIZ, GOOGLE)
+    assert "create" not in gads.kinds()[sent:] and gads.kinds()[sent:].count("pause") == 1
+    assert "enable" not in gads.kinds()
+    assert [c["status"] for c in gads.campaigns.values()] == ["PAUSED"]
+    r = row(conn)
+    assert (r["state"], r["plan_id"], r["resources"]["demo_paused"]) == ("launching", plan_id, True)
+    assert r["resources"]["campaign"] == next(iter(gads.campaigns))
+
+
+def test_an_adopted_paused_campaign_needs_no_stop(conn, gads, live_paused, monkeypatch):
+    _queued(conn)
+    settings = config.load()
+    monkeypatch.setattr(ads_run, "_enable", _never)
+    gads.lose.add("create")
+    ads_run.launch(conn, settings, BIZ, GOOGLE)
+    sent = len(gads.sent)
+    ads_run.launch(conn, settings, BIZ, GOOGLE)  # adopted as Google has it: PAUSED
+    assert "pause" not in gads.kinds()[sent:] and row(conn)["resources"]["demo_paused"] is True
+
+
 def test_resume_refused_under_live_paused(conn, gads, live_paused, monkeypatch):
     _queued(conn)
     settings = config.load()
